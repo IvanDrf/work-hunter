@@ -3,7 +3,7 @@
 ## Naming
 Branch name must have following structure
 ```bash
-git branch direction:purpose
+git branch direction_purpose
 ```
 
 directions:
@@ -21,8 +21,8 @@ purpose:
 
 examples:
 ```bash
-git branch back:auth
-git branch front:account
-git branch front:docs
-git branch back:tests
+git branch back_auth
+git branch front_account
+git branch front_docs
+git branch back_tests
 ```
