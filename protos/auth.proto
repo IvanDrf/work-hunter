@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package auth;
+
+option  go_package = "pkg/auth-api";
+
+// auth servuce by jwt
+service Auth {
+    // register user by username, password
+    rpc Register(User) returns (JwtTokens); 
+
+    // login user by username, password
+    rpc Login(User) returns (JwtTokens);
+
+    // refresh access, refresh tokens if they are valid
+    rpc RefreshTokens(JwtTokens) returns (JwtTokens);
+}
+
+message User {
+    string username = 1;
+    string password = 2;
+}
+
+message JwtTokens {
+    string access = 1;
+    string refresh = 2;
+}
