@@ -14,7 +14,10 @@ directions:
 purpose:
 - working on service/feature
 - tests
-- docs
+- docs     
+- fix 
+- ref 
+
 
 examples:
 ```bash
