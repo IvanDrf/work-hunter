@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"errors"
 
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
@@ -9,8 +10,8 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *Handler) LoginUser(user *auth_api.User) (*auth_api.JwtTokens, error) {
-	access, refresh, err := h.authService.LoginUser(user.Username, user.Password)
+func (h *Handler) LoginUser(ctx context.Context, user *auth_api.User) (*auth_api.JwtTokens, error) {
+	access, refresh, err := h.authService.LoginUser(ctx, user.Username, user.Password)
 
 	var e models.Error
 	if errors.As(err, &e) {

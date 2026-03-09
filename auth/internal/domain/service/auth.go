@@ -1,8 +1,10 @@
 package service
 
-type AuthService interface {
-	RegisterUser(username string, password string) (string, string, error)
-	LoginUser(username string, password string) (string, string, error)
+import "context"
 
-	RefreshTokens(access string, refresh string) (string, string, error)
+type AuthService interface {
+	RegisterUser(ctx context.Context, username string, password string) (string, string, error)
+	LoginUser(ctx context.Context, username string, password string) (string, string, error)
+
+	RefreshTokens(ctx context.Context, access string, refresh string) (string, string, error)
 }

@@ -1,8 +1,12 @@
 package repo
 
-import "github.com/IvanDrf/work-hunter/auth/internal/domain/models"
+import (
+	"context"
+
+	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
+)
 
 type UserRepo interface {
-	CreateUser(user *models.User) error
-	FindUser(username string) (*models.User, error)
+	CreateUser(ctx context.Context, user *models.User) error
+	FindUser(ctx context.Context, username string) (*models.User, error)
 }
