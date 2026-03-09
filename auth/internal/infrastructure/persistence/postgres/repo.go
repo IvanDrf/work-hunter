@@ -21,3 +21,21 @@ func (a *AuthRepo) CreateUser(ctx context.Context, user *models.User) error {
 
 	return nil
 }
+
+func (a *AuthRepo) FindUser(ctx context.Context, username string) (*models.User, error) {
+	const query = "SELECT user_id, username, hashed_password FROM users WHERE username = $1 LIMIT 1"
+
+	rows, err := a.db.QueryContext(ctx, query, username)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	user := models.User{}
+	err = rows.Scan(&user.ID, &user.Username, &user.HashedPassword)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, err
+}
