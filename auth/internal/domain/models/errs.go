@@ -11,6 +11,8 @@ const (
 	ErrCodeUserAlreadyExists ErrorCode = "USER_ALREADY_EXISTS"
 
 	ErrCodeInvalidPassword ErrorCode = "INVALID_PASSWORD"
+
+	ErrInvalidJWT ErrorCode = "INVALID_JWT_TOKENS"
 )
 
 type Error struct {
