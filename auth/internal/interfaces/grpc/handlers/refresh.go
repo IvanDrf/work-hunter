@@ -11,7 +11,7 @@ import (
 )
 
 func (h *Handler) RefreshTokens(ctx context.Context, tokens *auth_api.JwtTokens) (*auth_api.JwtTokens, error) {
-	access, refresh, err := h.authService.RefreshTokens(ctx, tokens.Access, tokens.Refresh)
+	access, refresh, err := h.authService.RefreshTokens(ctx, tokens.Refresh)
 
 	var e models.Error
 	if errors.As(err, &e) {

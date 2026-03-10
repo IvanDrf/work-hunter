@@ -73,3 +73,15 @@ func (a *AuthService) LoginUser(ctx context.Context, username string, password s
 
 	return access, refresh, nil
 }
+
+func (a *AuthService) RefreshTokens(ctx context.Context, refresh string) (string, string, error) {
+	access, refresh, err := a.jwter.RefreshTokens(refresh)
+	if err != nil {
+		return "", "", models.Error{
+			Message: "invalid jwt token",
+			Code:    models.ErrCodeInvalidJWT,
+		}
+	}
+
+	return access, refresh, nil
+}
