@@ -6,6 +6,7 @@ import (
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/ports/jwt"
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/ports/repo"
+	"github.com/IvanDrf/work-hunter/auth/internal/domain/rules"
 )
 
 type AuthService struct {
@@ -32,6 +33,33 @@ func (a *AuthService) RegisterUser(ctx context.Context, username string, passwor
 		return "", "", models.Error{
 			Message: "can't register new user",
 			Code:    models.ErrCodeInternal,
+		}
+	}
+
+	access, refresh, err := a.jwter.CreateTokens(user.ID)
+	if err != nil {
+		return "", "", models.Error{
+			Message: "can't create jwt tokens for user",
+			Code:    models.ErrCodeInternal,
+		}
+	}
+
+	return access, refresh, nil
+}
+
+func (a *AuthService) LoginUser(ctx context.Context, username string, password string) (string, string, error) {
+	user, err := a.userRepo.FindUser(ctx, username)
+	if err != nil {
+		return "", "", models.Error{
+			Message: "user with that username doesn't exists",
+			Code:    models.ErrCodeUserNotFound,
+		}
+	}
+
+	if !rules.IsPasswordsSame(password, user.HashedPassword) {
+		return "", "", models.Error{
+			Message: "invalid password",
+			Code:    models.ErrCodeInvalidPassword,
 		}
 	}
 

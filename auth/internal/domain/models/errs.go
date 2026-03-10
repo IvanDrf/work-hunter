@@ -12,7 +12,7 @@ const (
 
 	ErrCodeInvalidPassword ErrorCode = "INVALID_PASSWORD"
 
-	ErrInvalidJWT ErrorCode = "INVALID_JWT_TOKENS"
+	ErrCodeInvalidJWT ErrorCode = "INVALID_JWT_TOKENS"
 )
 
 type Error struct {

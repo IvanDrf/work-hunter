@@ -16,7 +16,7 @@ func (h *Handler) RefreshTokens(ctx context.Context, tokens *auth_api.JwtTokens)
 	var e models.Error
 	if errors.As(err, &e) {
 		switch e.Code {
-		case models.ErrInvalidJWT:
+		case models.ErrCodeInvalidJWT:
 			return nil, status.Error(codes.InvalidArgument, e.Message)
 
 		case models.ErrCodeInternal:
