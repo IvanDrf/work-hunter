@@ -9,7 +9,15 @@ require (
 	google.golang.org/grpc v1.79.2
 )
 
-require github.com/golang-jwt/jwt/v5 v5.3.1
+require (
+	github.com/golang-jwt/jwt/v5 v5.3.1
+	github.com/stretchr/testify v1.11.1
+)
+
+require (
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+)
 
 require golang.org/x/crypto v0.48.0 // direct
 

@@ -37,5 +37,5 @@ func (a *AuthRepo) FindUser(ctx context.Context, username string) (*models.User,
 		return nil, err
 	}
 
-	return &user, err
+	return &user, nil
 }

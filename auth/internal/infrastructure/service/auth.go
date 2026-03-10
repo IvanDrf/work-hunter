@@ -3,11 +3,45 @@ package service
 import (
 	"context"
 
-	"github.com/IvanDrf/work-hunter/auth/internal/domain/repo"
+	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
+	"github.com/IvanDrf/work-hunter/auth/internal/domain/ports/jwt"
+	"github.com/IvanDrf/work-hunter/auth/internal/domain/ports/repo"
 )
 
 type AuthService struct {
-	repo repo.UserRepo
+	userRepo repo.UserRepo
+	jwter    jwt.Jwter
 }
 
-func (a *AuthService) RegisterUser(ctx context.Context, username string, password string) (string, string, error)
+func (a *AuthService) RegisterUser(ctx context.Context, username string, password string) (string, string, error) {
+	_, err := a.userRepo.FindUser(ctx, username)
+	if err == nil {
+		return "", "", models.Error{
+			Message: "user with that username already exists",
+			Code:    models.ErrCodeUserAlreadyExists,
+		}
+	}
+
+	user, err := models.NewUser(username, password)
+	if err != nil {
+		return "", "", err
+	}
+
+	err = a.userRepo.CreateUser(ctx, user)
+	if err != nil {
+		return "", "", models.Error{
+			Message: "can't register new user",
+			Code:    models.ErrCodeInternal,
+		}
+	}
+
+	access, refresh, err := a.jwter.CreateTokens(user.ID)
+	if err != nil {
+		return "", "", models.Error{
+			Message: "can't create jwt tokens for user",
+			Code:    models.ErrCodeInternal,
+		}
+	}
+
+	return access, refresh, nil
+}

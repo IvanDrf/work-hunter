@@ -1,6 +1,6 @@
 package handlers
 
-import "github.com/IvanDrf/work-hunter/auth/internal/domain/service"
+import "github.com/IvanDrf/work-hunter/auth/internal/domain/ports/service"
 
 type Handler struct {
 	authService service.AuthService
