@@ -10,7 +10,7 @@ import (
 
 var ErrInvalidJWT = errors.New("invalid jwt token")
 
-type Claims struct {
+type claims struct {
 	UserID string `json:"user_id"`
 
 	jwt.RegisteredClaims
@@ -46,7 +46,7 @@ func (j *Jwt) CreateTokens(userID uuid.UUID) (string, string, error) {
 }
 
 func (j *Jwt) createToken(userID uuid.UUID, duration time.Duration) (string, error) {
-	claims := Claims{
+	claims := claims{
 		UserID: userID.String(),
 
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -58,8 +58,8 @@ func (j *Jwt) createToken(userID uuid.UUID, duration time.Duration) (string, err
 	return token.SignedString(j.secret)
 }
 
-func (j *Jwt) GetTokenClaims(token string) (*Claims, error) {
-	claims := &Claims{}
+func (j *Jwt) GetUserID(token string) (uuid.UUID, error) {
+	claims := &claims{}
 
 	t, err := jwt.ParseWithClaims(token, claims, func(t *jwt.Token) (any, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -70,21 +70,16 @@ func (j *Jwt) GetTokenClaims(token string) (*Claims, error) {
 	})
 
 	if err != nil || !t.Valid {
-		return nil, err
+		return uuid.UUID{}, err
 	}
 
-	return claims, nil
+	return uuid.Parse(claims.UserID)
 }
 
 func (j *Jwt) RefreshTokens(refresh string) (string, string, error) {
-	claims, err := j.GetTokenClaims(refresh)
+	userID, err := j.GetUserID(refresh)
 	if err != nil {
 		return "", "", err
-	}
-
-	userID, err := uuid.Parse(claims.UserID)
-	if err != nil {
-		return "", "", ErrInvalidJWT
 	}
 
 	return j.CreateTokens(userID)

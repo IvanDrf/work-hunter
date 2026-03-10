@@ -39,19 +39,17 @@ func TestGetTokenClaims(t *testing.T) {
 	checkClaims(t, access)
 	checkClaims(t, refresh)
 
-	claims, err := jwter.GetTokenClaims(invalid_token)
-	assert.Nil(t, claims)
+	userIDFromJwt, err := jwter.GetUserID(invalid_token)
 	assert.NotNil(t, err)
+	assert.Empty(t, userIDFromJwt)
 }
 
 func checkClaims(t *testing.T, token string) {
 	t.Helper()
 
-	claims, err := jwter.GetTokenClaims(token)
+	userIDFromJwt, err := jwter.GetUserID(token)
 	assert.Nil(t, err)
-	assert.NotNil(t, claims)
 
-	userIDClaims, err := uuid.Parse(claims.UserID)
 	assert.Nil(t, err)
-	assert.Equal(t, userID, userIDClaims)
+	assert.Equal(t, userID, userIDFromJwt)
 }
