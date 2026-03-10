@@ -14,6 +14,13 @@ type AuthService struct {
 	jwter    jwt.Jwter
 }
 
+func NewAuthService(userRepo repo.UserRepo, jwter jwt.Jwter) *AuthService {
+	return &AuthService{
+		userRepo: userRepo,
+		jwter:    jwter,
+	}
+}
+
 func (a *AuthService) RegisterUser(ctx context.Context, username string, password string) (string, string, error) {
 	_, err := a.userRepo.FindUser(ctx, username)
 	if err == nil {

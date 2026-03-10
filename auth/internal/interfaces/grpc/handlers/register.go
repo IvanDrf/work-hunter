@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *Handler) RegisterUser(ctx context.Context, user *auth_api.User) (*auth_api.JwtTokens, error) {
+func (h *Handler) Register(ctx context.Context, user *auth_api.User) (*auth_api.JwtTokens, error) {
 	access, refresh, err := h.authService.RegisterUser(ctx, user.Username, user.Password)
 
 	var e models.Error

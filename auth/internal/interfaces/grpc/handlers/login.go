@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *Handler) LoginUser(ctx context.Context, user *auth_api.User) (*auth_api.JwtTokens, error) {
+func (h *Handler) Login(ctx context.Context, user *auth_api.User) (*auth_api.JwtTokens, error) {
 	access, refresh, err := h.authService.LoginUser(ctx, user.Username, user.Password)
 
 	var e models.Error

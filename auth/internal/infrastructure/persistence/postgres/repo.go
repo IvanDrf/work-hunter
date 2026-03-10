@@ -4,11 +4,18 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/IvanDrf/work-hunter/auth/internal/config"
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
 )
 
 type AuthRepo struct {
 	db *sql.DB
+}
+
+func NewAuthRepo(cfg *config.DatabaseConfig) *AuthRepo {
+	return &AuthRepo{
+		db: Connect(cfg),
+	}
 }
 
 func (a *AuthRepo) CreateUser(ctx context.Context, user *models.User) error {
