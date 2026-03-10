@@ -31,6 +31,40 @@
 
     }()
     ```
+
+## Structure
+Source - https://habr.com/ru/articles/911018/
+```
+├── cmd/ 
+│   ├── api/   
+│   └── worker/
+├── internal/ 
+│   ├── app/ 
+│   ├── domain/ 
+│   │   ├── models/
+│   │   ├── rules/
+│   │   ├── events/
+│   │   └── ports/
+│   │       ├── repository
+│   │       └── service
+│   ├── infrastructure/ 
+│   │   ├── adapters/
+│   │   │   ├── cache      
+│   │   │   ├── logger    
+│   │   │   └── router    
+│   │   ├── clients/
+│   │   ├── persistence/
+│   │   └── services/
+│   └── interfaces/ 
+│       └── http/
+│           ├── dto/
+│           ├── handlers/
+│           └── server/
+│               └── middleware/
+├── config/ 
+└── pkg/    
+    └── testutils/
+```
  
 ## Commits
  - use ```go mod tidy``` to delete unused imports
