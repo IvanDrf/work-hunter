@@ -12,7 +12,7 @@ import (
 
 func Connect(cfg *config.DatabaseConfig) *sql.DB {
 	dsn := fmt.Sprintf(
-		"host=%s port=%d user=%s password=%s dbname=%s",
+		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		cfg.Host, cfg.Port, cfg.Username, cfg.Password, cfg.Name,
 	)
 
