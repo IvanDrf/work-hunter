@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/IvanDrf/work-hunter/auth/internal/config"
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
@@ -34,14 +35,19 @@ func (a *AuthRepo) FindUser(ctx context.Context, username string) (*models.User,
 
 	rows, err := a.db.QueryContext(ctx, query, username)
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 	defer rows.Close()
 
 	user := models.User{}
-	err = rows.Scan(&user.ID, &user.Username, &user.HashedPassword)
-	if err != nil {
-		return nil, err
+	for rows.Next() {
+		err = rows.Scan(&user.ID, &user.Username, &user.HashedPassword)
+
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
 	}
 
 	return &user, nil

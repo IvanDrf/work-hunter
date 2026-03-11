@@ -8,6 +8,7 @@ import (
 	"github.com/IvanDrf/work-hunter/auth/internal/config"
 	auth_api "github.com/IvanDrf/work-hunter/pkg/auth-api"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 type App struct {
@@ -22,6 +23,7 @@ func NewApp(cfg *config.Config) *App {
 		server: grpc.NewServer(),
 	}
 
+	reflection.Register(app.server)
 	auth_api.RegisterAuthServer(app.server, newFactory(cfg).NewHandlers())
 	return app
 }
