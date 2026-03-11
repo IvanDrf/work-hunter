@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 
 	"github.com/IvanDrf/work-hunter/auth/internal/config"
@@ -11,12 +10,7 @@ import (
 )
 
 func Connect(cfg *config.DatabaseConfig) *sql.DB {
-	dsn := fmt.Sprintf(
-		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		cfg.Host, cfg.Port, cfg.Username, cfg.Password, cfg.Name,
-	)
-
-	db, err := sql.Open("postgres", dsn)
+	db, err := sql.Open("postgres", cfg.DSN())
 	if err != nil {
 		log.Fatalf("can't connect to postgres database: %s", err)
 	}
