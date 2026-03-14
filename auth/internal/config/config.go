@@ -9,8 +9,11 @@ import (
 )
 
 type Config struct {
-	App      AppConfig      `yaml:"app"`
-	Database DatabaseConfig `yaml:"database"`
+	App AppConfig `yaml:"app"`
+
+	Database PostgreConfig  `yaml:"database"`
+	Broker   RabbitMQConfig `yaml:"broker"`
+	Email    EmailConfig    `yaml:"email"`
 
 	Jwt JwtConfig `yaml:"jwt"`
 }

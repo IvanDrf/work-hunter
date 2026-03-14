@@ -2,7 +2,7 @@ package config
 
 import "fmt"
 
-type DatabaseConfig struct {
+type PostgreConfig struct {
 	Host string `yaml:"host"`
 	Port uint16 `yaml:"port"`
 
@@ -12,7 +12,7 @@ type DatabaseConfig struct {
 	Name string `yaml:"db_name"`
 }
 
-func (d *DatabaseConfig) DSN() string {
+func (d *PostgreConfig) DSN() string {
 	return fmt.Sprintf(
 		"postgres://%s:%s@%s:%d/%s?sslmode=disable",
 		d.Username, d.Password, d.Host, d.Port, d.Name,

@@ -3,6 +3,7 @@ app:
   host: localhost
   port: 50051
 
+#postgresql
 database:
   host: localhost
   port: 5432
@@ -11,6 +12,17 @@ database:
   password: password
 
   db_name: auth
+
+#rabbitmq
+broker:
+  host: localhost
+  port: 5672
+
+  username: username
+  password: password
+  
+  producer_queue: emails
+  consumer_queue: emails
 
 jwt:
   secret:  secret

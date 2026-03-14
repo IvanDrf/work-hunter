@@ -3,7 +3,7 @@ module github.com/IvanDrf/work-hunter/auth
 go 1.25.1
 
 require (
-	github.com/IvanDrf/work-hunter/pkg/auth-api v0.0.0-20260314183834-117bd19cf1e9
+	github.com/IvanDrf/work-hunter/pkg/auth-api v0.0.0-20260314195050-4a9baa10a1ce
 	github.com/google/uuid v1.6.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	google.golang.org/grpc v1.79.2
@@ -11,13 +11,14 @@ require (
 
 require (
 	github.com/golang-jwt/jwt/v5 v5.3.1
+	github.com/golang-migrate/migrate/v4 v4.19.1
 	github.com/stretchr/testify v1.11.1
 )
 
 require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
-	github.com/golang-migrate/migrate/v4 v4.19.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
+	github.com/rabbitmq/amqp091-go v1.10.0 // indirect
 )
 
 require golang.org/x/crypto v0.48.0 // direct

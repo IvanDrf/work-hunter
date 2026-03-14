@@ -12,7 +12,7 @@ type AuthRepo struct {
 	db *sql.DB
 }
 
-func NewAuthRepo(cfg *config.DatabaseConfig) *AuthRepo {
+func NewAuthRepo(cfg *config.PostgreConfig) *AuthRepo {
 	return &AuthRepo{
 		db: Connect(cfg),
 	}

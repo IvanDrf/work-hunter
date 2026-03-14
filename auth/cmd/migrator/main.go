@@ -12,7 +12,6 @@ import (
 )
 
 func main() {
-
 	migrations := ""
 
 	flag.StringVar(&migrations, "mig", "", "path to migration files")
