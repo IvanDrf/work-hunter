@@ -19,11 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Auth_Register_FullMethodName      = "/auth.Auth/Register"
-	Auth_Login_FullMethodName         = "/auth.Auth/Login"
-	Auth_VerifyEmail_FullMethodName   = "/auth.Auth/VerifyEmail"
-	Auth_IsTokenValid_FullMethodName  = "/auth.Auth/IsTokenValid"
-	Auth_RefreshTokens_FullMethodName = "/auth.Auth/RefreshTokens"
+	Auth_Register_FullMethodName              = "/auth.Auth/Register"
+	Auth_Login_FullMethodName                 = "/auth.Auth/Login"
+	Auth_SendVerificationEmail_FullMethodName = "/auth.Auth/SendVerificationEmail"
+	Auth_IsTokenValid_FullMethodName          = "/auth.Auth/IsTokenValid"
+	Auth_RefreshTokens_FullMethodName         = "/auth.Auth/RefreshTokens"
 )
 
 // AuthClient is the client API for Auth service.
@@ -36,8 +36,8 @@ type AuthClient interface {
 	Register(ctx context.Context, in *User, opts ...grpc.CallOption) (*JwtTokens, error)
 	// login user by username, password
 	Login(ctx context.Context, in *User, opts ...grpc.CallOption) (*JwtTokens, error)
-	// verify email
-	VerifyEmail(ctx context.Context, in *Email, opts ...grpc.CallOption) (*Verification, error)
+	// Send verification email if user didn't get it after registration
+	SendVerificationEmail(ctx context.Context, in *Email, opts ...grpc.CallOption) (*AcceptStatus, error)
 	// if token valid retursn token payload
 	IsTokenValid(ctx context.Context, in *AccessToken, opts ...grpc.CallOption) (*TokenPayload, error)
 	// refresh access, refresh tokens if they are valid
@@ -72,10 +72,10 @@ func (c *authClient) Login(ctx context.Context, in *User, opts ...grpc.CallOptio
 	return out, nil
 }
 
-func (c *authClient) VerifyEmail(ctx context.Context, in *Email, opts ...grpc.CallOption) (*Verification, error) {
+func (c *authClient) SendVerificationEmail(ctx context.Context, in *Email, opts ...grpc.CallOption) (*AcceptStatus, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Verification)
-	err := c.cc.Invoke(ctx, Auth_VerifyEmail_FullMethodName, in, out, cOpts...)
+	out := new(AcceptStatus)
+	err := c.cc.Invoke(ctx, Auth_SendVerificationEmail_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -112,8 +112,8 @@ type AuthServer interface {
 	Register(context.Context, *User) (*JwtTokens, error)
 	// login user by username, password
 	Login(context.Context, *User) (*JwtTokens, error)
-	// verify email
-	VerifyEmail(context.Context, *Email) (*Verification, error)
+	// Send verification email if user didn't get it after registration
+	SendVerificationEmail(context.Context, *Email) (*AcceptStatus, error)
 	// if token valid retursn token payload
 	IsTokenValid(context.Context, *AccessToken) (*TokenPayload, error)
 	// refresh access, refresh tokens if they are valid
@@ -134,8 +134,8 @@ func (UnimplementedAuthServer) Register(context.Context, *User) (*JwtTokens, err
 func (UnimplementedAuthServer) Login(context.Context, *User) (*JwtTokens, error) {
 	return nil, status.Error(codes.Unimplemented, "method Login not implemented")
 }
-func (UnimplementedAuthServer) VerifyEmail(context.Context, *Email) (*Verification, error) {
-	return nil, status.Error(codes.Unimplemented, "method VerifyEmail not implemented")
+func (UnimplementedAuthServer) SendVerificationEmail(context.Context, *Email) (*AcceptStatus, error) {
+	return nil, status.Error(codes.Unimplemented, "method SendVerificationEmail not implemented")
 }
 func (UnimplementedAuthServer) IsTokenValid(context.Context, *AccessToken) (*TokenPayload, error) {
 	return nil, status.Error(codes.Unimplemented, "method IsTokenValid not implemented")
@@ -200,20 +200,20 @@ func _Auth_Login_Handler(srv interface{}, ctx context.Context, dec func(interfac
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Auth_VerifyEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Auth_SendVerificationEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Email)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthServer).VerifyEmail(ctx, in)
+		return srv.(AuthServer).SendVerificationEmail(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Auth_VerifyEmail_FullMethodName,
+		FullMethod: Auth_SendVerificationEmail_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServer).VerifyEmail(ctx, req.(*Email))
+		return srv.(AuthServer).SendVerificationEmail(ctx, req.(*Email))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -270,8 +270,8 @@ var Auth_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Auth_Login_Handler,
 		},
 		{
-			MethodName: "VerifyEmail",
-			Handler:    _Auth_VerifyEmail_Handler,
+			MethodName: "SendVerificationEmail",
+			Handler:    _Auth_SendVerificationEmail_Handler,
 		},
 		{
 			MethodName: "IsTokenValid",

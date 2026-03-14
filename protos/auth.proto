@@ -11,9 +11,9 @@ service Auth {
 
     // login user by username, password
     rpc Login(User) returns (JwtTokens);
-    
-    // verify email
-    rpc VerifyEmail(Email) returns (Verification);
+
+    // Send verification email if user didn't get it after registration
+    rpc SendVerificationEmail(Email) returns (AcceptStatus);
     
     // if token valid retursn token payload
     rpc IsTokenValid(AccessToken) returns (TokenPayload);
@@ -27,12 +27,13 @@ message User {
     string password = 2;
 }
 
-message RefreshToken {
-    string refresh = 1;
-}
 
 message AccessToken {
     string access = 1;
+}
+
+message RefreshToken {
+    string refresh = 1;
 }
 
 message JwtTokens {
@@ -40,15 +41,17 @@ message JwtTokens {
     string refresh = 2;
 }
 
-message Email {
-    string email = 1;
-}
-
-message Verification {
-    bool status = 1;
-}
-
 message TokenPayload {
     string id = 1;
     bool verificated = 2;
 }
+
+
+message Email {
+    string email = 1;
+}
+
+message AcceptStatus {
+    bool accepted = 1;
+}
+
