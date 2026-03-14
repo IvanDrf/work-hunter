@@ -11,6 +11,7 @@ const (
 	ErrCodeUserAlreadyExists ErrorCode = "USER_ALREADY_EXISTS"
 
 	ErrCodeInvalidPassword ErrorCode = "INVALID_PASSWORD"
+	ErrCodeInvalidEmail    ErrorCode = "INVALID_EMAIL"
 
 	ErrCodeInvalidJWT ErrorCode = "INVALID_JWT_TOKENS"
 )

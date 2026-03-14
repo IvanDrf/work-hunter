@@ -21,16 +21,16 @@ func NewAuthService(userRepo repo.UserRepo, jwter jwt.Jwter) *AuthService {
 	}
 }
 
-func (a *AuthService) RegisterUser(ctx context.Context, username string, password string) (string, string, error) {
-	_, err := a.userRepo.FindUser(ctx, username)
+func (a *AuthService) RegisterUser(ctx context.Context, email string, password string) (string, string, error) {
+	_, err := a.userRepo.FindUser(ctx, email)
 	if err == nil {
 		return "", "", models.Error{
-			Message: "user with that username already exists",
+			Message: "user with that email already exists",
 			Code:    models.ErrCodeUserAlreadyExists,
 		}
 	}
 
-	user, err := models.NewUser(username, password)
+	user, err := models.NewUser(email, password)
 	if err != nil {
 		return "", "", err
 	}
@@ -54,11 +54,11 @@ func (a *AuthService) RegisterUser(ctx context.Context, username string, passwor
 	return access, refresh, nil
 }
 
-func (a *AuthService) LoginUser(ctx context.Context, username string, password string) (string, string, error) {
-	user, err := a.userRepo.FindUser(ctx, username)
+func (a *AuthService) LoginUser(ctx context.Context, email string, password string) (string, string, error) {
+	user, err := a.userRepo.FindUser(ctx, email)
 	if err != nil {
 		return "", "", models.Error{
-			Message: "user with that username doesn't exists",
+			Message: "user with that email doesn't exists",
 			Code:    models.ErrCodeUserNotFound,
 		}
 	}

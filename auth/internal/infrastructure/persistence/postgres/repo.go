@@ -19,9 +19,9 @@ func NewAuthRepo(cfg *config.DatabaseConfig) *AuthRepo {
 }
 
 func (a *AuthRepo) CreateUser(ctx context.Context, user *models.User) error {
-	const query = "INSERT INTO users(user_id, username, hashed_password) VALUES($1, $2, $3)"
+	const query = "INSERT INTO users(user_id, email, hashed_password, verificated) VALUES($1, $2, $3)"
 
-	_, err := a.db.ExecContext(ctx, query, user.ID, user.Username, user.HashedPassword)
+	_, err := a.db.ExecContext(ctx, query, user.ID, user.Email, user.HashedPassword, user.Verificated)
 	if err != nil {
 		return err
 	}
@@ -29,10 +29,10 @@ func (a *AuthRepo) CreateUser(ctx context.Context, user *models.User) error {
 	return nil
 }
 
-func (a *AuthRepo) FindUser(ctx context.Context, username string) (*models.User, error) {
-	const query = "SELECT user_id, username, hashed_password FROM users WHERE username = $1 LIMIT 1"
+func (a *AuthRepo) FindUser(ctx context.Context, email string) (*models.User, error) {
+	const query = "SELECT user_id, email, hashed_password, verificated FROM users WHERE username = $1 LIMIT 1"
 
-	rows, err := a.db.QueryContext(ctx, query, username)
+	rows, err := a.db.QueryContext(ctx, query, email)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func (a *AuthRepo) FindUser(ctx context.Context, username string) (*models.User,
 
 	user := models.User{}
 	for rows.Next() {
-		err = rows.Scan(&user.ID, &user.Username, &user.HashedPassword)
+		err = rows.Scan(&user.ID, &user.Email, &user.HashedPassword, &user.Verificated)
 
 		if err != nil {
 			return nil, err

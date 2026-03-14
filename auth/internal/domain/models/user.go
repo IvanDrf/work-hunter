@@ -8,15 +8,24 @@ import (
 type User struct {
 	ID uuid.UUID `json:"user_id"`
 
-	Username       string `json:"username"`
+	Email          string `json:"email"`
 	HashedPassword string `json:"password"`
+
+	Verificated bool `json:"verificated"`
 }
 
-func NewUser(username string, password string) (*User, error) {
+func NewUser(email string, password string) (*User, error) {
 	if !rules.IsPasswordCorrect(password) {
 		return nil, Error{
 			Message: "password is to long or short",
 			Code:    ErrCodeInvalidPassword,
+		}
+	}
+
+	if !rules.IsEmailValid(email) {
+		return nil, Error{
+			Message: "invalid email",
+			Code:    ErrCodeInvalidEmail,
 		}
 	}
 
@@ -30,7 +39,8 @@ func NewUser(username string, password string) (*User, error) {
 
 	return &User{
 		ID:             uuid.New(),
-		Username:       username,
+		Email:          email,
 		HashedPassword: hashedPassword,
+		Verificated:    false,
 	}, nil
 }

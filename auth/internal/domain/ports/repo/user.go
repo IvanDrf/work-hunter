@@ -8,5 +8,5 @@ import (
 
 type UserRepo interface {
 	CreateUser(ctx context.Context, user *models.User) error
-	FindUser(ctx context.Context, username string) (*models.User, error)
+	FindUser(ctx context.Context, email string) (*models.User, error)
 }
