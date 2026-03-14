@@ -11,17 +11,40 @@ service Auth {
 
     // login user by username, password
     rpc Login(User) returns (JwtTokens);
-
+    
+    // verify email
+    rpc VerifyEmail(Email) returns (Verification);
+    
     // refresh access, refresh tokens if they are valid
-    rpc RefreshTokens(JwtTokens) returns (JwtTokens);
+    rpc RefreshTokens(RefreshToken) returns (JwtTokens);
+    
+    // returns id, verification status(email)
+    rpc GetTokensPayload(JwtTokens) returns (TokensPayload);
 }
 
 message User {
-    string username = 1;
+    string email = 1;
     string password = 2;
+}
+
+message RefreshToken {
+    string refresh = 1;
 }
 
 message JwtTokens {
     string access = 1;
     string refresh = 2;
+}
+
+message Email {
+    string email = 1;
+}
+
+message Verification {
+    bool status = 1;
+}
+
+message TokensPayload {
+    string id = 1;
+    bool verificated = 2;
 }
