@@ -19,11 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Auth_Register_FullMethodName         = "/auth.Auth/Register"
-	Auth_Login_FullMethodName            = "/auth.Auth/Login"
-	Auth_VerifyEmail_FullMethodName      = "/auth.Auth/VerifyEmail"
-	Auth_RefreshTokens_FullMethodName    = "/auth.Auth/RefreshTokens"
-	Auth_GetTokensPayload_FullMethodName = "/auth.Auth/GetTokensPayload"
+	Auth_Register_FullMethodName      = "/auth.Auth/Register"
+	Auth_Login_FullMethodName         = "/auth.Auth/Login"
+	Auth_VerifyEmail_FullMethodName   = "/auth.Auth/VerifyEmail"
+	Auth_IsTokenValid_FullMethodName  = "/auth.Auth/IsTokenValid"
+	Auth_RefreshTokens_FullMethodName = "/auth.Auth/RefreshTokens"
 )
 
 // AuthClient is the client API for Auth service.
@@ -38,10 +38,10 @@ type AuthClient interface {
 	Login(ctx context.Context, in *User, opts ...grpc.CallOption) (*JwtTokens, error)
 	// verify email
 	VerifyEmail(ctx context.Context, in *Email, opts ...grpc.CallOption) (*Verification, error)
+	// if token valid retursn token payload
+	IsTokenValid(ctx context.Context, in *AccessToken, opts ...grpc.CallOption) (*TokenPayload, error)
 	// refresh access, refresh tokens if they are valid
 	RefreshTokens(ctx context.Context, in *RefreshToken, opts ...grpc.CallOption) (*JwtTokens, error)
-	// returns id, verification status(email)
-	GetTokensPayload(ctx context.Context, in *JwtTokens, opts ...grpc.CallOption) (*TokensPayload, error)
 }
 
 type authClient struct {
@@ -82,20 +82,20 @@ func (c *authClient) VerifyEmail(ctx context.Context, in *Email, opts ...grpc.Ca
 	return out, nil
 }
 
-func (c *authClient) RefreshTokens(ctx context.Context, in *RefreshToken, opts ...grpc.CallOption) (*JwtTokens, error) {
+func (c *authClient) IsTokenValid(ctx context.Context, in *AccessToken, opts ...grpc.CallOption) (*TokenPayload, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(JwtTokens)
-	err := c.cc.Invoke(ctx, Auth_RefreshTokens_FullMethodName, in, out, cOpts...)
+	out := new(TokenPayload)
+	err := c.cc.Invoke(ctx, Auth_IsTokenValid_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *authClient) GetTokensPayload(ctx context.Context, in *JwtTokens, opts ...grpc.CallOption) (*TokensPayload, error) {
+func (c *authClient) RefreshTokens(ctx context.Context, in *RefreshToken, opts ...grpc.CallOption) (*JwtTokens, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(TokensPayload)
-	err := c.cc.Invoke(ctx, Auth_GetTokensPayload_FullMethodName, in, out, cOpts...)
+	out := new(JwtTokens)
+	err := c.cc.Invoke(ctx, Auth_RefreshTokens_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -114,10 +114,10 @@ type AuthServer interface {
 	Login(context.Context, *User) (*JwtTokens, error)
 	// verify email
 	VerifyEmail(context.Context, *Email) (*Verification, error)
+	// if token valid retursn token payload
+	IsTokenValid(context.Context, *AccessToken) (*TokenPayload, error)
 	// refresh access, refresh tokens if they are valid
 	RefreshTokens(context.Context, *RefreshToken) (*JwtTokens, error)
-	// returns id, verification status(email)
-	GetTokensPayload(context.Context, *JwtTokens) (*TokensPayload, error)
 	mustEmbedUnimplementedAuthServer()
 }
 
@@ -137,11 +137,11 @@ func (UnimplementedAuthServer) Login(context.Context, *User) (*JwtTokens, error)
 func (UnimplementedAuthServer) VerifyEmail(context.Context, *Email) (*Verification, error) {
 	return nil, status.Error(codes.Unimplemented, "method VerifyEmail not implemented")
 }
+func (UnimplementedAuthServer) IsTokenValid(context.Context, *AccessToken) (*TokenPayload, error) {
+	return nil, status.Error(codes.Unimplemented, "method IsTokenValid not implemented")
+}
 func (UnimplementedAuthServer) RefreshTokens(context.Context, *RefreshToken) (*JwtTokens, error) {
 	return nil, status.Error(codes.Unimplemented, "method RefreshTokens not implemented")
-}
-func (UnimplementedAuthServer) GetTokensPayload(context.Context, *JwtTokens) (*TokensPayload, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetTokensPayload not implemented")
 }
 func (UnimplementedAuthServer) mustEmbedUnimplementedAuthServer() {}
 func (UnimplementedAuthServer) testEmbeddedByValue()              {}
@@ -218,6 +218,24 @@ func _Auth_VerifyEmail_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Auth_IsTokenValid_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AccessToken)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServer).IsTokenValid(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Auth_IsTokenValid_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServer).IsTokenValid(ctx, req.(*AccessToken))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Auth_RefreshTokens_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RefreshToken)
 	if err := dec(in); err != nil {
@@ -232,24 +250,6 @@ func _Auth_RefreshTokens_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthServer).RefreshTokens(ctx, req.(*RefreshToken))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Auth_GetTokensPayload_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(JwtTokens)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AuthServer).GetTokensPayload(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Auth_GetTokensPayload_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServer).GetTokensPayload(ctx, req.(*JwtTokens))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -274,12 +274,12 @@ var Auth_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Auth_VerifyEmail_Handler,
 		},
 		{
-			MethodName: "RefreshTokens",
-			Handler:    _Auth_RefreshTokens_Handler,
+			MethodName: "IsTokenValid",
+			Handler:    _Auth_IsTokenValid_Handler,
 		},
 		{
-			MethodName: "GetTokensPayload",
-			Handler:    _Auth_GetTokensPayload_Handler,
+			MethodName: "RefreshTokens",
+			Handler:    _Auth_RefreshTokens_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
