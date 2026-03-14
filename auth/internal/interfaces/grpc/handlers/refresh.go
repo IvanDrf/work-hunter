@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *Handler) RefreshTokens(ctx context.Context, tokens *auth_api.JwtTokens) (*auth_api.JwtTokens, error) {
+func (h *Handler) RefreshTokens(ctx context.Context, tokens *auth_api.RefreshToken) (*auth_api.JwtTokens, error) {
 	access, refresh, err := h.authService.RefreshTokens(ctx, tokens.Refresh)
 
 	var e models.Error

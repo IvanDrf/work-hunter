@@ -3,7 +3,7 @@ module github.com/IvanDrf/work-hunter/auth
 go 1.25.1
 
 require (
-	github.com/IvanDrf/work-hunter/pkg/auth-api v0.0.0-20260308141736-a7f40e70adac
+	github.com/IvanDrf/work-hunter/pkg/auth-api v0.0.0-20260314183834-117bd19cf1e9
 	github.com/google/uuid v1.6.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	google.golang.org/grpc v1.79.2

@@ -11,7 +11,7 @@ import (
 )
 
 func (h *Handler) Register(ctx context.Context, user *auth_api.User) (*auth_api.JwtTokens, error) {
-	access, refresh, err := h.authService.RegisterUser(ctx, user.Username, user.Password)
+	access, refresh, err := h.authService.RegisterUser(ctx, user.Email, user.Password)
 
 	var e models.Error
 	if errors.As(err, &e) {

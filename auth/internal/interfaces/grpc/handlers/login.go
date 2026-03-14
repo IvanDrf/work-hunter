@@ -11,7 +11,7 @@ import (
 )
 
 func (h *Handler) Login(ctx context.Context, user *auth_api.User) (*auth_api.JwtTokens, error) {
-	access, refresh, err := h.authService.LoginUser(ctx, user.Username, user.Password)
+	access, refresh, err := h.authService.LoginUser(ctx, user.Email, user.Password)
 
 	var e models.Error
 	if errors.As(err, &e) {
