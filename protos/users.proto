@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package users;
+package usersv1;
 
-option go_package = "pkg/users-api/v1;usersv1";
+option go_package = "pkg/users-api/v1";
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
@@ -21,8 +21,10 @@ service UserServer {
     // Delete user profile
     rpc DeleteProfile(DeleteProfileRequest) returns(google.protobuf.Empty);
 
+    // admin operations
     // Update user status (active/inactive/blocked)
     rpc UpdateUserStatus(UpdateUserStatusRequest) returns (UserProfile);
+    rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
 }
 
 enum UserStatus {
@@ -55,6 +57,9 @@ message UserProfile {
     google.protobuf.Timestamp created_at = 10;
     google.protobuf.Timestamp updated_at = 11;
     google.protobuf.Timestamp last_login_at = 12;
+
+    bool email_verified = 13;
+    map<string, string> metadata = 14;
 }
 
 message CreateProfileRequest {
@@ -68,25 +73,35 @@ message CreateProfileRequest {
 
 message GetProfileRequest {
     string user_id = 1;
-    string access_token = 2; // JWT access token for authorization
 }
 
 message UpdateProfileRequest {
-    string user_id = 1;                   
-    string access_token = 2;              // JWT access token for authorization
-    optional string first_name = 3;       // New first name
-    optional string last_name = 4;        // New last name
-    optional string phone_number = 5;     // New phone number
-    optional string avatar_url = 6;       // New avatar URL
+    string user_id = 1;                  // JWT access token for authorization
+    optional string first_name = 2;       // New first name
+    optional string last_name = 3;        // New last name
+    optional string phone_number = 4;     // New phone number
+    optional string avatar_url = 5;       // New avatar URL
+    map<string, string> metadata = 6;
 }
 
 message DeleteProfileRequest {
     string user_id = 1;
-    string access_token = 2; // JWT access token for authorization
 }
 
 message UpdateUserStatusRequest {
-    string user_id = 1;                     
-    string access_token = 2;                 // Admin JWT token for authorization
-    UserStatus status = 3;                   // New profile status
+    string user_id = 1;                      // Admin JWT token for authorization
+    UserStatus status = 2;                   // New profile status
+}
+
+message ListUsersRequest {
+    int32 page_size = 1;
+    UserStatus status = 2;
+    UserRole role = 3;
+    string serch_query = 4;
+    string sort_by = 5;
+}
+
+message ListUsersResponse {
+    repeated UserProfile users = 1;
+    int32 total_count = 2;
 }
