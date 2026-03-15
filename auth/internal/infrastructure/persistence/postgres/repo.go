@@ -49,3 +49,10 @@ func (a *AuthRepo) FindUser(ctx context.Context, email string) (*models.User, er
 
 	return &user, nil
 }
+
+func (a *AuthRepo) VerifyEmail(ctx context.Context, email string) error {
+	const query = "UPDATE users SET verificated = true WHERE email = $1"
+
+	_, err := a.db.ExecContext(ctx, query, email)
+	return err
+}
