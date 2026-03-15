@@ -10,9 +10,8 @@ import (
 )
 
 type RabbitMQProducer struct {
-	conn *rabbit.Connection
-	ch   *rabbit.Channel
-
+	conn  *rabbit.Connection
+	ch    *rabbit.Channel
 	queue *rabbit.Queue
 }
 

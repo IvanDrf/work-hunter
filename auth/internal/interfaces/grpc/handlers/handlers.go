@@ -18,3 +18,8 @@ func NewHandler(service service.AuthService, verificationService service.Verific
 		verificationService: verificationService,
 	}
 }
+
+func (h *Handler) Close() {
+	h.authService.Close()
+	h.verificationService.Close()
+}

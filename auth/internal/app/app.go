@@ -6,6 +6,7 @@ import (
 	"net"
 
 	"github.com/IvanDrf/work-hunter/auth/internal/config"
+	"github.com/IvanDrf/work-hunter/auth/internal/interfaces/grpc/handlers"
 	auth_api "github.com/IvanDrf/work-hunter/pkg/auth-api"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -14,17 +15,19 @@ import (
 type App struct {
 	cfg *config.Config
 
-	server *grpc.Server
+	handlers *handlers.Handler
+	server   *grpc.Server
 }
 
 func NewApp(cfg *config.Config) *App {
 	app := &App{
-		cfg:    cfg,
-		server: grpc.NewServer(),
+		cfg:      cfg,
+		handlers: newFactory(cfg).NewHandlers(),
+		server:   grpc.NewServer(),
 	}
 
 	reflection.Register(app.server)
-	auth_api.RegisterAuthServer(app.server, newFactory(cfg).NewHandlers())
+	auth_api.RegisterAuthServer(app.server, app.handlers)
 	return app
 }
 
@@ -40,6 +43,6 @@ func (a *App) Run() {
 }
 
 func (a *App) Stop() {
-
 	a.server.GracefulStop()
+	a.handlers.Close()
 }

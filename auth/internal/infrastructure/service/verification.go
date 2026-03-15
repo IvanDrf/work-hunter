@@ -13,9 +13,9 @@ import (
 
 type VerificationService struct {
 	emailProducer service.EmailProducer
-	jwter         jwt.Jwter
+	userRepo      repo.UserRepo
 
-	userRepo repo.UserRepo
+	jwter jwt.Jwter
 }
 
 func NewVerificationService(emailProducer service.EmailProducer, userRepo repo.UserRepo, jwter jwt.Jwter) *VerificationService {
@@ -24,6 +24,11 @@ func NewVerificationService(emailProducer service.EmailProducer, userRepo repo.U
 		userRepo:      userRepo,
 		jwter:         jwter,
 	}
+}
+
+func (v *VerificationService) Close() {
+	v.emailProducer.Close()
+	v.userRepo.Close()
 }
 
 func (v *VerificationService) SendVerificationEmail(ctx context.Context, email string) error {

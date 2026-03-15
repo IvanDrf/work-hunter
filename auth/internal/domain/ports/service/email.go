@@ -12,8 +12,12 @@ type EmailService interface {
 
 type EmailProducer interface {
 	SendEmailInQueue(ctx context.Context, message *models.EmailMessage) error
+
+	Close()
 }
 
 type EmailConsumer interface {
 	GetEmailFromQueue(ctx context.Context) (message *models.EmailMessage)
+
+	Close()
 }

@@ -21,6 +21,10 @@ func NewAuthService(userRepo repo.UserRepo, jwter jwt.Jwter) *AuthService {
 	}
 }
 
+func (a *AuthService) Close() {
+	a.userRepo.Close()
+}
+
 func (a *AuthService) RegisterUser(ctx context.Context, email string, password string) (string, string, error) {
 	_, err := a.userRepo.FindUser(ctx, email)
 	if err == nil {

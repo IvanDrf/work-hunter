@@ -18,6 +18,10 @@ func NewAuthRepo(cfg *config.PostgreConfig) *AuthRepo {
 	}
 }
 
+func (a *AuthRepo) Close() {
+	a.db.Close()
+}
+
 func (a *AuthRepo) CreateUser(ctx context.Context, user *models.User) error {
 	const query = "INSERT INTO users(user_id, email, hashed_password, verificated) VALUES($1, $2, $3)"
 

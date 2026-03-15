@@ -11,4 +11,6 @@ type UserRepo interface {
 	FindUser(ctx context.Context, email string) (*models.User, error)
 
 	VerifyEmail(ctx context.Context, email string) error
+
+	Close()
 }
