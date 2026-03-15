@@ -5,6 +5,7 @@ import (
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/ports/jwt"
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/ports/repo"
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/ports/service"
+	messaging "github.com/IvanDrf/work-hunter/auth/internal/infrastructure/messaging/rabbitmq"
 	"github.com/IvanDrf/work-hunter/auth/internal/infrastructure/persistence/postgres"
 	"github.com/IvanDrf/work-hunter/auth/internal/interfaces/grpc/handlers"
 	"github.com/IvanDrf/work-hunter/auth/pkg"
@@ -23,14 +24,27 @@ func newFactory(cfg *config.Config) *Factory {
 }
 
 func (f *Factory) NewHandlers() *handlers.Handler {
-	return handlers.NewHandler(f.newAuthService())
+	// dependencies
+	userRepo := f.newUserRepo()
+	jwter := f.newJwter()
+	emailProducer := f.newEmailProducer()
+
+	// services
+	auth := f.newAuthService(userRepo, jwter)
+	verification := f.newVerificationService(emailProducer, userRepo)
+
+	return handlers.NewHandler(auth, verification)
 }
 
-func (f *Factory) newAuthService() service.AuthService {
+func (f *Factory) newAuthService(userRepo repo.UserRepo, jwter jwt.Jwter) service.AuthService {
 	return s.NewAuthService(
-		f.newUserRepo(),
-		f.newJwter(),
+		userRepo,
+		jwter,
 	)
+}
+
+func (f *Factory) newVerificationService(producer service.EmailProducer, userRepo repo.UserRepo) service.VerificationService {
+	return s.NewVerificationService(producer, userRepo)
 }
 
 func (f *Factory) newJwter() jwt.Jwter {
@@ -39,4 +53,8 @@ func (f *Factory) newJwter() jwt.Jwter {
 
 func (f *Factory) newUserRepo() repo.UserRepo {
 	return postgres.NewAuthRepo(&f.cfg.Database)
+}
+
+func (f *Factory) newEmailProducer() service.EmailProducer {
+	return messaging.NewRabbitMqProducer(&f.cfg.Broker)
 }

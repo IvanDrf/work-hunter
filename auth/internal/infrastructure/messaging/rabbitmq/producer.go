@@ -32,7 +32,7 @@ func (p *RabbitMQProducer) Close() {
 	p.conn.Close()
 }
 
-func (p *RabbitMQProducer) SendMessage(ctx context.Context, msg *models.EmailMessage) error {
+func (p *RabbitMQProducer) SendEmailInQueue(ctx context.Context, msg *models.EmailMessage) error {
 	body, err := json.Marshal(*msg)
 	if err != nil {
 		return err

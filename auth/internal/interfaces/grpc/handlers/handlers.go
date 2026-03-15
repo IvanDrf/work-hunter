@@ -6,12 +6,15 @@ import (
 )
 
 type Handler struct {
-	authService service.AuthService
+	authService         service.AuthService
+	verificationService service.VerificationService
+
 	auth_api.UnimplementedAuthServer
 }
 
-func NewHandler(service service.AuthService) *Handler {
+func NewHandler(service service.AuthService, verificationService service.VerificationService) *Handler {
 	return &Handler{
-		authService: service,
+		authService:         service,
+		verificationService: verificationService,
 	}
 }
