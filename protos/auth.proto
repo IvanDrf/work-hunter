@@ -15,6 +15,9 @@ service Auth {
     // Send verification email if user didn't get it after registration
     rpc SendVerificationEmail(Email) returns (AcceptStatus);
     
+    // Verify user email in database
+    rpc VerifyEmail(Email) returns (JwtTokens);
+
     // if token valid retursn token payload
     rpc IsTokenValid(AccessToken) returns (TokenPayload);
 

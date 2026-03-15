@@ -22,6 +22,7 @@ const (
 	Auth_Register_FullMethodName              = "/auth.Auth/Register"
 	Auth_Login_FullMethodName                 = "/auth.Auth/Login"
 	Auth_SendVerificationEmail_FullMethodName = "/auth.Auth/SendVerificationEmail"
+	Auth_VerifyEmail_FullMethodName           = "/auth.Auth/VerifyEmail"
 	Auth_IsTokenValid_FullMethodName          = "/auth.Auth/IsTokenValid"
 	Auth_RefreshTokens_FullMethodName         = "/auth.Auth/RefreshTokens"
 )
@@ -38,6 +39,8 @@ type AuthClient interface {
 	Login(ctx context.Context, in *User, opts ...grpc.CallOption) (*JwtTokens, error)
 	// Send verification email if user didn't get it after registration
 	SendVerificationEmail(ctx context.Context, in *Email, opts ...grpc.CallOption) (*AcceptStatus, error)
+	// Verify user email in database
+	VerifyEmail(ctx context.Context, in *Email, opts ...grpc.CallOption) (*JwtTokens, error)
 	// if token valid retursn token payload
 	IsTokenValid(ctx context.Context, in *AccessToken, opts ...grpc.CallOption) (*TokenPayload, error)
 	// refresh access, refresh tokens if they are valid
@@ -82,6 +85,16 @@ func (c *authClient) SendVerificationEmail(ctx context.Context, in *Email, opts 
 	return out, nil
 }
 
+func (c *authClient) VerifyEmail(ctx context.Context, in *Email, opts ...grpc.CallOption) (*JwtTokens, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(JwtTokens)
+	err := c.cc.Invoke(ctx, Auth_VerifyEmail_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *authClient) IsTokenValid(ctx context.Context, in *AccessToken, opts ...grpc.CallOption) (*TokenPayload, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(TokenPayload)
@@ -114,6 +127,8 @@ type AuthServer interface {
 	Login(context.Context, *User) (*JwtTokens, error)
 	// Send verification email if user didn't get it after registration
 	SendVerificationEmail(context.Context, *Email) (*AcceptStatus, error)
+	// Verify user email in database
+	VerifyEmail(context.Context, *Email) (*JwtTokens, error)
 	// if token valid retursn token payload
 	IsTokenValid(context.Context, *AccessToken) (*TokenPayload, error)
 	// refresh access, refresh tokens if they are valid
@@ -136,6 +151,9 @@ func (UnimplementedAuthServer) Login(context.Context, *User) (*JwtTokens, error)
 }
 func (UnimplementedAuthServer) SendVerificationEmail(context.Context, *Email) (*AcceptStatus, error) {
 	return nil, status.Error(codes.Unimplemented, "method SendVerificationEmail not implemented")
+}
+func (UnimplementedAuthServer) VerifyEmail(context.Context, *Email) (*JwtTokens, error) {
+	return nil, status.Error(codes.Unimplemented, "method VerifyEmail not implemented")
 }
 func (UnimplementedAuthServer) IsTokenValid(context.Context, *AccessToken) (*TokenPayload, error) {
 	return nil, status.Error(codes.Unimplemented, "method IsTokenValid not implemented")
@@ -218,6 +236,24 @@ func _Auth_SendVerificationEmail_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Auth_VerifyEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Email)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServer).VerifyEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Auth_VerifyEmail_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServer).VerifyEmail(ctx, req.(*Email))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Auth_IsTokenValid_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AccessToken)
 	if err := dec(in); err != nil {
@@ -272,6 +308,10 @@ var Auth_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SendVerificationEmail",
 			Handler:    _Auth_SendVerificationEmail_Handler,
+		},
+		{
+			MethodName: "VerifyEmail",
+			Handler:    _Auth_VerifyEmail_Handler,
 		},
 		{
 			MethodName: "IsTokenValid",

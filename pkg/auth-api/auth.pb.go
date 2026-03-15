@@ -374,13 +374,14 @@ const file_protos_auth_proto_rawDesc = "" +
 	"\x05Email\x12\x14\n" +
 	"\x05email\x18\x01 \x01(\tR\x05email\"*\n" +
 	"\fAcceptStatus\x12\x1a\n" +
-	"\baccepted\x18\x01 \x01(\bR\baccepted2\xfc\x01\n" +
+	"\baccepted\x18\x01 \x01(\bR\baccepted2\xa9\x02\n" +
 	"\x04Auth\x12'\n" +
 	"\bRegister\x12\n" +
 	".auth.User\x1a\x0f.auth.JwtTokens\x12$\n" +
 	"\x05Login\x12\n" +
 	".auth.User\x1a\x0f.auth.JwtTokens\x128\n" +
-	"\x15SendVerificationEmail\x12\v.auth.Email\x1a\x12.auth.AcceptStatus\x125\n" +
+	"\x15SendVerificationEmail\x12\v.auth.Email\x1a\x12.auth.AcceptStatus\x12+\n" +
+	"\vVerifyEmail\x12\v.auth.Email\x1a\x0f.auth.JwtTokens\x125\n" +
 	"\fIsTokenValid\x12\x11.auth.AccessToken\x1a\x12.auth.TokenPayload\x124\n" +
 	"\rRefreshTokens\x12\x12.auth.RefreshToken\x1a\x0f.auth.JwtTokensB\x0eZ\fpkg/auth-apib\x06proto3"
 
@@ -410,15 +411,17 @@ var file_protos_auth_proto_depIdxs = []int32{
 	0, // 0: auth.Auth.Register:input_type -> auth.User
 	0, // 1: auth.Auth.Login:input_type -> auth.User
 	5, // 2: auth.Auth.SendVerificationEmail:input_type -> auth.Email
-	1, // 3: auth.Auth.IsTokenValid:input_type -> auth.AccessToken
-	2, // 4: auth.Auth.RefreshTokens:input_type -> auth.RefreshToken
-	3, // 5: auth.Auth.Register:output_type -> auth.JwtTokens
-	3, // 6: auth.Auth.Login:output_type -> auth.JwtTokens
-	6, // 7: auth.Auth.SendVerificationEmail:output_type -> auth.AcceptStatus
-	4, // 8: auth.Auth.IsTokenValid:output_type -> auth.TokenPayload
-	3, // 9: auth.Auth.RefreshTokens:output_type -> auth.JwtTokens
-	5, // [5:10] is the sub-list for method output_type
-	0, // [0:5] is the sub-list for method input_type
+	5, // 3: auth.Auth.VerifyEmail:input_type -> auth.Email
+	1, // 4: auth.Auth.IsTokenValid:input_type -> auth.AccessToken
+	2, // 5: auth.Auth.RefreshTokens:input_type -> auth.RefreshToken
+	3, // 6: auth.Auth.Register:output_type -> auth.JwtTokens
+	3, // 7: auth.Auth.Login:output_type -> auth.JwtTokens
+	6, // 8: auth.Auth.SendVerificationEmail:output_type -> auth.AcceptStatus
+	3, // 9: auth.Auth.VerifyEmail:output_type -> auth.JwtTokens
+	4, // 10: auth.Auth.IsTokenValid:output_type -> auth.TokenPayload
+	3, // 11: auth.Auth.RefreshTokens:output_type -> auth.JwtTokens
+	6, // [6:12] is the sub-list for method output_type
+	0, // [0:6] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
