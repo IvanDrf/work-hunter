@@ -4,6 +4,8 @@ github.com/BurntSushi/toml v1.2.1 h1:9F2/+DoOYIOksmaJFPw1tGFy1eDnIJXg+UHjuD8lTak
 github.com/BurntSushi/toml v1.2.1/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=
 github.com/IvanDrf/work-hunter/pkg/auth-api v0.0.0-20260314195050-4a9baa10a1ce h1:DyQoPuVHWSBq2DJUHpfSEn/UJp4xvVrOFSDeRD4nJjw=
 github.com/IvanDrf/work-hunter/pkg/auth-api v0.0.0-20260314195050-4a9baa10a1ce/go.mod h1:7MFO9fbUEPhWluguZqRzBpZav9eAIUesXODMj7s/AVI=
+github.com/IvanDrf/work-hunter/pkg/auth-api v0.0.0-20260315155058-9408cf984df8 h1:R2dJej7fYxKyQd2jwhp3XSuSpMJiawcvr7RLo970OTI=
+github.com/IvanDrf/work-hunter/pkg/auth-api v0.0.0-20260315155058-9408cf984df8/go.mod h1:7MFO9fbUEPhWluguZqRzBpZav9eAIUesXODMj7s/AVI=
 github.com/Microsoft/go-winio v0.6.2 h1:F2VQgta7ecxGYO8k3ZZz3RS8fVIXVxONVUPlNERoyfY=
 github.com/Microsoft/go-winio v0.6.2/go.mod h1:yd8OoFMLzJbo9gZq8j5qaps8bJ9aShtEA8Ipt1oGCvU=
 github.com/cespare/xxhash/v2 v2.3.0 h1:UL815xU9SqsFlibzuggzjXhog7bL6oX9BbNZnL2UFvs=

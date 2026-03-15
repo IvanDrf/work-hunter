@@ -6,20 +6,23 @@ import (
 	"encoding/hex"
 
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
+	"github.com/IvanDrf/work-hunter/auth/internal/domain/ports/jwt"
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/ports/repo"
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/ports/service"
 )
 
 type VerificationService struct {
 	emailProducer service.EmailProducer
+	jwter         jwt.Jwter
 
 	userRepo repo.UserRepo
 }
 
-func NewVerificationService(emailProducer service.EmailProducer, userRepo repo.UserRepo) *VerificationService {
+func NewVerificationService(emailProducer service.EmailProducer, userRepo repo.UserRepo, jwter jwt.Jwter) *VerificationService {
 	return &VerificationService{
 		emailProducer: emailProducer,
 		userRepo:      userRepo,
+		jwter:         jwter,
 	}
 }
 
@@ -39,10 +42,10 @@ func (v *VerificationService) SendVerificationEmail(ctx context.Context, email s
 	return nil
 }
 
-func (v *VerificationService) VerifyEmail(ctx context.Context, email string) error {
-	_, err := v.userRepo.FindUser(ctx, email)
+func (v *VerificationService) VerifyEmail(ctx context.Context, email string) (string, string, error) {
+	user, err := v.userRepo.FindUser(ctx, email)
 	if err != nil {
-		return models.Error{
+		return "", "", models.Error{
 			Message: "can't find user with that email",
 			Code:    models.ErrCodeInvalidEmail,
 		}
@@ -50,13 +53,21 @@ func (v *VerificationService) VerifyEmail(ctx context.Context, email string) err
 
 	err = v.userRepo.VerifyEmail(ctx, email)
 	if err != nil {
-		return models.Error{
+		return "", "", models.Error{
 			Message: "can't verify user email",
 			Code:    models.ErrCodeInternal,
 		}
 	}
 
-	return nil
+	access, refresh, err := v.jwter.CreateTokens(user.ID, true)
+	if err != nil {
+		return "", "", models.Error{
+			Message: "can't create jwt tokens for user",
+			Code:    models.ErrCodeInternal,
+		}
+	}
+
+	return access, refresh, nil
 }
 
 func (v *VerificationService) createToken() string {

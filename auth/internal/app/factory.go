@@ -31,7 +31,7 @@ func (f *Factory) NewHandlers() *handlers.Handler {
 
 	// services
 	auth := f.newAuthService(userRepo, jwter)
-	verification := f.newVerificationService(emailProducer, userRepo)
+	verification := f.newVerificationService(emailProducer, userRepo, jwter)
 
 	return handlers.NewHandler(auth, verification)
 }
@@ -43,8 +43,8 @@ func (f *Factory) newAuthService(userRepo repo.UserRepo, jwter jwt.Jwter) servic
 	)
 }
 
-func (f *Factory) newVerificationService(producer service.EmailProducer, userRepo repo.UserRepo) service.VerificationService {
-	return s.NewVerificationService(producer, userRepo)
+func (f *Factory) newVerificationService(producer service.EmailProducer, userRepo repo.UserRepo, jwter jwt.Jwter) service.VerificationService {
+	return s.NewVerificationService(producer, userRepo, jwter)
 }
 
 func (f *Factory) newJwter() jwt.Jwter {

@@ -10,8 +10,8 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *Handler) VerifyEmail(ctx context.Context, email *auth_api.Email) (*auth_api.AcceptStatus, error) {
-	err := h.verificationService.VerifyEmail(ctx, email.Email)
+func (h *Handler) VerifyEmail(ctx context.Context, email *auth_api.Email) (*auth_api.JwtTokens, error) {
+	access, refresh, err := h.verificationService.VerifyEmail(ctx, email.Email)
 
 	var e models.Error
 	if errors.As(err, &e) {
@@ -24,7 +24,8 @@ func (h *Handler) VerifyEmail(ctx context.Context, email *auth_api.Email) (*auth
 		}
 	}
 
-	return &auth_api.AcceptStatus{
-		Accepted: true,
+	return &auth_api.JwtTokens{
+		Access:  access,
+		Refresh: refresh,
 	}, nil
 }
