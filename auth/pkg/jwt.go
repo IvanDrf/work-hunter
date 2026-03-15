@@ -11,7 +11,8 @@ import (
 var ErrInvalidJWT = errors.New("invalid jwt token")
 
 type claims struct {
-	UserID string `json:"user_id"`
+	UserID      string `json:"user_id"`
+	Verificated bool   `json:"verificated"`
 
 	jwt.RegisteredClaims
 }
@@ -31,13 +32,13 @@ func NewJwt(secret string, accessTime time.Duration, refreshTime time.Duration) 
 	}
 }
 
-func (j *Jwt) CreateTokens(userID uuid.UUID) (string, string, error) {
-	access, err := j.createToken(userID, j.accessTime)
+func (j *Jwt) CreateTokens(userID uuid.UUID, verificated bool) (string, string, error) {
+	access, err := j.createToken(userID, verificated, j.accessTime)
 	if err != nil {
 		return "", "", err
 	}
 
-	refresh, err := j.createToken(userID, j.refreshTime)
+	refresh, err := j.createToken(userID, verificated, j.refreshTime)
 	if err != nil {
 		return "", "", err
 	}
@@ -45,9 +46,10 @@ func (j *Jwt) CreateTokens(userID uuid.UUID) (string, string, error) {
 	return access, refresh, nil
 }
 
-func (j *Jwt) createToken(userID uuid.UUID, duration time.Duration) (string, error) {
+func (j *Jwt) createToken(userID uuid.UUID, verificated bool, duration time.Duration) (string, error) {
 	claims := claims{
-		UserID: userID.String(),
+		UserID:      userID.String(),
+		Verificated: verificated,
 
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(duration)),
@@ -58,7 +60,7 @@ func (j *Jwt) createToken(userID uuid.UUID, duration time.Duration) (string, err
 	return token.SignedString(j.secret)
 }
 
-func (j *Jwt) GetUserID(token string) (uuid.UUID, error) {
+func (j *Jwt) GetPayload(token string) (uuid.UUID, bool, error) {
 	claims := &claims{}
 
 	t, err := jwt.ParseWithClaims(token, claims, func(t *jwt.Token) (any, error) {
@@ -70,17 +72,18 @@ func (j *Jwt) GetUserID(token string) (uuid.UUID, error) {
 	})
 
 	if err != nil || !t.Valid {
-		return uuid.UUID{}, err
+		return uuid.UUID{}, false, err
 	}
 
-	return uuid.Parse(claims.UserID)
+	id, err := uuid.Parse(claims.UserID)
+	return id, claims.Verificated, err
 }
 
 func (j *Jwt) RefreshTokens(refresh string) (string, string, error) {
-	userID, err := j.GetUserID(refresh)
+	userID, verificated, err := j.GetPayload(refresh)
 	if err != nil {
 		return "", "", err
 	}
 
-	return j.CreateTokens(userID)
+	return j.CreateTokens(userID, verificated)
 }

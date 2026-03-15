@@ -43,7 +43,7 @@ func (a *AuthService) RegisterUser(ctx context.Context, email string, password s
 		}
 	}
 
-	access, refresh, err := a.jwter.CreateTokens(user.ID)
+	access, refresh, err := a.jwter.CreateTokens(user.ID, user.Verificated)
 	if err != nil {
 		return "", "", models.Error{
 			Message: "can't create jwt tokens for user",
@@ -70,7 +70,7 @@ func (a *AuthService) LoginUser(ctx context.Context, email string, password stri
 		}
 	}
 
-	access, refresh, err := a.jwter.CreateTokens(user.ID)
+	access, refresh, err := a.jwter.CreateTokens(user.ID, user.Verificated)
 	if err != nil {
 		return "", "", models.Error{
 			Message: "can't create jwt tokens for user",
