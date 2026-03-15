@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.1
 // - protoc             v3.21.12
-// source: users/v1/users.proto
+// source: users.proto
 
-package v1
+package users_api
 
 import (
 	context "context"
@@ -20,12 +20,13 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	UserServer_CreateProfile_FullMethodName    = "/usersv1.UserServer/CreateProfile"
-	UserServer_GetProfile_FullMethodName       = "/usersv1.UserServer/GetProfile"
-	UserServer_UpdateProfile_FullMethodName    = "/usersv1.UserServer/UpdateProfile"
-	UserServer_DeleteProfile_FullMethodName    = "/usersv1.UserServer/DeleteProfile"
-	UserServer_UpdateUserStatus_FullMethodName = "/usersv1.UserServer/UpdateUserStatus"
-	UserServer_ListUsers_FullMethodName        = "/usersv1.UserServer/ListUsers"
+	UserServer_CreateProfile_FullMethodName        = "/users.UserServer/CreateProfile"
+	UserServer_GetProfile_FullMethodName           = "/users.UserServer/GetProfile"
+	UserServer_GetProfileByUsername_FullMethodName = "/users.UserServer/GetProfileByUsername"
+	UserServer_UpdateProfile_FullMethodName        = "/users.UserServer/UpdateProfile"
+	UserServer_DeleteProfile_FullMethodName        = "/users.UserServer/DeleteProfile"
+	UserServer_UpdateUserStatus_FullMethodName     = "/users.UserServer/UpdateUserStatus"
+	UserServer_ListUsers_FullMethodName            = "/users.UserServer/ListUsers"
 )
 
 // UserServerClient is the client API for UserServer service.
@@ -38,6 +39,8 @@ type UserServerClient interface {
 	CreateProfile(ctx context.Context, in *CreateProfileRequest, opts ...grpc.CallOption) (*UserProfile, error)
 	// Get user profile by ID
 	GetProfile(ctx context.Context, in *GetProfileRequest, opts ...grpc.CallOption) (*UserProfile, error)
+	// Get user profile by username
+	GetProfileByUsername(ctx context.Context, in *GetProfileByUsernameRequest, opts ...grpc.CallOption) (*UserProfile, error)
 	// Update user profile
 	UpdateProfile(ctx context.Context, in *UpdateProfileRequest, opts ...grpc.CallOption) (*UserProfile, error)
 	// Delete user profile
@@ -70,6 +73,16 @@ func (c *userServerClient) GetProfile(ctx context.Context, in *GetProfileRequest
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(UserProfile)
 	err := c.cc.Invoke(ctx, UserServer_GetProfile_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServerClient) GetProfileByUsername(ctx context.Context, in *GetProfileByUsernameRequest, opts ...grpc.CallOption) (*UserProfile, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UserProfile)
+	err := c.cc.Invoke(ctx, UserServer_GetProfileByUsername_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -126,6 +139,8 @@ type UserServerServer interface {
 	CreateProfile(context.Context, *CreateProfileRequest) (*UserProfile, error)
 	// Get user profile by ID
 	GetProfile(context.Context, *GetProfileRequest) (*UserProfile, error)
+	// Get user profile by username
+	GetProfileByUsername(context.Context, *GetProfileByUsernameRequest) (*UserProfile, error)
 	// Update user profile
 	UpdateProfile(context.Context, *UpdateProfileRequest) (*UserProfile, error)
 	// Delete user profile
@@ -149,6 +164,9 @@ func (UnimplementedUserServerServer) CreateProfile(context.Context, *CreateProfi
 }
 func (UnimplementedUserServerServer) GetProfile(context.Context, *GetProfileRequest) (*UserProfile, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetProfile not implemented")
+}
+func (UnimplementedUserServerServer) GetProfileByUsername(context.Context, *GetProfileByUsernameRequest) (*UserProfile, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetProfileByUsername not implemented")
 }
 func (UnimplementedUserServerServer) UpdateProfile(context.Context, *UpdateProfileRequest) (*UserProfile, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateProfile not implemented")
@@ -215,6 +233,24 @@ func _UserServer_GetProfile_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServerServer).GetProfile(ctx, req.(*GetProfileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserServer_GetProfileByUsername_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetProfileByUsernameRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServerServer).GetProfileByUsername(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserServer_GetProfileByUsername_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServerServer).GetProfileByUsername(ctx, req.(*GetProfileByUsernameRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -295,7 +331,7 @@ func _UserServer_ListUsers_Handler(srv interface{}, ctx context.Context, dec fun
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var UserServer_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "usersv1.UserServer",
+	ServiceName: "users.UserServer",
 	HandlerType: (*UserServerServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -305,6 +341,10 @@ var UserServer_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetProfile",
 			Handler:    _UserServer_GetProfile_Handler,
+		},
+		{
+			MethodName: "GetProfileByUsername",
+			Handler:    _UserServer_GetProfileByUsername_Handler,
 		},
 		{
 			MethodName: "UpdateProfile",
@@ -324,5 +364,5 @@ var UserServer_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "users/v1/users.proto",
+	Metadata: "users.proto",
 }

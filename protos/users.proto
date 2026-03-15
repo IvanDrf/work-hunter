@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package usersv1;
+package users;
 
-option go_package = "pkg/users-api/v1";
+option go_package = "pkg/users-api";
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
@@ -14,6 +14,9 @@ service UserServer {
 
     // Get user profile by ID
     rpc GetProfile(GetProfileRequest) returns (UserProfile);
+
+    // Get user profile by username
+    rpc GetProfileByUsername(GetProfileByUsernameRequest) returns (UserProfile);
 
     // Update user profile
     rpc UpdateProfile(UpdateProfileRequest) returns (UserProfile);
@@ -86,6 +89,10 @@ message UpdateProfileRequest {
 
 message DeleteProfileRequest {
     string user_id = 1;
+}
+
+message GetProfileByUsernameRequest {
+    string username = 1;
 }
 
 message UpdateUserStatusRequest {
