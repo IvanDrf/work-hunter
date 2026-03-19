@@ -39,8 +39,8 @@ type AuthClient interface {
 	Login(ctx context.Context, in *User, opts ...grpc.CallOption) (*JwtTokens, error)
 	// Send verification email if user didn't get it after registration
 	SendVerificationEmail(ctx context.Context, in *Email, opts ...grpc.CallOption) (*AcceptStatus, error)
-	// Verify user email in database
-	VerifyEmail(ctx context.Context, in *Email, opts ...grpc.CallOption) (*JwtTokens, error)
+	// Verify user email by token
+	VerifyEmail(ctx context.Context, in *VerifToken, opts ...grpc.CallOption) (*JwtTokens, error)
 	// if token valid retursn token payload
 	IsTokenValid(ctx context.Context, in *AccessToken, opts ...grpc.CallOption) (*TokenPayload, error)
 	// refresh access, refresh tokens if they are valid
@@ -85,7 +85,7 @@ func (c *authClient) SendVerificationEmail(ctx context.Context, in *Email, opts 
 	return out, nil
 }
 
-func (c *authClient) VerifyEmail(ctx context.Context, in *Email, opts ...grpc.CallOption) (*JwtTokens, error) {
+func (c *authClient) VerifyEmail(ctx context.Context, in *VerifToken, opts ...grpc.CallOption) (*JwtTokens, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(JwtTokens)
 	err := c.cc.Invoke(ctx, Auth_VerifyEmail_FullMethodName, in, out, cOpts...)
@@ -127,8 +127,8 @@ type AuthServer interface {
 	Login(context.Context, *User) (*JwtTokens, error)
 	// Send verification email if user didn't get it after registration
 	SendVerificationEmail(context.Context, *Email) (*AcceptStatus, error)
-	// Verify user email in database
-	VerifyEmail(context.Context, *Email) (*JwtTokens, error)
+	// Verify user email by token
+	VerifyEmail(context.Context, *VerifToken) (*JwtTokens, error)
 	// if token valid retursn token payload
 	IsTokenValid(context.Context, *AccessToken) (*TokenPayload, error)
 	// refresh access, refresh tokens if they are valid
@@ -152,7 +152,7 @@ func (UnimplementedAuthServer) Login(context.Context, *User) (*JwtTokens, error)
 func (UnimplementedAuthServer) SendVerificationEmail(context.Context, *Email) (*AcceptStatus, error) {
 	return nil, status.Error(codes.Unimplemented, "method SendVerificationEmail not implemented")
 }
-func (UnimplementedAuthServer) VerifyEmail(context.Context, *Email) (*JwtTokens, error) {
+func (UnimplementedAuthServer) VerifyEmail(context.Context, *VerifToken) (*JwtTokens, error) {
 	return nil, status.Error(codes.Unimplemented, "method VerifyEmail not implemented")
 }
 func (UnimplementedAuthServer) IsTokenValid(context.Context, *AccessToken) (*TokenPayload, error) {
@@ -237,7 +237,7 @@ func _Auth_SendVerificationEmail_Handler(srv interface{}, ctx context.Context, d
 }
 
 func _Auth_VerifyEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Email)
+	in := new(VerifToken)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -249,7 +249,7 @@ func _Auth_VerifyEmail_Handler(srv interface{}, ctx context.Context, dec func(in
 		FullMethod: Auth_VerifyEmail_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServer).VerifyEmail(ctx, req.(*Email))
+		return srv.(AuthServer).VerifyEmail(ctx, req.(*VerifToken))
 	}
 	return interceptor(ctx, in, info, handler)
 }
