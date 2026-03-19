@@ -9,6 +9,7 @@ const (
 
 	ErrCodeUserNotFound      ErrorCode = "USER_NOT_FOUND"
 	ErrCodeUserAlreadyExists ErrorCode = "USER_ALREADY_EXISTS"
+	ErrOutdatedToken         ErrorCode = "TOKEN_IS_OUTDATED"
 
 	ErrCodeInvalidPassword ErrorCode = "INVALID_PASSWORD"
 	ErrCodeInvalidEmail    ErrorCode = "INVALID_EMAIL"

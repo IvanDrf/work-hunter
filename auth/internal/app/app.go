@@ -5,9 +5,11 @@ import (
 	"log"
 	"net"
 
+	"github.com/IvanDrf/work-hunter/auth/internal/app/factory"
 	"github.com/IvanDrf/work-hunter/auth/internal/config"
 	"github.com/IvanDrf/work-hunter/auth/internal/interfaces/grpc/handlers"
 	auth_api "github.com/IvanDrf/work-hunter/pkg/auth-api"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -22,7 +24,7 @@ type App struct {
 func NewApp(cfg *config.Config) *App {
 	app := &App{
 		cfg:      cfg,
-		handlers: newFactory(cfg).NewHandlers(),
+		handlers: factory.NewFactory(cfg).NewHandlers(),
 		server:   grpc.NewServer(),
 	}
 

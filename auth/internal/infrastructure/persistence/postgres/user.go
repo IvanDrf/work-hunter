@@ -4,28 +4,27 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/IvanDrf/work-hunter/auth/internal/config"
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
 )
 
-type AuthRepo struct {
+type UserRepo struct {
 	db *sql.DB
 }
 
-func NewAuthRepo(cfg *config.PostgreConfig) *AuthRepo {
-	return &AuthRepo{
-		db: Connect(cfg),
+func NewUserRepo(db *sql.DB) *UserRepo {
+	return &UserRepo{
+		db: db,
 	}
 }
 
-func (a *AuthRepo) Close() {
-	a.db.Close()
+func (u *UserRepo) Close() {
+	u.db.Close()
 }
 
-func (a *AuthRepo) CreateUser(ctx context.Context, user *models.User) error {
+func (u *UserRepo) CreateUser(ctx context.Context, user *models.User) error {
 	const query = "INSERT INTO users(user_id, email, hashed_password, verificated) VALUES($1, $2, $3)"
 
-	_, err := a.db.ExecContext(ctx, query, user.ID, user.Email, user.HashedPassword, user.Verificated)
+	_, err := u.db.ExecContext(ctx, query, user.ID, user.Email, user.HashedPassword, user.Verificated)
 	if err != nil {
 		return err
 	}
@@ -33,10 +32,10 @@ func (a *AuthRepo) CreateUser(ctx context.Context, user *models.User) error {
 	return nil
 }
 
-func (a *AuthRepo) FindUser(ctx context.Context, email string) (*models.User, error) {
+func (u *UserRepo) FindUser(ctx context.Context, email string) (*models.User, error) {
 	const query = "SELECT user_id, email, hashed_password, verificated FROM users WHERE username = $1 LIMIT 1"
 
-	rows, err := a.db.QueryContext(ctx, query, email)
+	rows, err := u.db.QueryContext(ctx, query, email)
 	if err != nil {
 		return nil, err
 	}
@@ -54,9 +53,9 @@ func (a *AuthRepo) FindUser(ctx context.Context, email string) (*models.User, er
 	return &user, nil
 }
 
-func (a *AuthRepo) VerifyEmail(ctx context.Context, email string) error {
+func (u *UserRepo) VerifyEmail(ctx context.Context, email string) error {
 	const query = "UPDATE users SET verificated = true WHERE email = $1"
 
-	_, err := a.db.ExecContext(ctx, query, email)
+	_, err := u.db.ExecContext(ctx, query, email)
 	return err
 }

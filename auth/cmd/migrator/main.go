@@ -25,5 +25,4 @@ func main() {
 	if err = m.Up(); err != nil {
 		log.Fatal(err)
 	}
-
 }

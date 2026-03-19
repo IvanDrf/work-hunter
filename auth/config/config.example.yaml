@@ -28,3 +28,8 @@ jwt:
   secret:  secret
   access_time: 15m
   refresh_time: 1080m
+
+email:
+  host_addr: smtp.gmail.com:587
+  username: host@gmail.com
+  password: password

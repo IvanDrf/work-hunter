@@ -16,7 +16,7 @@ func (h *Handler) VerifyEmail(ctx context.Context, email *auth_api.Email) (*auth
 	var e models.Error
 	if errors.As(err, &e) {
 		switch e.Code {
-		case models.ErrCodeInvalidEmail:
+		case models.ErrCodeUserNotFound:
 			return nil, status.Error(codes.NotFound, e.Message)
 
 		case models.ErrCodeInternal:

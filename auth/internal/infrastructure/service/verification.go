@@ -2,8 +2,7 @@ package service
 
 import (
 	"context"
-	"crypto/rand"
-	"encoding/hex"
+	"time"
 
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/ports/jwt"
@@ -13,15 +12,18 @@ import (
 
 type VerificationService struct {
 	emailProducer service.EmailProducer
-	userRepo      repo.UserRepo
+
+	userRepo  repo.UserRepo
+	tokenRepo repo.TokenRepo
 
 	jwter jwt.Jwter
 }
 
-func NewVerificationService(emailProducer service.EmailProducer, userRepo repo.UserRepo, jwter jwt.Jwter) *VerificationService {
+func NewVerificationService(emailProducer service.EmailProducer, userRepo repo.UserRepo, tokenRepo repo.TokenRepo, jwter jwt.Jwter) *VerificationService {
 	return &VerificationService{
 		emailProducer: emailProducer,
 		userRepo:      userRepo,
+		tokenRepo:     tokenRepo,
 		jwter:         jwter,
 	}
 }
@@ -32,9 +34,19 @@ func (v *VerificationService) Close() {
 }
 
 func (v *VerificationService) SendVerificationEmail(ctx context.Context, email string) error {
-	err := v.emailProducer.SendEmailInQueue(ctx, &models.EmailMessage{
+	token := models.NewToken()
+
+	err := v.tokenRepo.CreateToken(ctx, email, token)
+	if err != nil {
+		return models.Error{
+			Message: "can't create token for user",
+			Code:    models.ErrCodeInternal,
+		}
+	}
+
+	err = v.emailProducer.SendEmailInQueue(ctx, &models.EmailMessage{
 		Email: email,
-		Token: v.createToken(),
+		Token: token,
 	})
 
 	if err != nil {
@@ -47,12 +59,27 @@ func (v *VerificationService) SendVerificationEmail(ctx context.Context, email s
 	return nil
 }
 
-func (v *VerificationService) VerifyEmail(ctx context.Context, email string) (string, string, error) {
+func (v *VerificationService) VerifyEmailByToken(ctx context.Context, token string) (string, string, error) {
+	email, exp, err := v.tokenRepo.FindEmailExpByToken(ctx, token)
+	if err != nil {
+		return "", "", models.Error{
+			Message: "can't find user with that token",
+			Code:    models.ErrCodeUserNotFound,
+		}
+	}
+
+	if time.Now().After(exp) {
+		return "", "", models.Error{
+			Message: "token is outdated",
+			Code:    models.ErrOutdatedToken,
+		}
+	}
+
 	user, err := v.userRepo.FindUser(ctx, email)
 	if err != nil {
 		return "", "", models.Error{
 			Message: "can't find user with that email",
-			Code:    models.ErrCodeInvalidEmail,
+			Code:    models.ErrCodeUserNotFound,
 		}
 	}
 
@@ -73,11 +100,4 @@ func (v *VerificationService) VerifyEmail(ctx context.Context, email string) (st
 	}
 
 	return access, refresh, nil
-}
-
-func (v *VerificationService) createToken() string {
-	buff := make([]byte, 32)
-
-	rand.Read(buff)
-	return hex.EncodeToString(buff)
 }

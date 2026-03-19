@@ -4,7 +4,7 @@ import "context"
 
 type VerificationService interface {
 	SendVerificationEmail(ctx context.Context, email string) error
-	VerifyEmail(ctx context.Context, email string) (string, string, error)
+	VerifyEmailByToken(ctx context.Context, token string) (string, string, error)
 
 	Close()
 }
