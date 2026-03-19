@@ -19,7 +19,7 @@ func NewTokenRepo(db *sql.DB) *TokenRepo {
 }
 
 func (t *TokenRepo) CreateToken(ctx context.Context, email string, token *models.Token) error {
-	const query = "INSERT INTO tokens (email, token, exp) VALUES($1, $2, $3) ON CONFLICT (email) DO UPDATE SET token = $3, exp = $3"
+	const query = "INSERT INTO tokens (email, token, exp) VALUES($1, $2, $3) ON CONFLICT (email) DO UPDATE SET token = $4, exp = $5"
 
 	_, err := t.db.ExecContext(ctx, query, email, token.Token, token.Exp, token.Token, token.Exp)
 	return err
