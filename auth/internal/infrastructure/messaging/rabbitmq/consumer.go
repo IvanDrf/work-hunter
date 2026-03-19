@@ -27,12 +27,12 @@ func NewRabbitMqConsumer(cfg *config.RabbitMQConfig) *RabbitMQConsumer {
 	}
 }
 
-func (c *RabbitMQConsumer) Stop() {
+func (c *RabbitMQConsumer) Close() {
 	c.ch.Close()
 	c.conn.Close()
 }
 
-func (c *RabbitMQConsumer) GetEmailsFromQueue(ctx context.Context, output chan<- *models.EmailMessage) {
+func (c *RabbitMQConsumer) ProcessEmailsFromQueue(ctx context.Context, fn func(*models.EmailMessage) error) {
 	messages, err := c.ch.Consume(c.queue.Name, "", false, false, false, false, nil)
 	if err != nil {
 		log.Fatalf("can't start consuming messages from rabbitmq: %s", err)
@@ -48,17 +48,22 @@ func (c *RabbitMQConsumer) GetEmailsFromQueue(ctx context.Context, output chan<-
 				continue
 			}
 
-			email, err := parseMessage(message)
-			if err != nil {
-				// add logging
+			if err := processMessage(message, fn); err != nil {
 				message.Reject(false)
-				continue
+			} else {
+				message.Ack(false)
 			}
-
-			output <- email
-			message.Ack(false)
 		}
 	}
+}
+
+func processMessage(message rabbit.Delivery, fn func(*models.EmailMessage) error) error {
+	email, err := parseMessage(message)
+	if err != nil {
+		return err
+	}
+
+	return fn(email)
 }
 
 func parseMessage(message rabbit.Delivery) (*models.EmailMessage, error) {

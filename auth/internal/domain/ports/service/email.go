@@ -17,7 +17,7 @@ type EmailProducer interface {
 }
 
 type EmailConsumer interface {
-	GetEmailsFromQueue(ctx context.Context, output chan<- *models.EmailMessage)
+	ProcessEmailsFromQueue(ctx context.Context, fn func(msg *models.EmailMessage) error)
 
 	Close()
 }

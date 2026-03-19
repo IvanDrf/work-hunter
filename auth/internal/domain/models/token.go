@@ -19,3 +19,7 @@ func NewToken() *Token {
 		Exp:   time.Now().Add(tokenTTL).UTC(),
 	}
 }
+
+func (t *Token) IsTokenValid() bool {
+	return !time.Now().After(t.Exp)
+}

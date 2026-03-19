@@ -1,6 +1,11 @@
 package events
 
-import "github.com/IvanDrf/work-hunter/auth/internal/domain/ports/service"
+import (
+	"context"
+
+	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
+	"github.com/IvanDrf/work-hunter/auth/internal/domain/ports/service"
+)
 
 type EmailWorker struct {
 	consumer     service.EmailConsumer
@@ -14,6 +19,15 @@ func NewEmailWorker(consumer service.EmailConsumer, emailService service.EmailSe
 	}
 }
 
-func (w *EmailWorker) Start() {
+func (w *EmailWorker) Start(ctx context.Context) {
+	w.consumer.ProcessEmailsFromQueue(ctx, func(msg *models.EmailMessage) error {
+		if !msg.Token.IsTokenValid() {
+			return models.Error{
+				Message: "token is outdated",
+				Code:    models.ErrOutdatedToken,
+			}
+		}
 
+		return w.emailService.SendVerificationEmail(msg.Email, msg.Token.Token)
+	})
 }
