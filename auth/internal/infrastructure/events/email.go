@@ -31,3 +31,7 @@ func (w *EmailWorker) Start(ctx context.Context) {
 		return w.emailService.SendVerificationEmail(msg.Email, msg.Token.Token)
 	})
 }
+
+func (w *EmailWorker) Stop() {
+	w.consumer.Close()
+}

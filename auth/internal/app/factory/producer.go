@@ -5,6 +5,6 @@ import (
 	messaging "github.com/IvanDrf/work-hunter/auth/internal/infrastructure/messaging/rabbitmq"
 )
 
-func (f *Factory) NewProducer() service.EmailProducer {
+func (f *Factory) newProducer() service.EmailProducer {
 	return messaging.NewRabbitMqProducer(&f.cfg.Broker)
 }

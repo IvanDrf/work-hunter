@@ -1,5 +1,8 @@
 package events
 
+import "context"
+
 type EmailWorker interface {
-	SendEmailVerification(email string)
+	Start(ctx context.Context)
+	Stop()
 }
