@@ -34,3 +34,10 @@ func (t *TokenRepo) FindEmailExpByToken(ctx context.Context, token string) (stri
 	err := t.db.QueryRowContext(ctx, query, token).Scan(&email, &exp)
 	return email, exp, err
 }
+
+func (t *TokenRepo) DeleteToken(ctx context.Context, token string) error {
+	const query = "DELETE FROM tokens WHERE token = $1"
+
+	_, err := t.db.ExecContext(ctx, query, token)
+	return err
+}

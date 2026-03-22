@@ -91,6 +91,11 @@ func (v *VerificationService) VerifyEmailByToken(ctx context.Context, token stri
 		}
 	}
 
+	err = v.tokenRepo.DeleteToken(ctx, token)
+	if err != nil {
+		// add logging
+	}
+
 	access, refresh, err := v.jwter.CreateTokens(user.ID, true)
 	if err != nil {
 		return "", "", models.Error{
