@@ -96,3 +96,18 @@ func (a *AuthService) RefreshTokens(ctx context.Context, refresh string) (string
 
 	return access, refresh, nil
 }
+
+func (a *AuthService) GetTokenPayload(ctx context.Context, access string) (*models.JwtPayload, error) {
+	id, verificated, err := a.jwter.GetPayload(access)
+	if err != nil {
+		return nil, models.Error{
+			Code:    models.ErrCodeInvalidJWT,
+			Message: "invalid jwt token",
+		}
+	}
+
+	return &models.JwtPayload{
+		ID:          id,
+		Verificated: verificated,
+	}, nil
+}
