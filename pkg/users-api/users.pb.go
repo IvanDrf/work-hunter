@@ -143,9 +143,7 @@ type UserProfile struct {
 	Role          UserRole               `protobuf:"varint,9,opt,name=role,proto3,enum=users.UserRole" json:"role,omitempty"`       // User role
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	LastLoginAt   *timestamppb.Timestamp `protobuf:"bytes,12,opt,name=last_login_at,json=lastLoginAt,proto3" json:"last_login_at,omitempty"`
-	EmailVerified bool                   `protobuf:"varint,13,opt,name=email_verified,json=emailVerified,proto3" json:"email_verified,omitempty"`
-	Metadata      map[string]string      `protobuf:"bytes,14,rep,name=metadata,proto3" json:"metadata,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Metadata      map[string]string      `protobuf:"bytes,12,rep,name=metadata,proto3" json:"metadata,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -255,20 +253,6 @@ func (x *UserProfile) GetUpdatedAt() *timestamppb.Timestamp {
 		return x.UpdatedAt
 	}
 	return nil
-}
-
-func (x *UserProfile) GetLastLoginAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.LastLoginAt
-	}
-	return nil
-}
-
-func (x *UserProfile) GetEmailVerified() bool {
-	if x != nil {
-		return x.EmailVerified
-	}
-	return false
 }
 
 func (x *UserProfile) GetMetadata() map[string]string {
@@ -762,7 +746,7 @@ var File_users_proto protoreflect.FileDescriptor
 
 const file_users_proto_rawDesc = "" +
 	"\n" +
-	"\vusers.proto\x12\x05users\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bgoogle/protobuf/empty.proto\"\xf5\x04\n" +
+	"\vusers.proto\x12\x05users\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bgoogle/protobuf/empty.proto\"\x8e\x04\n" +
 	"\vUserProfile\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
 	"\busername\x18\x02 \x01(\tR\busername\x12\x14\n" +
@@ -779,10 +763,8 @@ const file_users_proto_rawDesc = "" +
 	"created_at\x18\n" +
 	" \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"updated_at\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12>\n" +
-	"\rlast_login_at\x18\f \x01(\v2\x1a.google.protobuf.TimestampR\vlastLoginAt\x12%\n" +
-	"\x0eemail_verified\x18\r \x01(\bR\remailVerified\x12<\n" +
-	"\bmetadata\x18\x0e \x03(\v2 .users.UserProfile.MetadataEntryR\bmetadata\x1a;\n" +
+	"updated_at\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12<\n" +
+	"\bmetadata\x18\f \x03(\v2 .users.UserProfile.MetadataEntryR\bmetadata\x1a;\n" +
 	"\rMetadataEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xc0\x01\n" +
@@ -890,32 +872,31 @@ var file_users_proto_depIdxs = []int32{
 	1,  // 1: users.UserProfile.role:type_name -> users.UserRole
 	13, // 2: users.UserProfile.created_at:type_name -> google.protobuf.Timestamp
 	13, // 3: users.UserProfile.updated_at:type_name -> google.protobuf.Timestamp
-	13, // 4: users.UserProfile.last_login_at:type_name -> google.protobuf.Timestamp
-	11, // 5: users.UserProfile.metadata:type_name -> users.UserProfile.MetadataEntry
-	12, // 6: users.UpdateProfileRequest.metadata:type_name -> users.UpdateProfileRequest.MetadataEntry
-	0,  // 7: users.UpdateUserStatusRequest.status:type_name -> users.UserStatus
-	0,  // 8: users.ListUsersRequest.status:type_name -> users.UserStatus
-	1,  // 9: users.ListUsersRequest.role:type_name -> users.UserRole
-	2,  // 10: users.ListUsersResponse.users:type_name -> users.UserProfile
-	3,  // 11: users.UserServer.CreateProfile:input_type -> users.CreateProfileRequest
-	4,  // 12: users.UserServer.GetProfile:input_type -> users.GetProfileRequest
-	7,  // 13: users.UserServer.GetProfileByUsername:input_type -> users.GetProfileByUsernameRequest
-	5,  // 14: users.UserServer.UpdateProfile:input_type -> users.UpdateProfileRequest
-	6,  // 15: users.UserServer.DeleteProfile:input_type -> users.DeleteProfileRequest
-	8,  // 16: users.UserServer.UpdateUserStatus:input_type -> users.UpdateUserStatusRequest
-	9,  // 17: users.UserServer.ListUsers:input_type -> users.ListUsersRequest
-	2,  // 18: users.UserServer.CreateProfile:output_type -> users.UserProfile
-	2,  // 19: users.UserServer.GetProfile:output_type -> users.UserProfile
-	2,  // 20: users.UserServer.GetProfileByUsername:output_type -> users.UserProfile
-	2,  // 21: users.UserServer.UpdateProfile:output_type -> users.UserProfile
-	14, // 22: users.UserServer.DeleteProfile:output_type -> google.protobuf.Empty
-	2,  // 23: users.UserServer.UpdateUserStatus:output_type -> users.UserProfile
-	10, // 24: users.UserServer.ListUsers:output_type -> users.ListUsersResponse
-	18, // [18:25] is the sub-list for method output_type
-	11, // [11:18] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	11, // 4: users.UserProfile.metadata:type_name -> users.UserProfile.MetadataEntry
+	12, // 5: users.UpdateProfileRequest.metadata:type_name -> users.UpdateProfileRequest.MetadataEntry
+	0,  // 6: users.UpdateUserStatusRequest.status:type_name -> users.UserStatus
+	0,  // 7: users.ListUsersRequest.status:type_name -> users.UserStatus
+	1,  // 8: users.ListUsersRequest.role:type_name -> users.UserRole
+	2,  // 9: users.ListUsersResponse.users:type_name -> users.UserProfile
+	3,  // 10: users.UserServer.CreateProfile:input_type -> users.CreateProfileRequest
+	4,  // 11: users.UserServer.GetProfile:input_type -> users.GetProfileRequest
+	7,  // 12: users.UserServer.GetProfileByUsername:input_type -> users.GetProfileByUsernameRequest
+	5,  // 13: users.UserServer.UpdateProfile:input_type -> users.UpdateProfileRequest
+	6,  // 14: users.UserServer.DeleteProfile:input_type -> users.DeleteProfileRequest
+	8,  // 15: users.UserServer.UpdateUserStatus:input_type -> users.UpdateUserStatusRequest
+	9,  // 16: users.UserServer.ListUsers:input_type -> users.ListUsersRequest
+	2,  // 17: users.UserServer.CreateProfile:output_type -> users.UserProfile
+	2,  // 18: users.UserServer.GetProfile:output_type -> users.UserProfile
+	2,  // 19: users.UserServer.GetProfileByUsername:output_type -> users.UserProfile
+	2,  // 20: users.UserServer.UpdateProfile:output_type -> users.UserProfile
+	14, // 21: users.UserServer.DeleteProfile:output_type -> google.protobuf.Empty
+	2,  // 22: users.UserServer.UpdateUserStatus:output_type -> users.UserProfile
+	10, // 23: users.UserServer.ListUsers:output_type -> users.ListUsersResponse
+	17, // [17:24] is the sub-list for method output_type
+	10, // [10:17] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_users_proto_init() }
