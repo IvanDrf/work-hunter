@@ -1,7 +1,5 @@
 package service
 
-// TODO: add workable domain
-
 import (
 	"bytes"
 	"html/template"
