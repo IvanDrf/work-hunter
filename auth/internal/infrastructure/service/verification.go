@@ -68,7 +68,7 @@ func (v *VerificationService) VerifyEmailByToken(ctx context.Context, token stri
 		}
 	}
 
-	if time.Now().After(exp) {
+	if time.Now().UTC().Before(exp) {
 		return "", "", models.Error{
 			Message: "token is outdated",
 			Code:    models.ErrOutdatedToken,

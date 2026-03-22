@@ -1,5 +1,7 @@
 package service
 
+// TODO: add workable domain
+
 import (
 	"bytes"
 	"html/template"
@@ -46,7 +48,7 @@ func (e *SmtpEmailService) SendVerificationEmail(email string, token string) err
 
 const (
 	htmlEmailBodyPath = "static/email.html"
-	headers           = "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";"
+	headers           = "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\nSubject: Подтверждение email на Work-Hunter\n"
 )
 
 func createVerificationMessage(token string) (string, error) {
@@ -57,7 +59,11 @@ func createVerificationMessage(token string) (string, error) {
 
 	buff := bytes.Buffer{}
 
-	err = tmpl.Execute(&buff, token)
+	err = tmpl.Execute(&buff, struct {
+		Token string
+	}{Token: token},
+	)
+
 	if err != nil {
 		return "", err
 	}

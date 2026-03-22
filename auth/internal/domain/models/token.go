@@ -21,5 +21,5 @@ func NewToken() *Token {
 }
 
 func (t *Token) IsTokenValid() bool {
-	return !time.Now().After(t.Exp)
+	return time.Now().UTC().Before(t.Exp)
 }

@@ -29,7 +29,7 @@ func (h *Handler) Register(ctx context.Context, user *auth_api.User) (*auth_api.
 
 	err = h.verificationService.SendVerificationEmail(ctx, user.Email)
 	if err != nil {
-		// TODO: add logging
+		// add logging
 	}
 
 	return &auth_api.JwtTokens{
