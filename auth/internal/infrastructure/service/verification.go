@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"time"
 
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/ports/jwt"
@@ -68,7 +67,7 @@ func (v *VerificationService) VerifyEmailByToken(ctx context.Context, token stri
 		}
 	}
 
-	if !time.Now().UTC().Before(exp) {
+	if !(&models.Token{Exp: exp}).IsTokenValid() {
 		return "", "", models.Error{
 			Message: "token is outdated",
 			Code:    models.ErrOutdatedToken,
