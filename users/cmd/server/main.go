@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/IvanDrf/workk-hunter/pkg/users/internal/config"
-	"github.com/IvanDrf/workk-hunter/pkg/users/internal/database"
+	"github.com/IvanDrf/workk-hunter/pkg/users/internal/infrastructure/persistence/postgres"
 	"github.com/IvanDrf/workk-hunter/pkg/users/internal/logger"
 	"github.com/IvanDrf/workk-hunter/pkg/users/internal/migration/migrator"
 )
@@ -23,7 +23,7 @@ func main() {
 	log.Info("Starting user service", slog.Int("port", config.Server.Port), slog.String("log_level", config.Logger.Level))
 
 	// connect to db
-	db, err := database.NewPostgresConnection(config.Database, log)
+	db, err := postgres.NewPostgresConnection(config.Database, log)
 	if err != nil {
 		log.Error("Failed to connect to database", slog.Any("error", err))
 		os.Exit(1)

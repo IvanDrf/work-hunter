@@ -3,6 +3,7 @@ package user
 import (
 	"time"
 
+	"github.com/IvanDrf/workk-hunter/pkg/users/internal/interfaces/grpc/dto"
 	"github.com/google/uuid"
 )
 
@@ -43,7 +44,7 @@ type User struct {
 	UpdatedAt time.Time `db:"updatet_at"`
 }
 
-func NewUser(req *CreateUserRequest) *User {
+func NewUser(req *dto.CreateUserRequest) *User {
 	now := time.Now()
 	return &User{
 		ID:          uuid.New(),
@@ -63,7 +64,7 @@ func NewUser(req *CreateUserRequest) *User {
 	}
 }
 
-func (u *User) UpdateUser(req *UpdateUserRequest) {
+func (u *User) UpdateUser(req *dto.UpdateUserRequest) {
 	if req.FirstName != "" {
 		u.FirstName = req.FirstName
 	}
@@ -82,22 +83,4 @@ func (u *User) UpdateUser(req *UpdateUserRequest) {
 	}
 
 	u.UpdatedAt = time.Now()
-}
-
-// DTO for creating user
-type CreateUserRequest struct {
-	Username    string
-	Email       string
-	FirstName   string
-	LastName    string
-	PhoneNumber string
-}
-
-// DTO for updating user
-type UpdateUserRequest struct {
-	FirstName   string
-	LastName    string
-	PhoneNumber string
-	AvatarURL   string
-	Metadata    map[string]string
 }
