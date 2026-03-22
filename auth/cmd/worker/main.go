@@ -21,7 +21,7 @@ func main() {
 	go worker.Start(ctx)
 	stop := make(chan os.Signal, 1)
 
-	signal.Notify(stop, syscall.SIGABRT, syscall.SIGTERM)
+	signal.Notify(stop, syscall.SIGABRT, syscall.SIGTERM, syscall.SIGINT)
 	<-stop
 	cancel()
 

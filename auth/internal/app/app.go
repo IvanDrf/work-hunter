@@ -3,6 +3,7 @@ package app
 import (
 	"fmt"
 	"log"
+	"log/slog"
 	"net"
 
 	"github.com/IvanDrf/work-hunter/auth/internal/app/factory"
@@ -39,12 +40,16 @@ func (a *App) Run() {
 		log.Fatalf("can't start AUTH service: %s", err)
 	}
 
+	slog.Info("Starting AUTH service", slog.String("host", a.cfg.App.Host), slog.Int("port", a.cfg.App.Port))
+
 	if err := a.server.Serve(l); err != nil {
 		log.Fatalf("can't start AUTH servie: %s", err)
 	}
 }
 
 func (a *App) Stop() {
+	slog.Info("Stopping AUTH service", slog.String("host", a.cfg.App.Host), slog.Int("port", a.cfg.App.Port))
+
 	a.server.GracefulStop()
 	a.handlers.Close()
 }
