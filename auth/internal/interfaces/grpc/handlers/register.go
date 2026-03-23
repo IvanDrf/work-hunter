@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"errors"
+	"log/slog"
 
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
 	auth_api "github.com/IvanDrf/work-hunter/pkg/auth-api"
@@ -11,10 +12,13 @@ import (
 )
 
 func (h *Handler) Register(ctx context.Context, user *auth_api.User) (*auth_api.JwtTokens, error) {
+	slog.Info("Register got request")
 	access, refresh, err := h.authService.RegisterUser(ctx, user.Email, user.Password)
 
 	var e models.Error
 	if errors.As(err, &e) {
+		slog.Error("Register error", slog.String("error", err.Error()))
+
 		switch e.Code {
 		case models.ErrCodeUserAlreadyExists:
 			return nil, status.Error(codes.AlreadyExists, e.Message)
@@ -29,9 +33,10 @@ func (h *Handler) Register(ctx context.Context, user *auth_api.User) (*auth_api.
 
 	err = h.verificationService.SendVerificationEmail(ctx, user.Email)
 	if err != nil {
-		// add logging
+		slog.Error("Register error", slog.String("error", err.Error()))
 	}
 
+	slog.Info("Register successfull response")
 	return &auth_api.JwtTokens{
 		Access:  access,
 		Refresh: refresh,
