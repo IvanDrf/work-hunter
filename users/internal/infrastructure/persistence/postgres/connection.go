@@ -7,15 +7,21 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 
 	"github.com/IvanDrf/workk-hunter/pkg/users/internal/config"
 	"github.com/IvanDrf/workk-hunter/pkg/users/internal/logger"
 )
 
+type PostgresConnection struct {
+	db  *sqlx.DB
+	log *logger.Logger
+}
+
 // create connection to postgres database
-func NewPostgresConnection(cfg config.DBConfig, log *logger.Logger) (*sql.DB, error) {
-	db, err := sql.Open("postgres", cfg.DSN())
+func NewPostgresConnection(cfg config.DBConfig, log *logger.Logger) (*PostgresConnection, error) {
+	db, err := sqlx.Open("postgres", cfg.DSN())
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
 	}
@@ -36,11 +42,22 @@ func NewPostgresConnection(cfg config.DBConfig, log *logger.Logger) (*sql.DB, er
 		slog.Int("port", cfg.Port),
 		slog.String("dbname", cfg.DBName))
 
-	return db, nil
+	return &PostgresConnection{
+		db:  db,
+		log: log,
+	}, nil
+}
+
+func (c *PostgresConnection) GetDB() *sqlx.DB {
+	return c.db
+}
+
+func (c *PostgresConnection) Close() error {
+	return c.db.Close()
 }
 
 // execute function in transaction
-func WithTransaction(ctx context.Context, db *sql.DB, fn func(*sql.Tx) error) error {
+func WithTransaction(ctx context.Context, db *sqlx.DB, fn func(*sql.Tx) error) error {
 	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("failed to begin transaction: %w", err)
