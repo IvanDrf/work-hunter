@@ -1,4 +1,4 @@
-CREATE TYPE user_status AS ENUM ('active', 'inacticve', 'blocked', 'deleted');
+CREATE TYPE user_status AS ENUM ('active', 'inactive', 'blocked', 'deleted');
 CREATE TYPE user_role AS ENUM ('user', 'moderator', 'admin');
 
 CREATE TABLE IF NOT EXISTS users (
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS users (
     status user_status NOT NULL DEFAULT 'active',
     role user_role NOT NULL DEFAULT 'user',
 
-    metadata JSONB NOT NULL DEFAULT '{}'
+    metadata JSONB NOT NULL DEFAULT '{}',
 
     -- time points 
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -34,7 +34,7 @@ CREATE INDEX IF NOT EXISTS idx_users_role ON users(role) WHERE deleted_at IS NUL
 CREATE INDEX IF NOT EXISTS idx_users_created_at ON users(created_at) WHERE deleted_at IS NULL;
 
 -- index for fill-text search
-CREATE INDEX IF NOT EXISTS idx_users_serch ON users
+CREATE INDEX IF NOT EXISTS idx_users_search ON users
 USING GIN(to_tsvector('russian', username || ' ' || email || ' ' || first_name || ' ' || last_name));
 
 -- trigger for auto update 'updated_at'

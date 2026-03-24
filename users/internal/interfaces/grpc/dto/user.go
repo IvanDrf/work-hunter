@@ -1,7 +1,12 @@
 package dto
 
+import (
+	"github.com/IvanDrf/workk-hunter/pkg/users/internal/domain/rules"
+)
+
 // DTO for creating user
 type CreateUserRequest struct {
+	ID          string
 	Username    string
 	Email       string
 	FirstName   string
@@ -11,9 +16,25 @@ type CreateUserRequest struct {
 
 // DTO for updating user
 type UpdateUserRequest struct {
+	ID          string
 	FirstName   string
 	LastName    string
 	PhoneNumber string
 	AvatarURL   string
 	Metadata    map[string]string
+}
+
+// DTO for listing users
+type ListUsersRequest struct {
+	PageSize    int32
+	Status      rules.UserStatus
+	Role        rules.UserRole
+	SearchQuery string
+	SortBy      string
+}
+
+// DTO for updating user status
+type UpdateUserStatusRequest struct {
+	ID     string
+	Status rules.UserStatus
 }

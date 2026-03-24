@@ -10,8 +10,8 @@ import (
 
 	"github.com/IvanDrf/workk-hunter/pkg/users/internal/config"
 	"github.com/IvanDrf/workk-hunter/pkg/users/internal/infrastructure/persistence/postgres"
+	"github.com/IvanDrf/workk-hunter/pkg/users/internal/infrastructure/persistence/postgres/migrator"
 	"github.com/IvanDrf/workk-hunter/pkg/users/internal/logger"
-	"github.com/IvanDrf/workk-hunter/pkg/users/internal/migration/migrator"
 )
 
 func main() {
