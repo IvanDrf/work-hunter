@@ -46,3 +46,23 @@ func NewUser(req *dto.CreateUserRequest) *User {
 		UpdatedAt: now,
 	}
 }
+
+func (u *User) UpdateUser(req *dto.UpdateUserRequest) {
+	if req.FirstName != "" {
+		u.FirstName = req.FirstName
+	}
+	if req.LastName != "" {
+		u.LastName = req.LastName
+	}
+	if req.PhoneNumber != "" {
+		u.PhoneNumber = req.PhoneNumber
+	}
+	if req.AvatarURL != "" {
+		u.AvatarURL = req.AvatarURL
+	}
+	if req.Metadata != nil {
+		u.Metadata = req.Metadata
+	}
+
+	u.UpdatedAt = time.Now()
+}

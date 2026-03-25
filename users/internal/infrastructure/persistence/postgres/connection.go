@@ -4,23 +4,20 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"log/slog"
 	"time"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 
 	"github.com/IvanDrf/workk-hunter/pkg/users/internal/config"
-	"github.com/IvanDrf/workk-hunter/pkg/users/internal/logger"
 )
 
 type PostgresConnection struct {
-	db  *sqlx.DB
-	log *logger.Logger
+	db *sqlx.DB
 }
 
 // create connection to postgres database
-func NewPostgresConnection(cfg config.DBConfig, log *logger.Logger) (*PostgresConnection, error) {
+func NewPostgresConnection(cfg config.DBConfig) (*PostgresConnection, error) {
 	db, err := sqlx.Open("postgres", cfg.DSN())
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
@@ -37,14 +34,8 @@ func NewPostgresConnection(cfg config.DBConfig, log *logger.Logger) (*PostgresCo
 		return nil, fmt.Errorf("failed to ping database: %w", err)
 	}
 
-	log.Info("Connected to database",
-		slog.String("host", cfg.Host),
-		slog.Int("port", cfg.Port),
-		slog.String("dbname", cfg.DBName))
-
 	return &PostgresConnection{
-		db:  db,
-		log: log,
+		db: db,
 	}, nil
 }
 

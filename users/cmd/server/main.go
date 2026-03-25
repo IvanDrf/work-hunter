@@ -23,12 +23,12 @@ func main() {
 	log.Info("Starting user service", slog.Int("port", config.Server.Port), slog.String("log_level", config.Logger.Level))
 
 	// connect to db
-	db, err := postgres.NewPostgresConnection(config.Database, log)
+	conn, err := postgres.NewPostgresConnection(config.Database)
 	if err != nil {
 		log.Error("Failed to connect to database", slog.Any("error", err))
 		os.Exit(1)
 	}
-	defer db.Close()
+	defer conn.Close()
 
 	// migrations
 	if err := migrator.MigrateUp(config.Database.DSN()); err != nil {

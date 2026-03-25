@@ -22,7 +22,7 @@ type UpdateUserRequest struct {
 	LastName    string
 	PhoneNumber string
 	AvatarURL   string
-	Metadata    map[string]string
+	Metadata    []byte
 }
 
 // DTO for listing users
