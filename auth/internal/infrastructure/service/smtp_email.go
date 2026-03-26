@@ -3,6 +3,7 @@ package service
 import (
 	"bytes"
 	"html/template"
+	"log/slog"
 	"net/smtp"
 
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
@@ -26,6 +27,7 @@ func NewSmtpEmailService(host string, username string, password string) *SmtpEma
 func (e *SmtpEmailService) SendVerificationEmail(email string, token string) error {
 	message, err := createVerificationMessage(token)
 	if err != nil {
+		slog.Error("SendVerifEmail error", slog.String("error", err.Error()))
 		return models.Error{
 			Message: "can't create verification message",
 			Code:    models.ErrCodeInternal,
@@ -35,6 +37,7 @@ func (e *SmtpEmailService) SendVerificationEmail(email string, token string) err
 	auth := smtp.PlainAuth("", e.username, e.password, "smtp.gmail.com")
 	err = smtp.SendMail(e.host, auth, e.username, []string{email}, []byte(message))
 	if err != nil {
+		slog.Error("SendVerifEmail error", slog.String("error", err.Error()))
 		return models.Error{
 			Message: "can't send verification email",
 			Code:    models.ErrCodeInternal,
