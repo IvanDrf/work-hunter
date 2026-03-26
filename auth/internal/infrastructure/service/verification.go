@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/ports/jwt"
@@ -37,6 +38,7 @@ func (v *VerificationService) SendVerificationEmail(ctx context.Context, email s
 
 	err := v.tokenRepo.CreateToken(ctx, email, token)
 	if err != nil {
+		slog.Error("verif:SendVerifEmail service error", slog.String("error", err.Error()))
 		return models.Error{
 			Message: "can't create token for user",
 			Code:    models.ErrCodeInternal,
@@ -49,18 +51,21 @@ func (v *VerificationService) SendVerificationEmail(ctx context.Context, email s
 	})
 
 	if err != nil {
+		slog.Error("verif:SendVerifEmail service error", slog.String("error", err.Error()))
 		return models.Error{
 			Message: "can't send verification message",
 			Code:    models.ErrCodeInternal,
 		}
 	}
 
+	slog.Info("verif:SendVerifEmail service success")
 	return nil
 }
 
 func (v *VerificationService) VerifyEmailByToken(ctx context.Context, token string) (string, string, error) {
 	email, exp, err := v.tokenRepo.FindEmailExpByToken(ctx, token)
 	if err != nil {
+		slog.Error("verif:VerifyEmailByToken error", slog.String("error", err.Error()))
 		return "", "", models.Error{
 			Message: "can't find user with that token",
 			Code:    models.ErrCodeUserNotFound,
@@ -68,6 +73,7 @@ func (v *VerificationService) VerifyEmailByToken(ctx context.Context, token stri
 	}
 
 	if !(&models.Token{Exp: exp}).IsTokenValid() {
+		slog.Info("verif:VerifyEmailByToken token is expired")
 		return "", "", models.Error{
 			Message: "token is outdated",
 			Code:    models.ErrOutdatedToken,
@@ -76,6 +82,7 @@ func (v *VerificationService) VerifyEmailByToken(ctx context.Context, token stri
 
 	user, err := v.userRepo.FindUser(ctx, email)
 	if err != nil {
+		slog.Error("verif:VerifyEmailByToken error", slog.String("error", err.Error()))
 		return "", "", models.Error{
 			Message: "can't find user with that email",
 			Code:    models.ErrCodeUserNotFound,
@@ -84,6 +91,7 @@ func (v *VerificationService) VerifyEmailByToken(ctx context.Context, token stri
 
 	err = v.userRepo.VerifyEmail(ctx, email)
 	if err != nil {
+		slog.Error("verif:VerifyEmailByToken error", slog.String("error", err.Error()))
 		return "", "", models.Error{
 			Message: "can't verify user email",
 			Code:    models.ErrCodeInternal,
@@ -92,16 +100,18 @@ func (v *VerificationService) VerifyEmailByToken(ctx context.Context, token stri
 
 	err = v.tokenRepo.DeleteToken(ctx, token)
 	if err != nil {
-		// add logging
+		slog.Error("verif:VerifyByEmailToken internal error, can't delete token", slog.String("error", err.Error()))
 	}
 
 	access, refresh, err := v.jwter.CreateTokens(user.ID, true)
 	if err != nil {
+		slog.Error("verif:VerifyEmailByToken error", slog.String("error", err.Error()))
 		return "", "", models.Error{
 			Message: "can't create jwt tokens for user",
 			Code:    models.ErrCodeInternal,
 		}
 	}
 
+	slog.Info("verif:VerifyEmailByToken service success")
 	return access, refresh, nil
 }
