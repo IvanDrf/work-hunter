@@ -2,6 +2,7 @@ package events
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/ports/service"
@@ -20,8 +21,12 @@ func NewEmailWorker(consumer service.EmailConsumer, emailService service.EmailSe
 }
 
 func (w *EmailWorker) Start(ctx context.Context) {
+	slog.Info("Starting WORKER")
+
 	w.consumer.ProcessEmailsFromQueue(ctx, func(msg *models.EmailMessage) error {
+		slog.Info("worker: got message from queue")
 		if !msg.IsTokenValid() {
+			slog.Warn("worker: token is outdated")
 			return models.Error{
 				Message: "token is outdated",
 				Code:    models.ErrCodeOutdatedToken,

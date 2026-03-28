@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"log"
+	"log/slog"
 
 	"github.com/IvanDrf/work-hunter/auth/internal/config"
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
@@ -50,6 +51,7 @@ func (c *RabbitMQConsumer) ProcessEmailsFromQueue(ctx context.Context, fn func(*
 
 			if err := processMessage(message, fn); err != nil {
 				message.Reject(false)
+				slog.Error("Error while processing message from broker", slog.String("error", err.Error()))
 			} else {
 				message.Ack(false)
 			}
