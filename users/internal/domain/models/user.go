@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/IvanDrf/workk-hunter/pkg/users/internal/domain/rules"
-	"github.com/IvanDrf/workk-hunter/pkg/users/internal/interfaces/grpc/dto"
 	"github.com/google/uuid"
 )
 
@@ -27,15 +26,15 @@ type User struct {
 	UpdatedAt time.Time `db:"updated_at"`
 }
 
-func NewUser(req *dto.CreateUserRequest) *User {
+func NewUser(id uuid.UUID, username, email, firstName, lastName, phoneNumber string) *User {
 	now := time.Now()
 	return &User{
-		ID:          req.ID,
-		Username:    req.Username,
-		Email:       req.Email,
-		FirstName:   req.FirstName,
-		LastName:    req.LastName,
-		PhoneNumber: req.PhoneNumber,
+		ID:          id,
+		Username:    username,
+		Email:       email,
+		FirstName:   firstName,
+		LastName:    lastName,
+		PhoneNumber: phoneNumber,
 
 		Status: rules.UserStatusActive,
 		Role:   rules.UserRoleUser,
@@ -47,21 +46,21 @@ func NewUser(req *dto.CreateUserRequest) *User {
 	}
 }
 
-func (u *User) UpdateUser(req *dto.UpdateUserRequest) {
-	if req.FirstName != "" {
-		u.FirstName = req.FirstName
+func (u *User) UpdateUser(firstName, lastName, phoneNumber, avatarURL string, metadata json.RawMessage) {
+	if firstName != "" {
+		u.FirstName = firstName
 	}
-	if req.LastName != "" {
-		u.LastName = req.LastName
+	if lastName != "" {
+		u.LastName = lastName
 	}
-	if req.PhoneNumber != "" {
-		u.PhoneNumber = req.PhoneNumber
+	if phoneNumber != "" {
+		u.PhoneNumber = phoneNumber
 	}
-	if req.AvatarURL != "" {
-		u.AvatarURL = req.AvatarURL
+	if avatarURL != "" {
+		u.AvatarURL = avatarURL
 	}
-	if req.Metadata != nil {
-		u.Metadata = req.Metadata
+	if metadata != nil {
+		u.Metadata = metadata
 	}
 
 	u.UpdatedAt = time.Now()

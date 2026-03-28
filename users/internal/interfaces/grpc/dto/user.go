@@ -1,6 +1,7 @@
 package dto
 
 import (
+	"github.com/IvanDrf/workk-hunter/pkg/users/internal/domain/models"
 	"github.com/IvanDrf/workk-hunter/pkg/users/internal/domain/rules"
 	"github.com/google/uuid"
 )
@@ -32,6 +33,13 @@ type ListUsersRequest struct {
 	Role        rules.UserRole
 	SearchQuery string
 	SortBy      string
+	Offset      int32
+}
+
+type ListUsersResponse struct {
+	Users      []*models.User
+	TotalCount int32
+	HasNext    bool
 }
 
 // DTO for updating user status

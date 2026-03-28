@@ -14,6 +14,6 @@ type UserRepository interface {
 	GetUserByUsername(ctx context.Context, username string) (*models.User, error)
 	UpdateUser(ctx context.Context, req *dto.UpdateUserRequest) (*models.User, error)
 	DeleteUser(ctx context.Context, id uuid.UUID) error
-	ListUsers(ctx context.Context, req *dto.ListUsersRequest) ([]*models.User, int32, error)
+	ListUsers(ctx context.Context, req *dto.ListUsersRequest) (*dto.ListUsersResponse, error)
 	UpdateUserStatus(ctx context.Context, req *dto.UpdateUserStatusRequest) (*models.User, error)
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/IvanDrf/workk-hunter/pkg/users/internal/domain/models"
@@ -37,7 +38,7 @@ func (r *UserRepository) CreateUser(ctx context.Context, user *dto.CreateUserReq
 	)
 	RETURNING *`
 
-	userModel := models.NewUser(user)
+	userModel := models.NewUser(user.ID, user.Username, user.Email, user.FirstName, user.LastName, user.PhoneNumber)
 
 	rows, err := r.db.NamedQueryContext(ctx, query, userModel)
 	if err != nil {
@@ -124,7 +125,7 @@ func (r *UserRepository) UpdateUser(ctx context.Context, req *dto.UpdateUserRequ
 		return nil, err
 	}
 
-	current.UpdateUser(req)
+	current.UpdateUser(req.FirstName, req.LastName, req.PhoneNumber, req.AvatarURL, req.Metadata)
 
 	query := `
 	UPDATE users SET
@@ -202,9 +203,112 @@ func (r *UserRepository) DeleteUser(ctx context.Context, id uuid.UUID) error {
 	return nil
 }
 
-func (r *UserRepository) ListUsers(ctx context.Context, req *dto.ListUsersRequest) ([]*models.User, int32, error) {
-	//TODO
-	return nil, 0, nil
+func (r *UserRepository) ListUsers(ctx context.Context, req *dto.ListUsersRequest) (*dto.ListUsersResponse, error) {
+	baseQuery := `
+	SELECT * FROM users 
+	WHERE status != 'deleted'
+	`
+
+	countQuery := "SELECT COUNT(*) FROM users WHERE status != 'deleted'"
+
+	conditions := []string{}
+	args := []any{}
+	argPos := 1
+
+	if req.Status != "" {
+		if err := rules.ValidateUserStatus(req.Status); err != nil {
+			return nil, &models.Error{
+				Message: "invalid user status in request",
+				Code:    models.ErrCodeInvalidStatus,
+			}
+		}
+		conditions = append(conditions, fmt.Sprintf("status = $%d", argPos))
+		args = append(args, string(req.Status))
+		argPos++
+	}
+
+	if req.Role != "" {
+		if err := rules.ValidateUserRole(req.Role); err != nil {
+			return nil, &models.Error{
+				Message: "invalod user role in request",
+				Code:    models.ErrCodeInvalidRole,
+			}
+		}
+		conditions = append(conditions, fmt.Sprintf("role = $%d", argPos))
+		args = append(args, string(req.Role))
+		argPos++
+	}
+
+	if req.SearchQuery != "" {
+		searchPattern := "%" + req.SearchQuery + "%"
+		conditions = append(conditions, fmt.Sprintf(
+			"(username ILIKE $%d OR email ILIKE $%d OR first_name ILIKE $%d OR last_name ILIKE $%d)",
+			argPos, argPos, argPos, argPos,
+		))
+		args = append(args, searchPattern, searchPattern, searchPattern, searchPattern)
+		argPos += 4
+	}
+
+	if len(conditions) > 0 {
+		whereClause := " AND " + strings.Join(conditions, " AND ")
+		baseQuery += whereClause
+		countQuery += whereClause
+	}
+
+	var totalCount int32
+	err := r.db.GetContext(ctx, &totalCount, countQuery, args...)
+	if err != nil {
+		return nil, &models.Error{
+			Message: fmt.Sprintf("failed to get total count: %v", err),
+			Code:    models.ErrCodeInternal,
+		}
+	}
+
+	pageSize := req.PageSize
+	if pageSize <= 0 {
+		pageSize = 10
+	}
+	if pageSize > 100 {
+		pageSize = 100
+	}
+
+	sortField := "created_at"
+	if req.SortBy != "" {
+		allowedSortFields := map[string]bool{
+			"id": true, "username": true, "email": true,
+			"created_at": true, "updated_at": true, "last_login_at": true,
+		}
+		if allowedSortFields[req.SortBy] {
+			sortField = req.SortBy
+		}
+	}
+
+	query := fmt.Sprintf("%s ORDER BY %s ASC LIMIT $%d OFFSET $%d",
+		baseQuery, sortField, argPos, argPos+1)
+	args = append(args, pageSize, req.Offset)
+
+	var users []*models.User
+	if err = r.db.SelectContext(ctx, &users, query, args...); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, &models.Error{
+				Message: "no users with such parametrs",
+				Code:    models.ErrCodeUserNotFound,
+			}
+		}
+
+		return nil, &models.Error{
+			Message: fmt.Sprintf("failed to get users: %v", err),
+			Code:    models.ErrCodeInternal,
+		}
+	}
+
+	hasNext := int32(len(users)) == pageSize && (req.Offset+pageSize) < totalCount
+
+	return &dto.ListUsersResponse{
+		Users:      users,
+		TotalCount: totalCount,
+		HasNext:    hasNext,
+	}, nil
 }
 
 func (r *UserRepository) UpdateUserStatus(ctx context.Context, req *dto.UpdateUserStatusRequest) (*models.User, error) {
