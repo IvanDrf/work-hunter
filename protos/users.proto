@@ -104,11 +104,11 @@ message ListUsersRequest {
     UserRole role = 3;       
     string search_query = 4;      
     string sort_by = 5; 
+    int32 offset = 6;
 }
 
 message ListUsersResponse {
     repeated UserProfile users = 1;  
     int32 total_count = 2;           
-    bool has_next = 3;               
-    int32 current_page = 4;
+    bool has_next = 3;  
 }
