@@ -619,7 +619,7 @@ type ListUsersRequest struct {
 	PageSize      int32                  `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	Status        UserStatus             `protobuf:"varint,2,opt,name=status,proto3,enum=users.UserStatus" json:"status,omitempty"`
 	Role          UserRole               `protobuf:"varint,3,opt,name=role,proto3,enum=users.UserRole" json:"role,omitempty"`
-	SerchQuery    string                 `protobuf:"bytes,4,opt,name=serch_query,json=serchQuery,proto3" json:"serch_query,omitempty"`
+	SearchQuery   string                 `protobuf:"bytes,4,opt,name=search_query,json=searchQuery,proto3" json:"search_query,omitempty"`
 	SortBy        string                 `protobuf:"bytes,5,opt,name=sort_by,json=sortBy,proto3" json:"sort_by,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -676,9 +676,9 @@ func (x *ListUsersRequest) GetRole() UserRole {
 	return UserRole_USER_ROLE_UNSPECIFIED
 }
 
-func (x *ListUsersRequest) GetSerchQuery() string {
+func (x *ListUsersRequest) GetSearchQuery() string {
 	if x != nil {
-		return x.SerchQuery
+		return x.SearchQuery
 	}
 	return ""
 }
@@ -694,6 +694,8 @@ type ListUsersResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Users         []*UserProfile         `protobuf:"bytes,1,rep,name=users,proto3" json:"users,omitempty"`
 	TotalCount    int32                  `protobuf:"varint,2,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty"`
+	HasNext       bool                   `protobuf:"varint,3,opt,name=has_next,json=hasNext,proto3" json:"has_next,omitempty"`
+	CurrentPage   int32                  `protobuf:"varint,4,opt,name=current_page,json=currentPage,proto3" json:"current_page,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -738,6 +740,20 @@ func (x *ListUsersResponse) GetUsers() []*UserProfile {
 func (x *ListUsersResponse) GetTotalCount() int32 {
 	if x != nil {
 		return x.TotalCount
+	}
+	return 0
+}
+
+func (x *ListUsersResponse) GetHasNext() bool {
+	if x != nil {
+		return x.HasNext
+	}
+	return false
+}
+
+func (x *ListUsersResponse) GetCurrentPage() int32 {
+	if x != nil {
+		return x.CurrentPage
 	}
 	return 0
 }
@@ -801,18 +817,19 @@ const file_users_proto_rawDesc = "" +
 	"\busername\x18\x01 \x01(\tR\busername\"]\n" +
 	"\x17UpdateUserStatusRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12)\n" +
-	"\x06status\x18\x02 \x01(\x0e2\x11.users.UserStatusR\x06status\"\xb9\x01\n" +
+	"\x06status\x18\x02 \x01(\x0e2\x11.users.UserStatusR\x06status\"\xbb\x01\n" +
 	"\x10ListUsersRequest\x12\x1b\n" +
 	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12)\n" +
 	"\x06status\x18\x02 \x01(\x0e2\x11.users.UserStatusR\x06status\x12#\n" +
-	"\x04role\x18\x03 \x01(\x0e2\x0f.users.UserRoleR\x04role\x12\x1f\n" +
-	"\vserch_query\x18\x04 \x01(\tR\n" +
-	"serchQuery\x12\x17\n" +
-	"\asort_by\x18\x05 \x01(\tR\x06sortBy\"^\n" +
+	"\x04role\x18\x03 \x01(\x0e2\x0f.users.UserRoleR\x04role\x12!\n" +
+	"\fsearch_query\x18\x04 \x01(\tR\vsearchQuery\x12\x17\n" +
+	"\asort_by\x18\x05 \x01(\tR\x06sortBy\"\x9c\x01\n" +
 	"\x11ListUsersResponse\x12(\n" +
 	"\x05users\x18\x01 \x03(\v2\x12.users.UserProfileR\x05users\x12\x1f\n" +
 	"\vtotal_count\x18\x02 \x01(\x05R\n" +
-	"totalCount*\x8d\x01\n" +
+	"totalCount\x12\x19\n" +
+	"\bhas_next\x18\x03 \x01(\bR\ahasNext\x12!\n" +
+	"\fcurrent_page\x18\x04 \x01(\x05R\vcurrentPage*\x8d\x01\n" +
 	"\n" +
 	"UserStatus\x12\x1b\n" +
 	"\x17USER_STATUS_UNSPECIFIED\x10\x00\x12\x16\n" +
