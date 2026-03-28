@@ -37,9 +37,24 @@ func (v *VerificationService) Close() {
 }
 
 func (v *VerificationService) SendVerificationEmail(ctx context.Context, email string) error {
+	user, err := v.userRepo.FindUser(ctx, email)
+	if err != nil {
+		return models.Error{
+			Message: "can't find user with that email",
+			Code:    models.ErrCodeUserNotFound,
+		}
+	}
+
+	if user.Verificated {
+		return models.Error{
+			Message: "user already verificated",
+			Code:    models.ErrCodeUserAlreadyVerificated,
+		}
+	}
+
 	token := rules.GenerateToken()
 
-	err := v.tokenRepo.CreateToken(ctx, email, token, rules.TokenTTL)
+	err = v.tokenRepo.CreateToken(ctx, email, token, rules.TokenTTL)
 	if err != nil {
 		slog.Error("verif:SendVerifEmail service error", slog.String("error", err.Error()))
 		return models.Error{

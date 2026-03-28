@@ -20,6 +20,12 @@ func (h *Handler) SendVerificationEmail(ctx context.Context, email *auth_api.Ema
 		slog.Error("SendVerificationEmail error", slog.String("error", err.Error()))
 
 		switch e.Code {
+		case models.ErrCodeUserNotFound:
+			return nil, status.Error(codes.InvalidArgument, e.Message)
+
+		case models.ErrCodeUserAlreadyVerificated:
+			return nil, status.Error(codes.AlreadyExists, e.Message)
+
 		case models.ErrCodeInternal:
 			return nil, status.Error(codes.Internal, e.Message)
 		}

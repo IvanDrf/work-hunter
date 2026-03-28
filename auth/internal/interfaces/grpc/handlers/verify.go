@@ -23,7 +23,7 @@ func (h *Handler) VerifyEmail(ctx context.Context, token *auth_api.VerifToken) (
 		case models.ErrCodeUserNotFound:
 			return nil, status.Error(codes.NotFound, e.Message)
 
-		case models.ErrOutdatedToken:
+		case models.ErrCodeOutdatedToken:
 			return nil, status.Error(codes.DeadlineExceeded, e.Message)
 
 		case models.ErrCodeInternal:

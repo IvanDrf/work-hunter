@@ -24,7 +24,7 @@ func (w *EmailWorker) Start(ctx context.Context) {
 		if !msg.IsTokenValid() {
 			return models.Error{
 				Message: "token is outdated",
-				Code:    models.ErrOutdatedToken,
+				Code:    models.ErrCodeOutdatedToken,
 			}
 		}
 
