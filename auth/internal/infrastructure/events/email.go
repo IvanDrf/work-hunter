@@ -21,14 +21,14 @@ func NewEmailWorker(consumer service.EmailConsumer, emailService service.EmailSe
 
 func (w *EmailWorker) Start(ctx context.Context) {
 	w.consumer.ProcessEmailsFromQueue(ctx, func(msg *models.EmailMessage) error {
-		if !msg.Token.IsTokenValid() {
+		if !msg.IsTokenValid() {
 			return models.Error{
 				Message: "token is outdated",
 				Code:    models.ErrOutdatedToken,
 			}
 		}
 
-		return w.emailService.SendVerificationEmail(msg.Email, msg.Token.Token)
+		return w.emailService.SendVerificationEmail(msg.Email, msg.Token)
 	})
 }
 

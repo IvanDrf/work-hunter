@@ -8,6 +8,7 @@ import (
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/ports/jwt"
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/ports/repo"
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/ports/service"
+	"github.com/IvanDrf/work-hunter/auth/internal/domain/rules"
 )
 
 type VerificationService struct {
@@ -30,13 +31,15 @@ func NewVerificationService(emailProducer service.EmailProducer, userRepo repo.U
 
 func (v *VerificationService) Close() {
 	v.emailProducer.Close()
+
 	v.userRepo.Close()
+	v.tokenRepo.Close()
 }
 
 func (v *VerificationService) SendVerificationEmail(ctx context.Context, email string) error {
-	token := models.NewToken()
+	token := rules.GenerateToken()
 
-	err := v.tokenRepo.CreateToken(ctx, email, token)
+	err := v.tokenRepo.CreateToken(ctx, email, token, rules.TokenTTL)
 	if err != nil {
 		slog.Error("verif:SendVerifEmail service error", slog.String("error", err.Error()))
 		return models.Error{
@@ -48,6 +51,7 @@ func (v *VerificationService) SendVerificationEmail(ctx context.Context, email s
 	err = v.emailProducer.SendEmailInQueue(ctx, &models.EmailMessage{
 		Email: email,
 		Token: token,
+		Exp:   rules.NewExpTime(),
 	})
 
 	if err != nil {
@@ -63,20 +67,12 @@ func (v *VerificationService) SendVerificationEmail(ctx context.Context, email s
 }
 
 func (v *VerificationService) VerifyEmailByToken(ctx context.Context, token string) (string, string, error) {
-	email, exp, err := v.tokenRepo.FindEmailExpByToken(ctx, token)
-	if err != nil {
-		slog.Error("verif:VerifyEmailByToken error", slog.String("error", err.Error()))
+	email := v.tokenRepo.FindEmailByToken(ctx, token)
+	if email == "" {
+		slog.Error("verif:VerifyEmailByToken error")
 		return "", "", models.Error{
-			Message: "can't find user with that token",
+			Message: "can't find user with that token or token is outdated",
 			Code:    models.ErrCodeUserNotFound,
-		}
-	}
-
-	if !(&models.Token{Exp: exp}).IsTokenValid() {
-		slog.Info("verif:VerifyEmailByToken token is expired")
-		return "", "", models.Error{
-			Message: "token is outdated",
-			Code:    models.ErrOutdatedToken,
 		}
 	}
 

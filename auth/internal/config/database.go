@@ -18,3 +18,15 @@ func (d *PostgreConfig) DSN() string {
 		d.Username, d.Password, d.Host, d.Port, d.Name,
 	)
 }
+
+type RedisConfig struct {
+	Host string `yaml:"host"`
+	Port int    `yaml:"port"`
+
+	Password string `yaml:"password"`
+	Database int    `yaml:"database"`
+}
+
+func (r *RedisConfig) DSN() string {
+	return fmt.Sprintf("%s:%d", r.Host, r.Port)
+}
