@@ -32,7 +32,7 @@ func (u *UserRepo) CreateUser(ctx context.Context, user *models.User) error {
 	return nil
 }
 
-func (u *UserRepo) FindUser(ctx context.Context, email string) (*models.User, error) {
+func (u *UserRepo) FindUserByEmail(ctx context.Context, email string) (*models.User, error) {
 	const query = "SELECT user_id, email, hashed_password, verificated FROM users WHERE email = $1 LIMIT 1"
 
 	user := models.User{}

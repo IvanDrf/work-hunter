@@ -27,7 +27,7 @@ func (a *AuthService) Close() {
 }
 
 func (a *AuthService) RegisterUser(ctx context.Context, email string, password string) (string, string, error) {
-	_, err := a.userRepo.FindUser(ctx, email)
+	_, err := a.userRepo.FindUserByEmail(ctx, email)
 	if err == nil {
 		slog.Info("auth:RegisterUser user with that email already exists")
 		return "", "", models.Error{
@@ -65,7 +65,7 @@ func (a *AuthService) RegisterUser(ctx context.Context, email string, password s
 }
 
 func (a *AuthService) LoginUser(ctx context.Context, email string, password string) (string, string, error) {
-	user, err := a.userRepo.FindUser(ctx, email)
+	user, err := a.userRepo.FindUserByEmail(ctx, email)
 	if err != nil {
 		slog.Error("auth:LoginUser error", slog.String("error", err.Error()))
 		return "", "", models.Error{

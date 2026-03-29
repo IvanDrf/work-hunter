@@ -37,7 +37,7 @@ func (v *VerificationService) Close() {
 }
 
 func (v *VerificationService) SendVerificationEmail(ctx context.Context, email string) error {
-	user, err := v.userRepo.FindUser(ctx, email)
+	user, err := v.userRepo.FindUserByEmail(ctx, email)
 	if err != nil {
 		return models.Error{
 			Message: "can't find user with that email",
@@ -91,7 +91,7 @@ func (v *VerificationService) VerifyEmailByToken(ctx context.Context, token stri
 		}
 	}
 
-	user, err := v.userRepo.FindUser(ctx, email)
+	user, err := v.userRepo.FindUserByEmail(ctx, email)
 	if err != nil {
 		slog.Error("verif:VerifyEmailByToken error", slog.String("error", err.Error()))
 		return "", "", models.Error{
