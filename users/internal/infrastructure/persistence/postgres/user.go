@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/IvanDrf/workk-hunter/pkg/users/internal/domain/models"
-	"github.com/IvanDrf/workk-hunter/pkg/users/internal/domain/rules"
-	"github.com/IvanDrf/workk-hunter/pkg/users/internal/interfaces/grpc/dto"
+	"github.com/IvanDrf/work-hunter/users/internal/domain/models"
+	"github.com/IvanDrf/work-hunter/users/internal/domain/rules"
+	"github.com/IvanDrf/work-hunter/users/internal/interfaces/grpc/dto"
 	"github.com/google/uuid"
 	"github.com/lib/pq"
 )

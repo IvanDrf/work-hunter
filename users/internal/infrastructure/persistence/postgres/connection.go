@@ -6,10 +6,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/IvanDrf/work-hunter/users/internal/config"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-
-	"github.com/IvanDrf/workk-hunter/pkg/users/internal/config"
 )
 
 type PostgresConnection struct {

@@ -1,4 +1,4 @@
-module github.com/IvanDrf/workk-hunter/pkg/users
+module github.com/IvanDrf/work-hunter/users
 
 go 1.25.0
 

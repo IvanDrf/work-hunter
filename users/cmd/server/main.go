@@ -8,10 +8,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/IvanDrf/workk-hunter/pkg/users/internal/config"
-	"github.com/IvanDrf/workk-hunter/pkg/users/internal/infrastructure/persistence/postgres"
-	"github.com/IvanDrf/workk-hunter/pkg/users/internal/infrastructure/persistence/postgres/migrator"
-	"github.com/IvanDrf/workk-hunter/pkg/users/internal/logger"
+	"github.com/IvanDrf/work-hunter/users/internal/config"
+	"github.com/IvanDrf/work-hunter/users/internal/infrastructure/persistence/postgres"
+	"github.com/IvanDrf/work-hunter/users/internal/infrastructure/persistence/postgres/migrator"
+	"github.com/IvanDrf/work-hunter/users/internal/logger"
 )
 
 func main() {

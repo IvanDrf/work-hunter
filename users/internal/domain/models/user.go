@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/IvanDrf/workk-hunter/pkg/users/internal/domain/rules"
+	"github.com/IvanDrf/work-hunter/users/internal/domain/rules"
 	"github.com/google/uuid"
 )
 
