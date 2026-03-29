@@ -11,17 +11,16 @@ import (
 	"github.com/IvanDrf/workk-hunter/pkg/users/internal/domain/rules"
 	"github.com/IvanDrf/workk-hunter/pkg/users/internal/interfaces/grpc/dto"
 	"github.com/google/uuid"
-	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 )
 
 type UserRepository struct {
-	db *sqlx.DB
+	*PostgresConnection
 }
 
 func NewUserRepository(conn *PostgresConnection) *UserRepository {
 	return &UserRepository{
-		db: conn.GetDB(),
+		PostgresConnection: conn,
 	}
 }
 
