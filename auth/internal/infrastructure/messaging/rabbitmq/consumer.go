@@ -6,7 +6,6 @@ import (
 	"log"
 	"log/slog"
 
-	"github.com/IvanDrf/work-hunter/auth/internal/config"
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
 	rabbit "github.com/rabbitmq/amqp091-go"
 )
@@ -17,10 +16,7 @@ type RabbitMQConsumer struct {
 	queue *rabbit.Queue
 }
 
-func NewRabbitMqConsumer(cfg *config.RabbitMQConfig) *RabbitMQConsumer {
-	conn, ch := connect(cfg)
-	queue := declareQueue(cfg.ConsumerQueue, ch)
-
+func NewRabbitMqConsumer(conn *rabbit.Connection, ch *rabbit.Channel, queue *rabbit.Queue) *RabbitMQConsumer {
 	return &RabbitMQConsumer{
 		conn:  conn,
 		ch:    ch,

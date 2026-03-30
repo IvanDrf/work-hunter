@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/IvanDrf/work-hunter/auth/internal/config"
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
 	rabbit "github.com/rabbitmq/amqp091-go"
 )
@@ -15,10 +14,7 @@ type RabbitMQProducer struct {
 	queue *rabbit.Queue
 }
 
-func NewRabbitMqProducer(cfg *config.RabbitMQConfig) *RabbitMQProducer {
-	conn, ch := connect(cfg)
-	queue := declareQueue(cfg.ProducerQueue, ch)
-
+func NewRabbitMqProducer(conn *rabbit.Connection, ch *rabbit.Channel, queue *rabbit.Queue) *RabbitMQProducer {
 	return &RabbitMQProducer{
 		conn:  conn,
 		ch:    ch,

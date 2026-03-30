@@ -6,5 +6,5 @@ import (
 )
 
 func (f *Factory) newConsumer() service.EmailConsumer {
-	return messaging.NewRabbitMqConsumer(&f.cfg.Broker)
+	return messaging.NewRabbitMqConsumer(messaging.Connect(&f.cfg.Broker, f.cfg.Broker.ConsumerQueue))
 }

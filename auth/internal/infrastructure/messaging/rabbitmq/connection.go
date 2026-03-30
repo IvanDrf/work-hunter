@@ -7,7 +7,7 @@ import (
 	rabbit "github.com/rabbitmq/amqp091-go"
 )
 
-func connect(cfg *config.RabbitMQConfig) (*rabbit.Connection, *rabbit.Channel) {
+func Connect(cfg *config.RabbitMQConfig, queueName string) (*rabbit.Connection, *rabbit.Channel, *rabbit.Queue) {
 	conn, err := rabbit.Dial(cfg.DSN())
 	if err != nil {
 		log.Fatalf("can't connect to rabbitmq: %s", err)
@@ -18,5 +18,16 @@ func connect(cfg *config.RabbitMQConfig) (*rabbit.Connection, *rabbit.Channel) {
 		log.Fatalf("can't open new channel in rabbitmq: %s", err)
 	}
 
-	return conn, ch
+	queue := declareQueue(queueName, ch)
+
+	return conn, ch, queue
+}
+
+func declareQueue(name string, ch *rabbit.Channel) *rabbit.Queue {
+	queue, err := ch.QueueDeclare(name, false, false, false, false, nil)
+	if err != nil {
+		log.Fatalf("can't declare queue in rabbitmq: %s", err)
+	}
+
+	return &queue
 }
