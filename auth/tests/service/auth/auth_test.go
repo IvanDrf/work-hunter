@@ -5,7 +5,7 @@ import (
 
 	"github.com/IvanDrf/work-hunter/auth/internal/infrastructure/service"
 	"github.com/IvanDrf/work-hunter/auth/tests/service/auth/fixtures"
-	"github.com/IvanDrf/work-hunter/auth/tests/service/auth/mocks"
+	"github.com/IvanDrf/work-hunter/auth/tests/service/mocks"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
