@@ -6,33 +6,22 @@ import (
 	"time"
 
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/rules"
+	"github.com/IvanDrf/work-hunter/auth/tests/rules/fixtures"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestIsEmailValid(t *testing.T) {
 	t.Parallel()
 
-	valids := []string{
-		"test@gmail.com",
-		"y@yandex.ru",
-		"user@mail.ru",
-	}
-
-	invalids := []string{
-		"41235612873",
-		"user.com",
-		"invalid@",
-	}
-
 	wg := new(sync.WaitGroup)
 	wg.Go(func() {
-		for _, email := range valids {
+		for _, email := range fixtures.ValidEmails {
 			assert.True(t, rules.IsEmailValid(email))
 		}
 	})
 
 	wg.Go(func() {
-		for _, email := range invalids {
+		for _, email := range fixtures.InvalidEmails {
 			assert.False(t, rules.IsEmailValid(email))
 		}
 	})
@@ -43,13 +32,7 @@ func TestIsEmailValid(t *testing.T) {
 func TestPasswordHashing(t *testing.T) {
 	t.Parallel()
 
-	passwords := []string{
-		"qwerty123",
-		"printsf.f_mtA",
-		"ersmkruwbrlnh123",
-	}
-
-	for _, password := range passwords {
+	for _, password := range fixtures.ValidPasswords {
 		hashed, err := rules.HashPassword(password)
 
 		assert.Nil(t, err)
@@ -62,28 +45,15 @@ func TestPasswordHashing(t *testing.T) {
 func TestIsPasswordCorrect(t *testing.T) {
 	t.Parallel()
 
-	valids := []string{
-		"qwerty123",
-		"strongPASsWorD",
-		"nu2msq",
-	}
-
-	invalids := []string{
-		"rthjekpofwpoifjliuwekfmwjefwuikfmwel;f,wiejri",
-		"1",
-		"q",
-		"wdf",
-	}
-
 	wg := new(sync.WaitGroup)
 	wg.Go(func() {
-		for _, password := range valids {
+		for _, password := range fixtures.ValidPasswords {
 			assert.True(t, rules.IsPasswordCorrect(password))
 		}
 	})
 
 	wg.Go(func() {
-		for _, password := range invalids {
+		for _, password := range fixtures.InvalidPasswords {
 			assert.False(t, rules.IsPasswordCorrect(password))
 		}
 	})
