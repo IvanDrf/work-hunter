@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package users;
+package user;
 
-option go_package = "pkg/users-api";
+option go_package = "pkg/user-api";
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
@@ -46,16 +46,16 @@ enum UserRole {
 }
 
 message UserProfile {
-    string id = 1;                      // UUID
-    string username = 2;                // Username (same as in auth service)
+    string id = 1; // UUID
+    string username = 2; // Username (same as in auth service)
     string email = 3;
     string first_name = 4; 
     string last_name = 5; 
     string phone_number = 6;
     string avatar_URL = 7;
 
-    UserStatus status = 8;              // Account status
-    UserRole role = 9;                  // User role
+    UserStatus status = 8; // Account status
+    UserRole role = 9; // User role
 
     google.protobuf.Timestamp created_at = 10;
     google.protobuf.Timestamp updated_at = 11;
@@ -66,8 +66,8 @@ message UserProfile {
 }
 
 message CreateProfileRequest {
-    string user_id = 1;             // User ID from auth service
-    string username = 2;            // Username from auth service
+    string user_id = 1; // User ID from auth service
+    string username = 2; // Username from auth service
     string email = 3;
     string first_name = 4;
     string last_name = 5;
@@ -79,7 +79,7 @@ message GetProfileRequest {
 }
 
 message UpdateProfileRequest {
-    string user_id = 1;                  // JWT access token for authorization
+    string user_id = 1; // JWT access token for authorization
     optional string first_name = 2;       // New first name
     optional string last_name = 3;        // New last name
     optional string phone_number = 4;     // New phone number
@@ -96,8 +96,8 @@ message GetProfileByUsernameRequest {
 }
 
 message UpdateUserStatusRequest {
-    string user_id = 1;                      // Admin JWT token for authorization
-    UserStatus status = 2;                   // New profile status
+    string user_id = 1; // Admin JWT token for authorization
+    UserStatus status = 2; // New profile status
 }
 
 message ListUsersRequest {
