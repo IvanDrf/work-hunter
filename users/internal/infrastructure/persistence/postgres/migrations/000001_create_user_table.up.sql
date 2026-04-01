@@ -22,16 +22,14 @@ CREATE TABLE IF NOT EXISTS users (
     -- time points 
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
-
-    deleted_at TIMESTAMP
 );
 
 -- indexes for fast search
-CREATE INDEX IF NOT EXISTS idx_users_username ON users(username) WHERE deleted_at IS NULL;
-CREATE INDEX IF NOT EXISTS idx_users_email ON users(email) WHERE deleted_at IS NULL;
-CREATE INDEX IF NOT EXISTS idx_users_status ON users(status) WHERE deleted_at IS NULL;
-CREATE INDEX IF NOT EXISTS idx_users_role ON users(role) WHERE deleted_at IS NULL;
-CREATE INDEX IF NOT EXISTS idx_users_created_at ON users(created_at) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_users_username ON users(username) WHERE status != 'deleted';
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email) WHERE status != 'deleted';
+CREATE INDEX IF NOT EXISTS idx_users_status ON users(status) WHERE status != 'deleted';
+CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
+CREATE INDEX IF NOT EXISTS idx_users_created_at ON users(created_at) WHERE status != 'deleted';
 
 -- index for fill-text search
 CREATE INDEX IF NOT EXISTS idx_users_search ON users
