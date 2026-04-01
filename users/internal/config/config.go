@@ -9,20 +9,9 @@ import (
 
 // Service configuration
 type Config struct {
-	Server ServerConfig `yaml:"server"`
-	Logger LoggerConfig `yaml:"logger"`
-}
-
-// Server configuration
-type ServerConfig struct {
-	Port int `yaml:"port"`
-}
-
-// Logger configuration
-type LoggerConfig struct {
-	Level      string   `yaml:"level"`
-	Format     string   `yaml:"format"`
-	OutputPath []string `yaml:"output_path"`
+	Server   ServerConfig `yaml:"server"`
+	Logger   LoggerConfig `yaml:"logger"`
+	Database DBConfig     `yaml:"database"`
 }
 
 func MustLoad() *Config {

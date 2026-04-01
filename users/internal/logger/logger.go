@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/IvanDrf/workk-hunter/pkg/users/internal/config"
+	"github.com/IvanDrf/work-hunter/users/internal/config"
 )
 
 type Logger struct {
