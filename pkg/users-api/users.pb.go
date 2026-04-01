@@ -841,9 +841,8 @@ const file_users_proto_rawDesc = "" +
 	"\x15USER_ROLE_UNSPECIFIED\x10\x00\x12\x12\n" +
 	"\x0eUSER_ROLE_USER\x10\x01\x12\x17\n" +
 	"\x13USER_ROLE_MODERATOR\x10\x02\x12\x13\n" +
-	"\x0fUSER_ROLE_ADMIN\x10\x032\xea\x03\n" +
-	"\n" +
-	"UserServer\x12@\n" +
+	"\x0fUSER_ROLE_ADMIN\x10\x032\xe4\x03\n" +
+	"\x04User\x12@\n" +
 	"\rCreateProfile\x12\x1b.users.CreateProfileRequest\x1a\x12.users.UserProfile\x12:\n" +
 	"\n" +
 	"GetProfile\x12\x18.users.GetProfileRequest\x1a\x12.users.UserProfile\x12N\n" +
@@ -895,20 +894,20 @@ var file_users_proto_depIdxs = []int32{
 	0,  // 7: users.ListUsersRequest.status:type_name -> users.UserStatus
 	1,  // 8: users.ListUsersRequest.role:type_name -> users.UserRole
 	2,  // 9: users.ListUsersResponse.users:type_name -> users.UserProfile
-	3,  // 10: users.UserServer.CreateProfile:input_type -> users.CreateProfileRequest
-	4,  // 11: users.UserServer.GetProfile:input_type -> users.GetProfileRequest
-	7,  // 12: users.UserServer.GetProfileByUsername:input_type -> users.GetProfileByUsernameRequest
-	5,  // 13: users.UserServer.UpdateProfile:input_type -> users.UpdateProfileRequest
-	6,  // 14: users.UserServer.DeleteProfile:input_type -> users.DeleteProfileRequest
-	8,  // 15: users.UserServer.UpdateUserStatus:input_type -> users.UpdateUserStatusRequest
-	9,  // 16: users.UserServer.ListUsers:input_type -> users.ListUsersRequest
-	2,  // 17: users.UserServer.CreateProfile:output_type -> users.UserProfile
-	2,  // 18: users.UserServer.GetProfile:output_type -> users.UserProfile
-	2,  // 19: users.UserServer.GetProfileByUsername:output_type -> users.UserProfile
-	2,  // 20: users.UserServer.UpdateProfile:output_type -> users.UserProfile
-	14, // 21: users.UserServer.DeleteProfile:output_type -> google.protobuf.Empty
-	2,  // 22: users.UserServer.UpdateUserStatus:output_type -> users.UserProfile
-	10, // 23: users.UserServer.ListUsers:output_type -> users.ListUsersResponse
+	3,  // 10: users.User.CreateProfile:input_type -> users.CreateProfileRequest
+	4,  // 11: users.User.GetProfile:input_type -> users.GetProfileRequest
+	7,  // 12: users.User.GetProfileByUsername:input_type -> users.GetProfileByUsernameRequest
+	5,  // 13: users.User.UpdateProfile:input_type -> users.UpdateProfileRequest
+	6,  // 14: users.User.DeleteProfile:input_type -> users.DeleteProfileRequest
+	8,  // 15: users.User.UpdateUserStatus:input_type -> users.UpdateUserStatusRequest
+	9,  // 16: users.User.ListUsers:input_type -> users.ListUsersRequest
+	2,  // 17: users.User.CreateProfile:output_type -> users.UserProfile
+	2,  // 18: users.User.GetProfile:output_type -> users.UserProfile
+	2,  // 19: users.User.GetProfileByUsername:output_type -> users.UserProfile
+	2,  // 20: users.User.UpdateProfile:output_type -> users.UserProfile
+	14, // 21: users.User.DeleteProfile:output_type -> google.protobuf.Empty
+	2,  // 22: users.User.UpdateUserStatus:output_type -> users.UserProfile
+	10, // 23: users.User.ListUsers:output_type -> users.ListUsersResponse
 	17, // [17:24] is the sub-list for method output_type
 	10, // [10:17] is the sub-list for method input_type
 	10, // [10:10] is the sub-list for extension type_name
