@@ -1,0 +1,114 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "pkg/user-api";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+// User service for managing user profiles and data
+service User {
+     // Create a new user profile (called after successful registration in auth service)
+    rpc CreateProfile(CreateProfileRequest) returns (UserProfile);
+
+    // Get user profile by ID
+    rpc GetProfile(GetProfileRequest) returns (UserProfile);
+
+    // Get user profile by username
+    rpc GetProfileByUsername(GetProfileByUsernameRequest) returns (UserProfile);
+
+    // Update user profile
+    rpc UpdateProfile(UpdateProfileRequest) returns (UserProfile);
+
+    // Delete user profile
+    rpc DeleteProfile(DeleteProfileRequest) returns(google.protobuf.Empty);
+
+    // admin operations
+    // Update user status (active/inactive/blocked)
+    rpc UpdateUserStatus(UpdateUserStatusRequest) returns (UserProfile);
+    rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
+}
+
+enum UserStatus {
+    USER_STATUS_UNSPECIFIED = 0;
+    USER_STATUS_ACTIVE = 1;
+    USER_STATUS_INACTIVE = 2;
+    USER_STATUS_BLOCKED = 3;
+    USER_STATUS_DELETED = 4;
+}
+
+enum UserRole {
+    USER_ROLE_UNSPECIFIED = 0;
+    USER_ROLE_USER = 1;
+    USER_ROLE_MODERATOR = 2;
+    USER_ROLE_ADMIN = 3;
+}
+
+message UserProfile {
+    string id = 1; // UUID
+    string username = 2; // Username (same as in auth service)
+    string email = 3;
+    string first_name = 4; 
+    string last_name = 5; 
+    string phone_number = 6;
+    string avatar_URL = 7;
+
+    UserStatus status = 8; // Account status
+    UserRole role = 9; // User role
+
+    google.protobuf.Timestamp created_at = 10;
+    google.protobuf.Timestamp updated_at = 11;
+    google.protobuf.Timestamp last_login_at = 12;
+
+    bool email_verified = 13;
+    map<string, string> metadata = 14;
+}
+
+message CreateProfileRequest {
+    string user_id = 1; // User ID from auth service
+    string username = 2; // Username from auth service
+    string email = 3;
+    string first_name = 4;
+    string last_name = 5;
+    string phone_number = 6;
+}
+
+message GetProfileRequest {
+    string user_id = 1;
+}
+
+message UpdateProfileRequest {
+    string user_id = 1; // JWT access token for authorization
+    optional string first_name = 2;       // New first name
+    optional string last_name = 3;        // New last name
+    optional string phone_number = 4;     // New phone number
+    optional string avatar_url = 5;       // New avatar URL
+    map<string, string> metadata = 6;
+}
+
+message DeleteProfileRequest {
+    string user_id = 1;
+}
+
+message GetProfileByUsernameRequest {
+    string username = 1;
+}
+
+message UpdateUserStatusRequest {
+    string user_id = 1; // Admin JWT token for authorization
+    UserStatus status = 2; // New profile status
+}
+
+message ListUsersRequest {
+    int32 page_size = 1;
+    UserStatus status = 2;
+    UserRole role = 3;
+    string serch_query = 4;
+    string sort_by = 5;
+}
+
+message ListUsersResponse {
+    repeated UserProfile users = 1;
+    int32 total_count = 2;
+}
