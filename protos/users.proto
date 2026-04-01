@@ -8,7 +8,7 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 
 // User service for managing user profiles and data
-service UserServer {
+service User {
      // Create a new user profile (called after successful registration in auth service)
     rpc CreateProfile(CreateProfileRequest) returns (UserProfile);
 
