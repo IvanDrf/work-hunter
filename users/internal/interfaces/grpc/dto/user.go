@@ -3,12 +3,11 @@ package dto
 import (
 	"github.com/IvanDrf/work-hunter/users/internal/domain/models"
 	"github.com/IvanDrf/work-hunter/users/internal/domain/rules"
-	"github.com/google/uuid"
 )
 
 // DTO for creating user
 type CreateUserRequest struct {
-	ID          uuid.UUID
+	ID          string
 	Username    string
 	Email       string
 	FirstName   string
@@ -18,7 +17,7 @@ type CreateUserRequest struct {
 
 // DTO for updating user
 type UpdateUserRequest struct {
-	ID          uuid.UUID
+	ID          string
 	FirstName   string
 	LastName    string
 	PhoneNumber string

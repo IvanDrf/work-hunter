@@ -34,7 +34,7 @@ func (r *UserRepository) CreateUser(ctx context.Context, user *models.User) erro
 		:status, :role, :metadata, :created_at, :updated_at
 	)`
 
-	rows, err := r.db.NamedQueryContext(ctx, query, user)
+	_, err := r.db.NamedExecContext(ctx, query, user)
 	if err != nil {
 		if isUniqueViolation(err) {
 			return &models.Error{
@@ -48,25 +48,13 @@ func (r *UserRepository) CreateUser(ctx context.Context, user *models.User) erro
 		}
 	}
 
-	defer rows.Close()
-
-	var created models.User
-	if rows.Next() {
-		if err := rows.StructScan(&created); err != nil {
-			return &models.Error{
-				Message: fmt.Sprintf("failed to scan created user: %v", err),
-				Code:    models.ErrCodeInternal,
-			}
-		}
-	}
-
 	return nil
 }
 
 func (r *UserRepository) GetUserByID(ctx context.Context, id uuid.UUID) (*models.User, error) {
 	query := `
 	SELECT * FROM users
-	WHERE id = $1 AND status != 'deleted'
+	WHERE id = $1
 	`
 
 	var user models.User
