@@ -6,7 +6,7 @@ import (
 
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
 	"github.com/IvanDrf/work-hunter/auth/internal/infrastructure/service"
-	"github.com/IvanDrf/work-hunter/auth/tests/service/auth/fixtures"
+	"github.com/IvanDrf/work-hunter/auth/tests/service/fixtures"
 	"github.com/stretchr/testify/assert"
 )
 
