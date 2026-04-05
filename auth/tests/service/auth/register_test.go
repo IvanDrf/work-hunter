@@ -6,6 +6,7 @@ import (
 
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
 	"github.com/IvanDrf/work-hunter/auth/internal/infrastructure/service"
+	"github.com/IvanDrf/work-hunter/auth/tests/service/common"
 	"github.com/IvanDrf/work-hunter/auth/tests/service/fixtures"
 	"github.com/stretchr/testify/assert"
 )
@@ -33,7 +34,7 @@ func testRegisterNewUsers(t *testing.T, auth *service.AuthService) {
 		assert.NotEmpty(t, refresh)
 
 		// jwt tokens after registration should be valid
-		testTokenValidatation(t, access, refresh)
+		common.TestTokenValidatation(t, access, refresh, false)
 	}
 }
 

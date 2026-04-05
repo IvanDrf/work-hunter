@@ -6,13 +6,14 @@ import (
 
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
 	"github.com/IvanDrf/work-hunter/auth/internal/infrastructure/service"
+	"github.com/IvanDrf/work-hunter/auth/tests/service/common"
 	"github.com/IvanDrf/work-hunter/auth/tests/service/fixtures"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGetTokenPayload(t *testing.T) {
 	// create valid and invalud access jwt
-	validTokens, invalidTokens := createTokens()
+	validTokens, invalidTokens := common.CreateTokens()
 	auth := newAuthService()
 
 	t.Run("Test GetTokenPayload from valid tokens", func(t *testing.T) {

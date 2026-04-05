@@ -11,7 +11,7 @@ import (
 )
 
 func TestSendVerificationEmail(t *testing.T) {
-	t.Parallel()
+	// should not be parallel, because we use common Queue for SendVerificationEmail and VerifyEmailByToken
 
 	verif := newVerificationService()
 
@@ -24,6 +24,8 @@ func TestSendVerificationEmail(t *testing.T) {
 	t.Run("Send verification email", func(t *testing.T) {
 		testSendVerificationEmailUnregistredUsers(t, verif)
 	})
+
+	verif.Close()
 }
 
 func testSendVerificationEmail(t *testing.T, verif *service.VerificationService) {

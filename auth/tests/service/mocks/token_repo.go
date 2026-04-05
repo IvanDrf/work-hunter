@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
+	"github.com/IvanDrf/work-hunter/auth/internal/domain/rules"
+	"github.com/IvanDrf/work-hunter/auth/tests/service/fixtures"
 )
 
 type tokenRepo struct {
@@ -21,6 +23,18 @@ func NewTokenRepo() *tokenRepo {
 			ttl   time.Time
 		}{},
 	}
+}
+
+// Returns new filled token repo with tokens for registres users from fixtures.Users
+func NewFilledTokenRepo() *tokenRepo {
+	tokenRepo := NewTokenRepo()
+	i := 0
+	for email := range fixtures.Users {
+		tokenRepo.CreateToken(context.TODO(), email, fixtures.Tokens[i], rules.TokenTTL)
+		i++
+	}
+
+	return tokenRepo
 }
 
 func (t *tokenRepo) CreateToken(ctx context.Context, email string, token string, ttl time.Duration) error {
