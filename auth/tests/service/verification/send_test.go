@@ -15,11 +15,12 @@ func TestSendVerificationEmail(t *testing.T) {
 
 	verif := newVerificationService()
 
-	// send verif email to registred users
+	// send verif email to registred users, should be no errors
 	t.Run("Send verification email", func(t *testing.T) {
 		testSendVerificationEmail(t, verif)
 	})
 
+	// send verif email to unregistred users, should be errors
 	t.Run("Send verification email", func(t *testing.T) {
 		testSendVerificationEmailUnregistredUsers(t, verif)
 	})
@@ -32,7 +33,7 @@ func testSendVerificationEmail(t *testing.T, verif *service.VerificationService)
 
 		err := verif.SendVerificationEmail(t.Context(), email)
 		assert.Nil(t, err)
-		assert.Equal(t, len(Queue), sended)
+		assert.Equal(t, sended, len(Queue)) // len of email producer queue should increase and be equal to sended
 	}
 }
 
@@ -48,6 +49,6 @@ func testSendVerificationEmailUnregistredUsers(t *testing.T, verif *service.Veri
 			t.Fatalf("send verif email: should me models error with code %s, actual %s", models.ErrCodeUserNotFound, err.Error())
 		}
 
-		assert.Equal(t, sended, len(Queue))
+		assert.Equal(t, sended, len(Queue)) // len of email producer queue should not change and should be equal to sended
 	}
 }
