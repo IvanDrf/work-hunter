@@ -5,9 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
+	"net/url"
+	"strconv"
+	"sync"
 
 	"github.com/IvanDrf/work-hunter/users/internal/domain/models"
 	repository "github.com/IvanDrf/work-hunter/users/internal/domain/ports/repo"
+	"github.com/IvanDrf/work-hunter/users/internal/domain/rules"
 	"github.com/IvanDrf/work-hunter/users/internal/interfaces/grpc/dto"
 	"github.com/IvanDrf/work-hunter/users/internal/logger"
 	"github.com/google/uuid"
@@ -43,13 +47,13 @@ func (s *UserService) CreateProfile(ctx context.Context, req *dto.CreateUserRequ
 			Code:    models.ErrCodeUserAlreadyExists,
 		}
 	}
-	log.Debug("user model created successfully", "user", user)
+	log.Debug("user model created successfully", "id", user.ID.String())
 
 	if err := s.repo.CreateUser(ctx, user); err != nil {
 		log.Error("failed to create user", "error", err)
 		return nil, err
 	}
-	log.Info("user created successfully", "user", user)
+	log.Info("user created successfully", "id", user.ID.String())
 
 	return modelToResp(user, log)
 }
@@ -68,7 +72,7 @@ func (s *UserService) GetProfile(ctx context.Context, id string) (*dto.UserRespo
 
 		return nil, err
 	}
-	log.Info("user found successfully", "user", user)
+	log.Info("user found successfully", "id", user.ID.String())
 
 	return modelToResp(user, log)
 }
@@ -81,7 +85,7 @@ func (s *UserService) GetProfileByUsername(ctx context.Context, username string)
 		log.Error("failed to get user by username", "error", err)
 		return nil, err
 	}
-	log.Info("user found successfully", "user", user)
+	log.Info("user found successfully", "id", user.ID.String())
 
 	return modelToResp(user, log)
 }
@@ -99,14 +103,14 @@ func (s *UserService) UpdateProfile(ctx context.Context, req *dto.UpdateUserRequ
 		log.Error("failed to get user by id", "error", err)
 		return nil, err
 	}
-	log.Debug("user found successfully", "user", user)
+	log.Debug("user found successfully", "id", user.ID.String())
 
 	user.UpdateUser(req.FirstName, req.LastName, req.PhoneNumber, req.AvatarURL, req.Metadata)
 	if err := s.repo.UpdateUser(ctx, user); err != nil {
 		log.Error("failed to update user", "error", err)
 		return nil, err
 	}
-	log.Info("user updated successfully", "user", user)
+	log.Info("user updated successfully", "id", user.ID.String())
 
 	return modelToResp(user, log)
 }
@@ -124,7 +128,7 @@ func (s *UserService) DeleteProfile(ctx context.Context, id string) error {
 		log.Error("failed to get user by id", "error", err)
 		return err
 	}
-	log.Debug("user successfully found", "user", user)
+	log.Debug("user successfully found", "id", user.ID.String())
 
 	if user.Status == "deleted" {
 		err = s.repo.DeleteUser(ctx, uuid, true)
@@ -142,13 +146,118 @@ func (s *UserService) DeleteProfile(ctx context.Context, id string) error {
 }
 
 func (s *UserService) ListUsers(ctx context.Context, req *dto.ListUsersRequest) (*dto.ListUsersResponse, error) {
+	log := s.log.With("scope", "infrastructure/service/ListUsers")
 
-	return nil, nil
+	enabledFields := map[string]struct{}{
+		"id": {}, "username": {}, "email": {}, "first_name": {}, "last_name": {},
+		"created_at": {}, "updated_at": {},
+	}
+
+	params := make(map[string]string)
+	if req.Role != "" {
+		params["role"] = req.Role
+	}
+
+	if req.Status != "" {
+		params["status"] = req.Status
+	}
+
+	if req.PageSize == 0 {
+		params["limit"] = "100"
+	} else {
+		params["limit"] = strconv.Itoa(int(req.PageSize))
+	}
+
+	params["offset"] = strconv.Itoa(int(req.Offset))
+
+	if req.SortBy == "" {
+		params["order_by"] = req.SortBy
+	}
+
+	values, err := url.ParseQuery(req.SearchQuery)
+	if err != nil {
+		log.Error("failed to parse query", "error", err)
+		return nil, &models.Error{
+			Message: fmt.Sprintf("failed to parse search query: %v", err),
+			Code:    models.ErrCodeInvalidRequest,
+		}
+	}
+
+	for key, val := range values {
+		_, ok := enabledFields[key]
+		if !ok {
+			log.Error("cannot use this field", "field", key)
+			return nil, &models.Error{
+				Message: fmt.Sprintf("cannot use this field: %s", key),
+				Code:    models.ErrCodeInvalidRequest,
+			}
+		}
+
+		if len(val) > 0 {
+			params[key] = val[0]
+		}
+	}
+	log.Debug("params created successfully", "params", params)
+
+	users, totalCount, err := s.repo.ListUsers(ctx, params)
+	if err != nil {
+		log.Error("failed to list users", "error", err)
+		return nil, err
+	}
+	log.Info("users listed successfully", "count", len(users))
+
+	usersResp := make([]*dto.UserResponse, 0, len(users))
+	for _, val := range users {
+		userResp, err := modelToResp(val, log)
+		if err != nil {
+			return nil, err
+		}
+
+		usersResp = append(usersResp, userResp)
+	}
+
+	var hasNextPage bool
+	if len(users) < int(totalCount) {
+		hasNextPage = true
+	}
+
+	return &dto.ListUsersResponse{
+		Users:      usersResp,
+		TotalCount: totalCount,
+		HasNext:    hasNextPage,
+	}, nil
 }
 
 func (s *UserService) UpdateUserStatus(ctx context.Context, req *dto.UpdateUserStatusRequest) (*dto.UserResponse, error) {
-	// TODO
-	return nil, nil
+	log := s.log.With("scope", "infrastructure/service/UpdateUserStatus")
+
+	id, err := parseUUID(req.ID, log)
+	if err != nil {
+		return nil, err
+	}
+
+	user := new(models.User)
+	var wg sync.WaitGroup
+	wg.Go(func() {
+		user, errGet := s.repo.GetUserByID(ctx, id)
+		if err != nil {
+			log.Error("failed to get user", "error", errGet)
+		}
+		log.Debug("user found successfully", "id", user.ID.String())
+
+		user.Status = rules.UserStatus(req.Status)
+	})
+
+	if err = s.repo.UpdateUserStatus(ctx, id, rules.UserStatus(req.Status)); err != nil {
+		log.Error("failed to update user status", "error", err)
+		return nil, err
+	}
+
+	log.Info("user status updated successfully")
+
+	wg.Wait()
+
+	return modelToResp(user, log)
 }
 
 func parseUUID(id string, log *slog.Logger) (uuid.UUID, error) {
@@ -157,7 +266,7 @@ func parseUUID(id string, log *slog.Logger) (uuid.UUID, error) {
 		log.Error("failed to parse uuid from string", "error", err)
 		return uuid, &models.Error{
 			Message: fmt.Sprintf("failed to parse uuid from string: %v", err),
-			Code:    models.ErrCodeInternal,
+			Code:    models.ErrCodeInvalidRequest,
 		}
 	}
 	log.Debug("uuid parsed successfully", "uuid", uuid)

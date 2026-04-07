@@ -192,16 +192,6 @@ func (r *UserRepository) ListUsers(ctx context.Context, params map[string]string
 		}
 	}
 
-	if orderBy == "" {
-		orderBy = "created_at"
-	}
-	if limit == "" || limit == "0" {
-		limit = "100"
-	}
-	if offset == "" {
-		offset = "0"
-	}
-
 	baseQuery += whereConditions
 	baseQuery += fmt.Sprintf(" ORDER BY $%d LIMIT $%d OFFSET $%d", argPos, argPos+1, argPos+2)
 	args = append(args, orderBy, limit, offset)
