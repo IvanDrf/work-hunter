@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log/slog"
 
@@ -24,7 +25,7 @@ func NewUserService(repo repository.UserRepository, log *logger.Logger) *UserSer
 	}
 }
 
-func (s *UserService) CreateProfile(ctx context.Context, req *dto.CreateUserRequest) (*models.User, error) {
+func (s *UserService) CreateProfile(ctx context.Context, req *dto.CreateUserRequest) (*dto.UserResponse, error) {
 	log := s.log.With("scope", "infrastructure/service/CreateProfile")
 
 	uuid, err := parseUUID(req.ID, log)
@@ -50,10 +51,10 @@ func (s *UserService) CreateProfile(ctx context.Context, req *dto.CreateUserRequ
 	}
 	log.Info("user created successfully", "user", user)
 
-	return user, nil
+	return modelToResp(user, log)
 }
 
-func (s *UserService) GetProfile(ctx context.Context, id string) (*models.User, error) {
+func (s *UserService) GetProfile(ctx context.Context, id string) (*dto.UserResponse, error) {
 	log := s.log.With("scope", "infrastructure/service/GetProfile")
 
 	uuid, err := parseUUID(id, log)
@@ -69,10 +70,10 @@ func (s *UserService) GetProfile(ctx context.Context, id string) (*models.User, 
 	}
 	log.Info("user found successfully", "user", user)
 
-	return user, nil
+	return modelToResp(user, log)
 }
 
-func (s *UserService) GetProfileByUsername(ctx context.Context, username string) (*models.User, error) {
+func (s *UserService) GetProfileByUsername(ctx context.Context, username string) (*dto.UserResponse, error) {
 	log := s.log.With("scope", "infrastructure/service/GetProfileByUsername")
 
 	user, err := s.repo.GetUserByUsername(ctx, username)
@@ -82,10 +83,10 @@ func (s *UserService) GetProfileByUsername(ctx context.Context, username string)
 	}
 	log.Info("user found successfully", "user", user)
 
-	return user, nil
+	return modelToResp(user, log)
 }
 
-func (s *UserService) UpdateProfile(ctx context.Context, req *dto.UpdateUserRequest) (*models.User, error) {
+func (s *UserService) UpdateProfile(ctx context.Context, req *dto.UpdateUserRequest) (*dto.UserResponse, error) {
 	log := s.log.With("scope", "infrastructure/service/UpdateProfile")
 
 	uuid, err := parseUUID(req.ID, log)
@@ -107,7 +108,7 @@ func (s *UserService) UpdateProfile(ctx context.Context, req *dto.UpdateUserRequ
 	}
 	log.Info("user updated successfully", "user", user)
 
-	return user, nil
+	return modelToResp(user, log)
 }
 
 func (s *UserService) DeleteProfile(ctx context.Context, id string) error {
@@ -145,7 +146,7 @@ func (s *UserService) ListUsers(ctx context.Context, req *dto.ListUsersRequest) 
 	return nil, nil
 }
 
-func (s *UserService) UpdateUserStatus(ctx context.Context, req *dto.UpdateUserStatusRequest) (*models.User, error) {
+func (s *UserService) UpdateUserStatus(ctx context.Context, req *dto.UpdateUserStatusRequest) (*dto.UserResponse, error) {
 	// TODO
 	return nil, nil
 }
@@ -161,4 +162,31 @@ func parseUUID(id string, log *slog.Logger) (uuid.UUID, error) {
 	}
 	log.Debug("uuid parsed successfully", "uuid", uuid)
 	return uuid, nil
+}
+
+func modelToResp(user *models.User, log *slog.Logger) (*dto.UserResponse, error) {
+	metadata := make(map[string]string)
+	if err := json.Unmarshal(user.Metadata, &metadata); err != nil {
+		log.Error("failed to unmarshal json data", "error", err)
+		return nil, &models.Error{
+			Message: fmt.Sprintf("failed to unmarshal json data: %v", err),
+			Code:    models.ErrCodeInternal,
+		}
+	}
+	log.Debug("user converted successfully", "id", user.ID.String())
+
+	return &dto.UserResponse{
+		ID:          user.ID.String(),
+		Username:    user.Username,
+		Email:       user.Email,
+		FirstName:   user.FirstName,
+		LastName:    user.LastName,
+		PhoneNumber: user.PhoneNumber,
+		AvatarURL:   user.AvatarURL,
+		Status:      string(user.Status),
+		Role:        string(user.Role),
+		CreatedAt:   user.CreatedAt,
+		UpdatedAt:   user.UpdatedAt,
+		Metadata:    metadata,
+	}, nil
 }

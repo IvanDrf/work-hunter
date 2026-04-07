@@ -1,9 +1,26 @@
 package dto
 
 import (
-	"github.com/IvanDrf/work-hunter/users/internal/domain/models"
-	"github.com/IvanDrf/work-hunter/users/internal/domain/rules"
+	"time"
 )
+
+type UserResponse struct {
+	ID          string
+	Username    string
+	Email       string
+	FirstName   string
+	LastName    string
+	PhoneNumber string
+	AvatarURL   string
+
+	Status string
+	Role   string
+
+	CreatedAt time.Time
+	UpdatedAt time.Time
+
+	Metadata map[string]string
+}
 
 // DTO for creating user
 type CreateUserRequest struct {
@@ -28,15 +45,15 @@ type UpdateUserRequest struct {
 // DTO for listing users
 type ListUsersRequest struct {
 	PageSize    int32
-	Status      rules.UserStatus
-	Role        rules.UserRole
+	Status      string
+	Role        string
 	SearchQuery string
 	SortBy      string
 	Offset      int32
 }
 
 type ListUsersResponse struct {
-	Users      []*models.User
+	Users      []*UserResponse
 	TotalCount int32
 	HasNext    bool
 }
@@ -44,5 +61,5 @@ type ListUsersResponse struct {
 // DTO for updating user status
 type UpdateUserStatusRequest struct {
 	ID     string
-	Status rules.UserStatus
+	Status string
 }
