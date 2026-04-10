@@ -25,9 +25,11 @@ service Auth {
     rpc RefreshTokens(RefreshToken) returns (JwtTokens);
 }
 
+
 message User {
     string email = 1;
     string password = 2;
+    string role = 3; // ADMIN, EMPLOYEE, EMPLOYER
 }
 
 
