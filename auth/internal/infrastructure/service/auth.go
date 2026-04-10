@@ -26,7 +26,7 @@ func (a *AuthService) Close() {
 	a.userRepo.Close()
 }
 
-func (a *AuthService) RegisterUser(ctx context.Context, email string, password string) (string, string, error) {
+func (a *AuthService) RegisterUser(ctx context.Context, email string, password string, role string) (string, string, error) {
 	_, err := a.userRepo.FindUserByEmail(ctx, email)
 	if err == nil {
 		slog.Info("auth:RegisterUser user with that email already exists")
@@ -36,7 +36,16 @@ func (a *AuthService) RegisterUser(ctx context.Context, email string, password s
 		}
 	}
 
-	user, err := models.NewUser(email, password)
+	userRole := models.ROLES[role]
+	if userRole == "" {
+		slog.Info("auth:RegisterUser invalid role", slog.String("role", role))
+		return "", "", models.Error{
+			Message: "invalid role",
+			Code:    models.ErrCodeInvalidUserRole,
+		}
+	}
+
+	user, err := models.NewUser(email, password, userRole)
 	if err != nil {
 		slog.Error("auth:RegisterUser error", slog.String("error", err.Error()))
 		return "", "", err
@@ -51,7 +60,12 @@ func (a *AuthService) RegisterUser(ctx context.Context, email string, password s
 		}
 	}
 
-	access, refresh, err := a.jwter.CreateTokens(user.ID, user.Verificated)
+	access, refresh, err := a.jwter.CreateTokens(&models.JwtPayload{
+		UserID:      user.ID.String(),
+		Verificated: user.Verificated,
+		Role:        user.Role,
+	})
+
 	if err != nil {
 		slog.Error("auth:RegisterUser error", slog.String("error", err.Error()))
 		return "", "", models.Error{
@@ -82,7 +96,11 @@ func (a *AuthService) LoginUser(ctx context.Context, email string, password stri
 		}
 	}
 
-	access, refresh, err := a.jwter.CreateTokens(user.ID, user.Verificated)
+	access, refresh, err := a.jwter.CreateTokens(&models.JwtPayload{
+		UserID:      user.ID.String(),
+		Verificated: user.Verificated,
+		Role:        user.Role,
+	})
 	if err != nil {
 		slog.Error("auth:LoginUser error", slog.String("error", err.Error()))
 		return "", "", models.Error{
@@ -96,12 +114,29 @@ func (a *AuthService) LoginUser(ctx context.Context, email string, password stri
 }
 
 func (a *AuthService) RefreshTokens(ctx context.Context, refresh string) (string, string, error) {
-	access, refresh, err := a.jwter.RefreshTokens(refresh)
+	payload, err := a.jwter.GetPayload(refresh)
 	if err != nil {
-		slog.Error("auth:RefreshTokens error", slog.String("error", err.Error()))
+		slog.Error("auth:RefreshTokens error cant get valid payload", slog.String("error", err.Error()))
 		return "", "", models.Error{
 			Message: "invalid jwt token",
 			Code:    models.ErrCodeInvalidJWT,
+		}
+	}
+
+	if !payload.IsPayloadValid() {
+		slog.Error("auth:RefreshTokens error payload isn't valid")
+		return "", "", models.Error{
+			Message: "invalid payload in jwt token",
+			Code:    models.ErrCodeInvalidJWT,
+		}
+	}
+
+	access, refresh, err := a.jwter.CreateTokens(payload)
+	if err != nil {
+		slog.Error("auth:RefreshTokens error, cant create new tokens", slog.String("error", err.Error()))
+		return "", "", models.Error{
+			Message: "can't create new jwt tokens",
+			Code:    models.ErrCodeInternal,
 		}
 	}
 
@@ -110,7 +145,7 @@ func (a *AuthService) RefreshTokens(ctx context.Context, refresh string) (string
 }
 
 func (a *AuthService) GetTokenPayload(ctx context.Context, access string) (*models.JwtPayload, error) {
-	id, verificated, err := a.jwter.GetPayload(access)
+	payload, err := a.jwter.GetPayload(access)
 	if err != nil {
 		slog.Error("auth:GetTokenPayload error", slog.String("error", err.Error()))
 		return nil, models.Error{
@@ -119,9 +154,14 @@ func (a *AuthService) GetTokenPayload(ctx context.Context, access string) (*mode
 		}
 	}
 
+	if !payload.IsPayloadValid() {
+		slog.Error("auth:RefreshTokens error payload isn't valid")
+		return nil, models.Error{
+			Message: "invalid payload in jwt token",
+			Code:    models.ErrCodeInvalidJWT,
+		}
+	}
+
 	slog.Info("auth:GetTokenPayload success")
-	return &models.JwtPayload{
-		ID:          id,
-		Verificated: verificated,
-	}, nil
+	return payload, nil
 }

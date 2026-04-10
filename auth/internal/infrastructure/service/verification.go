@@ -114,7 +114,11 @@ func (v *VerificationService) VerifyEmailByToken(ctx context.Context, token stri
 		slog.Error("verif:VerifyByEmailToken internal error, can't delete token", slog.String("error", err.Error()))
 	}
 
-	access, refresh, err := v.jwter.CreateTokens(user.ID, true)
+	access, refresh, err := v.jwter.CreateTokens(&models.JwtPayload{
+		UserID:      user.ID.String(),
+		Verificated: true,
+		Role:        user.Role,
+	})
 	if err != nil {
 		slog.Error("verif:VerifyEmailByToken error", slog.String("error", err.Error()))
 		return "", "", models.Error{

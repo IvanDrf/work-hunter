@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/rules"
-	"github.com/IvanDrf/work-hunter/auth/pkg"
+	"github.com/IvanDrf/work-hunter/auth/internal/infrastructure/jwt"
 )
 
 var (
@@ -14,6 +14,6 @@ var (
 	// InvalidSecret - invalid secret for auth jwt tokens, auth service doesn't use this secret
 	InvalidSecret = rules.GenerateToken()
 
-	Jwter        = pkg.NewJwt(Secret, 1*time.Minute, 2*time.Minute)
-	InvalidJwter = pkg.NewJwt(InvalidSecret, 1*time.Minute, 2*time.Minute)
+	Jwter        = jwt.NewJwt(Secret, 1*time.Minute, 2*time.Minute)
+	InvalidJwter = jwt.NewJwt(InvalidSecret, 1*time.Minute, 2*time.Minute)
 )

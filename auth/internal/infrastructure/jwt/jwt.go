@@ -1,18 +1,17 @@
-package pkg
+package jwt
 
 import (
 	"errors"
 	"time"
 
+	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/google/uuid"
 )
 
 var ErrInvalidJWT = errors.New("invalid jwt token")
 
 type claims struct {
-	UserID      string `json:"user_id"`
-	Verificated bool   `json:"verificated"`
+	models.JwtPayload
 
 	jwt.RegisteredClaims
 }
@@ -32,13 +31,13 @@ func NewJwt(secret string, accessTime time.Duration, refreshTime time.Duration) 
 	}
 }
 
-func (j *Jwt) CreateTokens(userID uuid.UUID, verificated bool) (string, string, error) {
-	access, err := j.createToken(userID, verificated, j.accessTime)
+func (j *Jwt) CreateTokens(payload *models.JwtPayload) (string, string, error) {
+	access, err := j.createToken(payload, j.accessTime)
 	if err != nil {
 		return "", "", err
 	}
 
-	refresh, err := j.createToken(userID, verificated, j.refreshTime)
+	refresh, err := j.createToken(payload, j.refreshTime)
 	if err != nil {
 		return "", "", err
 	}
@@ -46,10 +45,9 @@ func (j *Jwt) CreateTokens(userID uuid.UUID, verificated bool) (string, string, 
 	return access, refresh, nil
 }
 
-func (j *Jwt) createToken(userID uuid.UUID, verificated bool, duration time.Duration) (string, error) {
+func (j *Jwt) createToken(payload *models.JwtPayload, duration time.Duration) (string, error) {
 	claims := claims{
-		UserID:      userID.String(),
-		Verificated: verificated,
+		JwtPayload: *payload,
 
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(duration)),
@@ -60,7 +58,7 @@ func (j *Jwt) createToken(userID uuid.UUID, verificated bool, duration time.Dura
 	return token.SignedString(j.secret)
 }
 
-func (j *Jwt) GetPayload(token string) (uuid.UUID, bool, error) {
+func (j *Jwt) GetPayload(token string) (*models.JwtPayload, error) {
 	claims := &claims{}
 
 	t, err := jwt.ParseWithClaims(token, claims, func(t *jwt.Token) (any, error) {
@@ -72,18 +70,12 @@ func (j *Jwt) GetPayload(token string) (uuid.UUID, bool, error) {
 	})
 
 	if err != nil || !t.Valid {
-		return uuid.UUID{}, false, err
+		return nil, err
 	}
 
-	id, err := uuid.Parse(claims.UserID)
-	return id, claims.Verificated, err
-}
-
-func (j *Jwt) RefreshTokens(refresh string) (string, string, error) {
-	userID, verificated, err := j.GetPayload(refresh)
-	if err != nil {
-		return "", "", err
-	}
-
-	return j.CreateTokens(userID, verificated)
+	return &models.JwtPayload{
+		UserID:      claims.UserID,
+		Verificated: claims.Verificated,
+		Role:        claims.Role,
+	}, err
 }

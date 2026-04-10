@@ -21,7 +21,7 @@ func CreateUsers() []*models.User {
 	users := make([]*models.User, 0, len(content))
 
 	for email, password := range content {
-		user, err := models.NewUser(email, password)
+		user, err := models.NewUser(email, password, models.EMPLOYEE)
 		if err != nil {
 			log.Fatalf("can't create new user: %s", err.Error())
 		}

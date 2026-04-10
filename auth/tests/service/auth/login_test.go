@@ -29,7 +29,7 @@ func TestLoginUser(t *testing.T) {
 func testLoginUsers(t *testing.T, auth *service.AuthService) {
 	for email, password := range fixtures.Users {
 		// register new user
-		_, _, err := auth.RegisterUser(t.Context(), email, password)
+		_, _, err := auth.RegisterUser(t.Context(), email, password, string(models.EMPLOYEE))
 		assert.Nil(t, err)
 
 		// login this new user

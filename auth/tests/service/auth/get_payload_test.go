@@ -21,7 +21,7 @@ func TestGetTokenPayload(t *testing.T) {
 
 		for i, token := range validTokens {
 			testValidTokensPayload(t, auth, token, &models.JwtPayload{
-				ID:          fixtures.UserIDs[i],
+				UserID:      fixtures.UserIDs[i].String(),
 				Verificated: false,
 			})
 		}
@@ -41,7 +41,7 @@ func testValidTokensPayload(t *testing.T, auth *service.AuthService, token strin
 	p, err := auth.GetTokenPayload(t.Context(), token)
 	assert.Nil(t, err)
 
-	assert.Equal(t, payload.ID, p.ID)
+	assert.Equal(t, payload.UserID, p.UserID)
 	assert.Equal(t, payload.Verificated, p.Verificated)
 }
 
