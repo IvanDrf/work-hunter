@@ -13,8 +13,12 @@ import (
 
 func main() {
 	migrations := ""
+	command := ""
+	steps := 1
 
 	flag.StringVar(&migrations, "mig", "", "path to migration files")
+	flag.StringVar(&command, "cmd", "", "command for migration: up or down")
+	flag.IntVar(&steps, "steps", 1, "amount of steps for migrations")
 	cfg := config.LoadFromYAML()
 
 	m, err := migrate.New(fmt.Sprintf("file://%s", migrations), cfg.Database.DSN())
@@ -22,7 +26,23 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if err = m.Up(); err != migrate.ErrNoChange && err != nil {
-		log.Fatal(err)
+	if command == "" {
+		log.Fatalf("no command was given in cmd flags, need: up or down")
+	}
+
+	if command == "up" {
+		if err = m.Steps(steps); err != migrate.ErrNoChange && err != nil {
+			log.Fatal(err)
+		}
+
+		log.Println("UP migration applyed")
+	}
+
+	if command == "down" {
+		if err = m.Steps(-steps); err != migrate.ErrNoChange && err != nil {
+			log.Fatal(err)
+		}
+
+		log.Println("DOWN migration applyed")
 	}
 }
