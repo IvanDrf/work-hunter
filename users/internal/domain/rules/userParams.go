@@ -6,19 +6,19 @@ import "errors"
 type UserStatus string
 
 const (
-	UserStatusActive   UserStatus = "active"
-	UserStatusInactive UserStatus = "inactive"
-	UserStatusBlocked  UserStatus = "blocked"
-	UserStatusDeleted  UserStatus = "deleted"
+	UserStatusActive   UserStatus = "USER_STATUS_ACTIVE"
+	UserStatusInactive UserStatus = "USER_STATUS_INACTIVE"
+	UserStatusBlocked  UserStatus = "USER_STATUS_BLOCKED"
+	UserStatusDeleted  UserStatus = "USER_STATUS_DELETED"
 )
 
 // user role
 type UserRole string
 
 const (
-	UserRoleUser      UserRole = "user"
-	UserRoleModerator UserRole = "moderator"
-	UserRoleAdmin     UserRole = "admin"
+	UserRoleUser      UserRole = "USER_ROLE_USER"
+	UserRoleModerator UserRole = "USER_ROLE_MODERATOR"
+	UserRoleAdmin     UserRole = "USER_ROLE_ADMIN"
 )
 
 func ValidateUserStatus(status UserStatus) error {
