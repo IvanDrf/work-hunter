@@ -1,5 +1,19 @@
 package main
 
+// Migrator is used to apply migrations in database
+// Example usage
+// go run cmd/migrator/main.go
+// --mig=./internal/infrastructure/persistence/postgres/migrations/
+// --config=./config/config.yaml
+// --cmd=up
+// --steps=1
+
+// Flags:
+// mig - path to migrations files
+// config - path to config file
+// cmd - command for migration - up/down
+// steps - migrations steps, file code 001, 002
+
 import (
 	"flag"
 	"fmt"

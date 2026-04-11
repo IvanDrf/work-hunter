@@ -1,5 +1,7 @@
 package main
 
+// Email worker is used to send verification messages on email
+
 import (
 	"context"
 	"os"
