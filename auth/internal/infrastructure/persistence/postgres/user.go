@@ -41,6 +41,13 @@ func (u *UserRepo) FindUserByEmail(ctx context.Context, email string) (*models.U
 	return &user, err
 }
 
+func (u *UserRepo) DeleteUser(ctx context.Context, email string) error {
+	const query = "DELETE FROM users WHERE email = $1"
+
+	_, err := u.db.ExecContext(ctx, query, email)
+	return err
+}
+
 func (u *UserRepo) VerifyEmail(ctx context.Context, email string) error {
 	const query = "UPDATE users SET verificated = true WHERE email = $1"
 

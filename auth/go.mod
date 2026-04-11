@@ -3,6 +3,7 @@ module github.com/IvanDrf/work-hunter/auth
 go 1.25.1
 
 require (
+	github.com/IvanDrf/work-hunter/pkg/auth-api v0.0.0-20260411210851-96034d0736a0
 	github.com/google/uuid v1.6.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	google.golang.org/grpc v1.80.0
@@ -10,7 +11,6 @@ require (
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
-	github.com/IvanDrf/work-hunter/pkg/auth-api v0.0.0-20260410201154-2b12f42e5800
 	github.com/go-redis/redismock/v9 v9.2.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/golang-migrate/migrate/v4 v4.19.1
