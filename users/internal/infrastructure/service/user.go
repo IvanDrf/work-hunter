@@ -260,6 +260,10 @@ func (s *UserService) UpdateUserStatus(ctx context.Context, req *dto.UpdateUserS
 	return modelToResp(user, log)
 }
 
+func (s *UserService) Close() {
+	s.repo.Close()
+}
+
 func parseUUID(id string, log *slog.Logger) (uuid.UUID, error) {
 	uuid, err := uuid.Parse(id)
 	if err != nil {

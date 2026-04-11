@@ -226,6 +226,10 @@ func (r *UserRepository) UpdateUserStatus(ctx context.Context, id uuid.UUID, sta
 	return nil
 }
 
+func (r *UserRepository) Close() {
+	r.PostgresConnection.Close()
+}
+
 func isUniqueViolation(err error) bool {
 	if pqErr, ok := err.(*pq.Error); ok {
 		return pqErr.Code == "23505"

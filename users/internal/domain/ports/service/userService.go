@@ -14,4 +14,6 @@ type UserService interface {
 	DeleteProfile(ctx context.Context, id string) error
 	ListUsers(ctx context.Context, req *dto.ListUsersRequest) (*dto.ListUsersResponse, error)
 	UpdateUserStatus(ctx context.Context, req *dto.UpdateUserStatusRequest) (*dto.UserResponse, error)
+
+	Close()
 }

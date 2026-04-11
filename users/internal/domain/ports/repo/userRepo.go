@@ -16,4 +16,5 @@ type UserRepository interface {
 	DeleteUser(ctx context.Context, id uuid.UUID, permanent bool) error
 	ListUsers(ctx context.Context, params map[string]string) ([]*models.User, int32, error)
 	UpdateUserStatus(ctx context.Context, id uuid.UUID, status rules.UserStatus) error
+	Close()
 }
