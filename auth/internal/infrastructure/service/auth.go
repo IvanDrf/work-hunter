@@ -8,6 +8,7 @@ import (
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/ports/jwt"
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/ports/repo"
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/rules"
+	"github.com/google/uuid"
 )
 
 type AuthService struct {
@@ -111,6 +112,49 @@ func (a *AuthService) LoginUser(ctx context.Context, email string, password stri
 
 	slog.Info("auth:LoginUser success")
 	return access, refresh, nil
+}
+
+func (a *AuthService) DeleteUser(ctx context.Context, access string, password string) error {
+	payload, err := a.jwter.GetPayload(access)
+	if err != nil {
+		return models.Error{
+			Message: "invalid jwt token",
+			Code:    models.ErrCodeInvalidJWT,
+		}
+	}
+
+	userID, err := uuid.Parse(payload.UserID)
+	if err != nil {
+		return models.Error{
+			Message: "invalid userID in jwt token",
+			Code:    models.ErrCodeInvalidJWT,
+		}
+	}
+
+	user, err := a.userRepo.FindUserByID(ctx, userID)
+	if err != nil {
+		return models.Error{
+			Message: "can't find user with given userID in jwt token",
+			Code:    models.ErrCodeUserNotFound,
+		}
+	}
+
+	if !rules.IsPasswordsSame(password, user.HashedPassword) {
+		return models.Error{
+			Message: "password is incorrect",
+			Code:    models.ErrCodeInvalidPassword,
+		}
+	}
+
+	err = a.userRepo.DeleteUser(ctx, user.Email)
+	if err != nil {
+		return models.Error{
+			Message: "can't delete user",
+			Code:    models.ErrCodeInternal,
+		}
+	}
+
+	return nil
 }
 
 func (a *AuthService) RefreshTokens(ctx context.Context, refresh string) (string, string, error) {
