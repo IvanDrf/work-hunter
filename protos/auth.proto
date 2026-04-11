@@ -12,6 +12,12 @@ service Auth {
     // login user by username, password
     rpc Login(User) returns (JwtTokens);
 
+    // delete user with given access token and password
+    rpc DeleteUser(DeleteUserRequest) returns (DeleteUserStatus);
+    
+    // change user's password from old to new
+    rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordStatus);
+
     // Send verification email if user didn't get it after registration
     rpc SendVerificationEmail(Email) returns (AcceptStatus);
     
@@ -62,4 +68,23 @@ message VerifToken {
 
 message AcceptStatus {
     bool accepted = 1;
+}
+
+message DeleteUserRequest {
+    string access = 1; // access jwt token
+    string password = 2; // user password
+}
+
+message DeleteUserStatus {
+    bool deleted = 1;
+}
+
+message ChangePasswordRequest {
+    string access = 1; // access jwt token
+    string old = 2; // old password
+    string new = 3; // new password
+}
+
+message ChangePasswordStatus {
+    bool changed = 1;
 }

@@ -405,6 +405,206 @@ func (x *AcceptStatus) GetAccepted() bool {
 	return false
 }
 
+type DeleteUserRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Access        string                 `protobuf:"bytes,1,opt,name=access,proto3" json:"access,omitempty"`     // access jwt token
+	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"` // user password
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteUserRequest) Reset() {
+	*x = DeleteUserRequest{}
+	mi := &file_protos_auth_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteUserRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteUserRequest) ProtoMessage() {}
+
+func (x *DeleteUserRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_protos_auth_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteUserRequest.ProtoReflect.Descriptor instead.
+func (*DeleteUserRequest) Descriptor() ([]byte, []int) {
+	return file_protos_auth_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *DeleteUserRequest) GetAccess() string {
+	if x != nil {
+		return x.Access
+	}
+	return ""
+}
+
+func (x *DeleteUserRequest) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
+type DeleteUserStatus struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Deleted       bool                   `protobuf:"varint,1,opt,name=deleted,proto3" json:"deleted,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteUserStatus) Reset() {
+	*x = DeleteUserStatus{}
+	mi := &file_protos_auth_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteUserStatus) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteUserStatus) ProtoMessage() {}
+
+func (x *DeleteUserStatus) ProtoReflect() protoreflect.Message {
+	mi := &file_protos_auth_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteUserStatus.ProtoReflect.Descriptor instead.
+func (*DeleteUserStatus) Descriptor() ([]byte, []int) {
+	return file_protos_auth_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *DeleteUserStatus) GetDeleted() bool {
+	if x != nil {
+		return x.Deleted
+	}
+	return false
+}
+
+type ChangePasswordRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Access        string                 `protobuf:"bytes,1,opt,name=access,proto3" json:"access,omitempty"` // access jwt token
+	Old           string                 `protobuf:"bytes,2,opt,name=old,proto3" json:"old,omitempty"`       // old password
+	New           string                 `protobuf:"bytes,3,opt,name=new,proto3" json:"new,omitempty"`       // new password
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ChangePasswordRequest) Reset() {
+	*x = ChangePasswordRequest{}
+	mi := &file_protos_auth_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ChangePasswordRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChangePasswordRequest) ProtoMessage() {}
+
+func (x *ChangePasswordRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_protos_auth_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChangePasswordRequest.ProtoReflect.Descriptor instead.
+func (*ChangePasswordRequest) Descriptor() ([]byte, []int) {
+	return file_protos_auth_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *ChangePasswordRequest) GetAccess() string {
+	if x != nil {
+		return x.Access
+	}
+	return ""
+}
+
+func (x *ChangePasswordRequest) GetOld() string {
+	if x != nil {
+		return x.Old
+	}
+	return ""
+}
+
+func (x *ChangePasswordRequest) GetNew() string {
+	if x != nil {
+		return x.New
+	}
+	return ""
+}
+
+type ChangePasswordStatus struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Changed       bool                   `protobuf:"varint,1,opt,name=changed,proto3" json:"changed,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ChangePasswordStatus) Reset() {
+	*x = ChangePasswordStatus{}
+	mi := &file_protos_auth_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ChangePasswordStatus) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChangePasswordStatus) ProtoMessage() {}
+
+func (x *ChangePasswordStatus) ProtoReflect() protoreflect.Message {
+	mi := &file_protos_auth_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChangePasswordStatus.ProtoReflect.Descriptor instead.
+func (*ChangePasswordStatus) Descriptor() ([]byte, []int) {
+	return file_protos_auth_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *ChangePasswordStatus) GetChanged() bool {
+	if x != nil {
+		return x.Changed
+	}
+	return false
+}
+
 var File_protos_auth_proto protoreflect.FileDescriptor
 
 const file_protos_auth_proto_rawDesc = "" +
@@ -430,12 +630,26 @@ const file_protos_auth_proto_rawDesc = "" +
 	"VerifToken\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\"*\n" +
 	"\fAcceptStatus\x12\x1a\n" +
-	"\baccepted\x18\x01 \x01(\bR\baccepted2\xae\x02\n" +
+	"\baccepted\x18\x01 \x01(\bR\baccepted\"G\n" +
+	"\x11DeleteUserRequest\x12\x16\n" +
+	"\x06access\x18\x01 \x01(\tR\x06access\x12\x1a\n" +
+	"\bpassword\x18\x02 \x01(\tR\bpassword\",\n" +
+	"\x10DeleteUserStatus\x12\x18\n" +
+	"\adeleted\x18\x01 \x01(\bR\adeleted\"S\n" +
+	"\x15ChangePasswordRequest\x12\x16\n" +
+	"\x06access\x18\x01 \x01(\tR\x06access\x12\x10\n" +
+	"\x03old\x18\x02 \x01(\tR\x03old\x12\x10\n" +
+	"\x03new\x18\x03 \x01(\tR\x03new\"0\n" +
+	"\x14ChangePasswordStatus\x12\x18\n" +
+	"\achanged\x18\x01 \x01(\bR\achanged2\xb8\x03\n" +
 	"\x04Auth\x12'\n" +
 	"\bRegister\x12\n" +
 	".auth.User\x1a\x0f.auth.JwtTokens\x12$\n" +
 	"\x05Login\x12\n" +
-	".auth.User\x1a\x0f.auth.JwtTokens\x128\n" +
+	".auth.User\x1a\x0f.auth.JwtTokens\x12=\n" +
+	"\n" +
+	"DeleteUser\x12\x17.auth.DeleteUserRequest\x1a\x16.auth.DeleteUserStatus\x12I\n" +
+	"\x0eChangePassword\x12\x1b.auth.ChangePasswordRequest\x1a\x1a.auth.ChangePasswordStatus\x128\n" +
 	"\x15SendVerificationEmail\x12\v.auth.Email\x1a\x12.auth.AcceptStatus\x120\n" +
 	"\vVerifyEmail\x12\x10.auth.VerifToken\x1a\x0f.auth.JwtTokens\x125\n" +
 	"\fIsTokenValid\x12\x11.auth.AccessToken\x1a\x12.auth.TokenPayload\x124\n" +
@@ -453,35 +667,43 @@ func file_protos_auth_proto_rawDescGZIP() []byte {
 	return file_protos_auth_proto_rawDescData
 }
 
-var file_protos_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_protos_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_protos_auth_proto_goTypes = []any{
-	(*User)(nil),         // 0: auth.User
-	(*AccessToken)(nil),  // 1: auth.AccessToken
-	(*RefreshToken)(nil), // 2: auth.RefreshToken
-	(*JwtTokens)(nil),    // 3: auth.JwtTokens
-	(*TokenPayload)(nil), // 4: auth.TokenPayload
-	(*Email)(nil),        // 5: auth.Email
-	(*VerifToken)(nil),   // 6: auth.VerifToken
-	(*AcceptStatus)(nil), // 7: auth.AcceptStatus
+	(*User)(nil),                  // 0: auth.User
+	(*AccessToken)(nil),           // 1: auth.AccessToken
+	(*RefreshToken)(nil),          // 2: auth.RefreshToken
+	(*JwtTokens)(nil),             // 3: auth.JwtTokens
+	(*TokenPayload)(nil),          // 4: auth.TokenPayload
+	(*Email)(nil),                 // 5: auth.Email
+	(*VerifToken)(nil),            // 6: auth.VerifToken
+	(*AcceptStatus)(nil),          // 7: auth.AcceptStatus
+	(*DeleteUserRequest)(nil),     // 8: auth.DeleteUserRequest
+	(*DeleteUserStatus)(nil),      // 9: auth.DeleteUserStatus
+	(*ChangePasswordRequest)(nil), // 10: auth.ChangePasswordRequest
+	(*ChangePasswordStatus)(nil),  // 11: auth.ChangePasswordStatus
 }
 var file_protos_auth_proto_depIdxs = []int32{
-	0, // 0: auth.Auth.Register:input_type -> auth.User
-	0, // 1: auth.Auth.Login:input_type -> auth.User
-	5, // 2: auth.Auth.SendVerificationEmail:input_type -> auth.Email
-	6, // 3: auth.Auth.VerifyEmail:input_type -> auth.VerifToken
-	1, // 4: auth.Auth.IsTokenValid:input_type -> auth.AccessToken
-	2, // 5: auth.Auth.RefreshTokens:input_type -> auth.RefreshToken
-	3, // 6: auth.Auth.Register:output_type -> auth.JwtTokens
-	3, // 7: auth.Auth.Login:output_type -> auth.JwtTokens
-	7, // 8: auth.Auth.SendVerificationEmail:output_type -> auth.AcceptStatus
-	3, // 9: auth.Auth.VerifyEmail:output_type -> auth.JwtTokens
-	4, // 10: auth.Auth.IsTokenValid:output_type -> auth.TokenPayload
-	3, // 11: auth.Auth.RefreshTokens:output_type -> auth.JwtTokens
-	6, // [6:12] is the sub-list for method output_type
-	0, // [0:6] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0,  // 0: auth.Auth.Register:input_type -> auth.User
+	0,  // 1: auth.Auth.Login:input_type -> auth.User
+	8,  // 2: auth.Auth.DeleteUser:input_type -> auth.DeleteUserRequest
+	10, // 3: auth.Auth.ChangePassword:input_type -> auth.ChangePasswordRequest
+	5,  // 4: auth.Auth.SendVerificationEmail:input_type -> auth.Email
+	6,  // 5: auth.Auth.VerifyEmail:input_type -> auth.VerifToken
+	1,  // 6: auth.Auth.IsTokenValid:input_type -> auth.AccessToken
+	2,  // 7: auth.Auth.RefreshTokens:input_type -> auth.RefreshToken
+	3,  // 8: auth.Auth.Register:output_type -> auth.JwtTokens
+	3,  // 9: auth.Auth.Login:output_type -> auth.JwtTokens
+	9,  // 10: auth.Auth.DeleteUser:output_type -> auth.DeleteUserStatus
+	11, // 11: auth.Auth.ChangePassword:output_type -> auth.ChangePasswordStatus
+	7,  // 12: auth.Auth.SendVerificationEmail:output_type -> auth.AcceptStatus
+	3,  // 13: auth.Auth.VerifyEmail:output_type -> auth.JwtTokens
+	4,  // 14: auth.Auth.IsTokenValid:output_type -> auth.TokenPayload
+	3,  // 15: auth.Auth.RefreshTokens:output_type -> auth.JwtTokens
+	8,  // [8:16] is the sub-list for method output_type
+	0,  // [0:8] is the sub-list for method input_type
+	0,  // [0:0] is the sub-list for extension type_name
+	0,  // [0:0] is the sub-list for extension extendee
+	0,  // [0:0] is the sub-list for field type_name
 }
 
 func init() { file_protos_auth_proto_init() }
@@ -495,7 +717,7 @@ func file_protos_auth_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_protos_auth_proto_rawDesc), len(file_protos_auth_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
