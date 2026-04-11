@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
+	"github.com/google/uuid"
 )
 
 type UserRepo struct {
@@ -37,6 +38,15 @@ func (u *UserRepo) FindUserByEmail(ctx context.Context, email string) (*models.U
 
 	user := models.User{}
 	err := u.db.QueryRowContext(ctx, query, email).Scan(&user.ID, &user.Email, &user.HashedPassword, &user.Verificated, &user.Role)
+
+	return &user, err
+}
+
+func (u *UserRepo) FindUserByID(ctx context.Context, userID uuid.UUID) (*models.User, error) {
+	const query = "SELECT user_id, email, hashed_password, verificated, role FROM users WHERE user_id = $1"
+
+	user := models.User{}
+	err := u.db.QueryRowContext(ctx, query, userID).Scan(&user.ID, &user.Email, &user.HashedPassword, &user.Verificated, &user.Role)
 
 	return &user, err
 }
