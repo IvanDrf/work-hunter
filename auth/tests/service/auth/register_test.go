@@ -6,7 +6,8 @@ import (
 
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
 	"github.com/IvanDrf/work-hunter/auth/internal/infrastructure/service"
-	"github.com/IvanDrf/work-hunter/auth/tests/service/auth/fixtures"
+	"github.com/IvanDrf/work-hunter/auth/tests/service/common"
+	"github.com/IvanDrf/work-hunter/auth/tests/service/fixtures"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -27,20 +28,20 @@ func TestRegisterUser(t *testing.T) {
 
 func testRegisterNewUsers(t *testing.T, auth *service.AuthService) {
 	for email, password := range fixtures.Users {
-		access, refresh, err := auth.RegisterUser(t.Context(), email, password)
+		access, refresh, err := auth.RegisterUser(t.Context(), email, password, string(models.EMPLOYEE))
 		assert.Nil(t, err)
 		assert.NotEmpty(t, access)
 		assert.NotEmpty(t, refresh)
 
 		// jwt tokens after registration should be valid
-		testTokenValidatation(t, access, refresh)
+		common.TestTokenValidatation(t, access, refresh, false)
 	}
 }
 
 func testRegisterOldUsers(t *testing.T, auth *service.AuthService) {
 	//users already registred, should be errors
 	for email, password := range fixtures.Users {
-		access, refresh, err := auth.RegisterUser(t.Context(), email, password)
+		access, refresh, err := auth.RegisterUser(t.Context(), email, password, string(models.EMPLOYEE))
 		assert.NotNil(t, err)
 
 		var e models.Error

@@ -15,6 +15,7 @@
     - tests (tests for app)
     - ref (refactor)
     - feat (feature)
+    - ci/cd (github workflows)
 
     examples:
     ```bash

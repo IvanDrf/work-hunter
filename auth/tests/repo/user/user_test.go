@@ -30,7 +30,7 @@ func TestCreateUser(t *testing.T) {
 
 	for _, user := range users {
 		mock.ExpectExec("INSERT INTO users").
-			WithArgs(user.ID, user.Email, user.HashedPassword, user.Verificated).
+			WithArgs(user.ID, user.Email, user.HashedPassword, user.Verificated, user.Role).
 			WillReturnResult(sqlmock.NewResult(0, 0))
 
 		err := repo.CreateUser(t.Context(), user)
@@ -49,10 +49,10 @@ func TestFindUserByEmail(t *testing.T) {
 	users := fixtures.CreateUsers()
 
 	for _, user := range users {
-		row := mock.NewRows([]string{"user_id", "email", "hashed_password", "verificated"}).
-			AddRow(user.ID, user.Email, user.HashedPassword, user.Verificated)
+		row := mock.NewRows([]string{"user_id", "email", "hashed_password", "verificated", "role"}).
+			AddRow(user.ID, user.Email, user.HashedPassword, user.Verificated, user.Role)
 
-		mock.ExpectQuery("SELECT user_id, email, hashed_password, verificated FROM users").
+		mock.ExpectQuery("SELECT user_id, email, hashed_password, verificated, role FROM users").
 			WithArgs(user.Email).WillReturnRows(row)
 
 		u, err := repo.FindUserByEmail(t.Context(), user.Email)
@@ -62,6 +62,8 @@ func TestFindUserByEmail(t *testing.T) {
 		assert.Equal(t, user.Email, u.Email)
 		assert.Equal(t, user.HashedPassword, u.HashedPassword)
 		assert.Equal(t, user.Verificated, u.Verificated)
+		assert.Equal(t, user.Role, u.Role)
+
 		assert.Nil(t, mock.ExpectationsWereMet())
 	}
 

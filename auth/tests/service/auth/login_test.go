@@ -6,7 +6,8 @@ import (
 
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
 	"github.com/IvanDrf/work-hunter/auth/internal/infrastructure/service"
-	"github.com/IvanDrf/work-hunter/auth/tests/service/auth/fixtures"
+	"github.com/IvanDrf/work-hunter/auth/tests/service/common"
+	"github.com/IvanDrf/work-hunter/auth/tests/service/fixtures"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -28,7 +29,7 @@ func TestLoginUser(t *testing.T) {
 func testLoginUsers(t *testing.T, auth *service.AuthService) {
 	for email, password := range fixtures.Users {
 		// register new user
-		_, _, err := auth.RegisterUser(t.Context(), email, password)
+		_, _, err := auth.RegisterUser(t.Context(), email, password, string(models.EMPLOYEE))
 		assert.Nil(t, err)
 
 		// login this new user
@@ -38,7 +39,7 @@ func testLoginUsers(t *testing.T, auth *service.AuthService) {
 		assert.NotEmpty(t, refresh)
 
 		// jwt tokens after login should be valid
-		testTokenValidatation(t, access, refresh)
+		common.TestTokenValidatation(t, access, refresh, false)
 	}
 }
 

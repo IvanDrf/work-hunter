@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
+	"github.com/IvanDrf/work-hunter/auth/tests/service/fixtures"
 )
 
 type userRepo struct {
@@ -14,6 +15,24 @@ func NewUserRepo() *userRepo {
 	return &userRepo{
 		storage: map[string]*models.User{},
 	}
+}
+
+// Returns new filled user repo with registred users from fixtures.Users
+func NewFilledUserRepo() *userRepo {
+	userRepo := NewUserRepo()
+	i := 0
+	for email, password := range fixtures.Users {
+		userRepo.CreateUser(context.TODO(), &models.User{
+			ID:             fixtures.UserIDs[i],
+			Email:          email,
+			HashedPassword: password,
+			Verificated:    false,
+		})
+
+		i++
+	}
+
+	return userRepo
 }
 
 func (u *userRepo) CreateUser(ctx context.Context, user *models.User) error {
