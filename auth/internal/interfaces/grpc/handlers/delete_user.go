@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"errors"
+	"log/slog"
 
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
 	auth_api "github.com/IvanDrf/work-hunter/pkg/auth-api"
@@ -11,10 +12,14 @@ import (
 )
 
 func (h *Handler) DeleteUser(ctx context.Context, req *auth_api.DeleteUserRequest) (*auth_api.DeleteUserStatus, error) {
+	slog.Info("DeleteUser got request")
+
 	err := h.authService.DeleteUser(ctx, req.Access, req.Password)
 	var e models.Error
 
 	if errors.As(err, &e) {
+		slog.Error("DeleteUser error", slog.String("error", err.Error()))
+
 		switch e.Code {
 		case models.ErrCodeInvalidJWT, models.ErrCodeInvalidPassword:
 			return nil, status.Error(codes.InvalidArgument, e.Message)
@@ -27,6 +32,7 @@ func (h *Handler) DeleteUser(ctx context.Context, req *auth_api.DeleteUserReques
 		}
 	}
 
+	slog.Info("DeleteUser successfull response")
 	return &auth_api.DeleteUserStatus{
 		Deleted: true,
 	}, nil

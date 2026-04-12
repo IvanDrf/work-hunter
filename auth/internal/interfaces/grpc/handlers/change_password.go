@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"errors"
+	"log/slog"
 
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
 	auth_api "github.com/IvanDrf/work-hunter/pkg/auth-api"
@@ -10,11 +11,15 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *Handler) ChangeUserPassword(ctx context.Context, req *auth_api.ChangePasswordRequest) (*auth_api.ChangePasswordStatus, error) {
+func (h *Handler) ChangePassword(ctx context.Context, req *auth_api.ChangePasswordRequest) (*auth_api.ChangePasswordStatus, error) {
+	slog.Info("ChangePassword got request")
+
 	err := h.authService.ChangeUserPassword(ctx, req.Access, req.Old, req.New)
 
 	var e models.Error
 	if errors.As(err, &e) {
+		slog.Error("ChangePassword error", slog.String("error", err.Error()))
+
 		switch e.Code {
 		case models.ErrCodeInvalidJWT, models.ErrCodeInvalidPassword:
 			return nil, status.Error(codes.InvalidArgument, e.Message)
@@ -27,6 +32,7 @@ func (h *Handler) ChangeUserPassword(ctx context.Context, req *auth_api.ChangePa
 		}
 	}
 
+	slog.Info("ChangePassword successfull response")
 	return &auth_api.ChangePasswordStatus{
 		Changed: true,
 	}, nil
