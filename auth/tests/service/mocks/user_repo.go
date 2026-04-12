@@ -5,6 +5,7 @@ import (
 
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
 	"github.com/IvanDrf/work-hunter/auth/tests/service/fixtures"
+	"github.com/google/uuid"
 )
 
 type userRepo struct {
@@ -54,6 +55,34 @@ func (u *userRepo) CreateUser(ctx context.Context, user *models.User) error {
 	return nil
 }
 
+func (u *userRepo) DeleteUser(ctx context.Context, email string) error {
+	old := len(u.storage)
+	delete(u.storage, email)
+
+	// if storage len doesn't change means there are no user wit given email
+	if old == len(u.storage) {
+		return models.Error{
+			Message: "can't delete user with given email",
+			Code:    models.ErrCodeUserNotFound,
+		}
+	}
+
+	return nil
+}
+
+func (u *userRepo) FindUserByID(ctx context.Context, userID uuid.UUID) (*models.User, error) {
+	for _, user := range u.storage {
+		if user.ID == userID {
+			return user, nil
+		}
+	}
+
+	return nil, models.Error{
+		Message: "can't find user with given userID",
+		Code:    models.ErrCodeUserNotFound,
+	}
+}
+
 func (u *userRepo) FindUserByEmail(ctx context.Context, email string) (*models.User, error) {
 	if u.storage == nil {
 		return nil, models.Error{
@@ -70,6 +99,16 @@ func (u *userRepo) FindUserByEmail(ctx context.Context, email string) (*models.U
 		Message: "user with that email doesn't exists",
 		Code:    models.ErrCodeUserNotFound,
 	}
+}
+
+func (u *userRepo) ChangeUserPassword(ctx context.Context, userID uuid.UUID, hashedPassword string) error {
+	user, err := u.FindUserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	user.HashedPassword = hashedPassword
+	return nil
 }
 
 func (u *userRepo) VerifyEmail(ctx context.Context, email string) error {
