@@ -33,6 +33,13 @@ func (u *UserRepo) CreateUser(ctx context.Context, user *models.User) error {
 	return nil
 }
 
+func (u *UserRepo) DeleteUser(ctx context.Context, email string) error {
+	const query = "DELETE FROM users WHERE email = $1"
+
+	_, err := u.db.ExecContext(ctx, query, email)
+	return err
+}
+
 func (u *UserRepo) FindUserByEmail(ctx context.Context, email string) (*models.User, error) {
 	const query = "SELECT user_id, email, hashed_password, verificated, role FROM users WHERE email = $1 LIMIT 1"
 
@@ -51,10 +58,10 @@ func (u *UserRepo) FindUserByID(ctx context.Context, userID uuid.UUID) (*models.
 	return &user, err
 }
 
-func (u *UserRepo) DeleteUser(ctx context.Context, email string) error {
-	const query = "DELETE FROM users WHERE email = $1"
+func (u *UserRepo) ChangeUserPassword(ctx context.Context, userID uuid.UUID, hashedPassword string) error {
+	const query = "UPDATE users SET hashed_password = $1 WHERE user_id = $2"
 
-	_, err := u.db.ExecContext(ctx, query, email)
+	_, err := u.db.ExecContext(ctx, query, hashedPassword, userID)
 	return err
 }
 
