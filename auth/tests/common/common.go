@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
+	"github.com/IvanDrf/work-hunter/auth/tests/mocks"
 	"github.com/IvanDrf/work-hunter/auth/tests/service/fixtures"
-	"github.com/IvanDrf/work-hunter/auth/tests/service/mocks"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )

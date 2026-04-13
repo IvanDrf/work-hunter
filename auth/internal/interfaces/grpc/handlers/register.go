@@ -23,7 +23,7 @@ func (h *Handler) Register(ctx context.Context, user *auth_api.User) (*auth_api.
 		case models.ErrCodeUserAlreadyExists:
 			return nil, status.Error(codes.AlreadyExists, e.Message)
 
-		case models.ErrCodeInvalidUserRole, models.ErrCodeInvalidPassword:
+		case models.ErrCodeInvalidUserRole, models.ErrCodeInvalidPassword, models.ErrCodeInvalidEmail:
 			return nil, status.Error(codes.InvalidArgument, e.Message)
 
 		case models.ErrCodeInternal:
