@@ -14,9 +14,13 @@ Auth service is used for registration, login, jwt tokens refreshing
 type AuthService interface {
     // register user with given email, password, role, returns jwt tokens
     RegisterUser(ctx context.Context, email string, password string, role string) (string, string, error)
-
     // login user with his email and password, returns jwt tokens
     LoginUser(ctx context.Context, email string, password string) (string, string, error)
+    // delete user account
+    DeleteUser(ctx context.Context, access string, password string) error
+    // change user password from old to new
+    ChangeUserPassword(ctx context.Context, access string, old string, new string) error
+
 
     // refresh jwt tokens by given refresh token, returns jwt tokens
     RefreshTokens(ctx context.Context, refresh string) (string, string, error)
