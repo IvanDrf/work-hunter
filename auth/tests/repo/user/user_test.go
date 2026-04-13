@@ -40,6 +40,26 @@ func TestCreateUser(t *testing.T) {
 	assert.Nil(t, mock.ExpectationsWereMet())
 }
 
+func TestDeleteUser(t *testing.T) {
+	t.Parallel()
+
+	repo, mock := connect()
+	defer repo.Close()
+
+	users := fixtures.CreateUsers()
+
+	for _, user := range users {
+		mock.ExpectExec("DELETE FROM users").
+			WithArgs(user.Email).
+			WillReturnResult(sqlmock.NewResult(0, 1))
+
+		err := repo.DeleteUser(t.Context(), user.Email)
+		assert.Nil(t, err)
+	}
+
+	assert.Nil(t, mock.ExpectationsWereMet())
+}
+
 func TestFindUserByEmail(t *testing.T) {
 	t.Parallel()
 
@@ -63,10 +83,38 @@ func TestFindUserByEmail(t *testing.T) {
 		assert.Equal(t, user.HashedPassword, u.HashedPassword)
 		assert.Equal(t, user.Verificated, u.Verificated)
 		assert.Equal(t, user.Role, u.Role)
+	}
+
+	assert.Nil(t, mock.ExpectationsWereMet())
+}
+
+func TestFindUserByID(t *testing.T) {
+	t.Parallel()
+
+	repo, mock := connect()
+	defer repo.Close()
+
+	users := fixtures.CreateUsers()
+	for _, user := range users {
+		row := mock.NewRows([]string{"user_id", "email", "hashed_password", "verificated", "role"}).
+			AddRow(user.ID, user.Email, user.HashedPassword, user.Verificated, user.Role)
+
+		mock.ExpectQuery("SELECT user_id, email, hashed_password, verificated, role FROM users").
+			WithArgs(user.ID).WillReturnRows(row)
+
+		u, err := repo.FindUserByID(t.Context(), user.ID)
+
+		assert.Nil(t, err)
+		assert.Equal(t, user.ID, u.ID)
+		assert.Equal(t, user.Email, u.Email)
+		assert.Equal(t, user.HashedPassword, u.HashedPassword)
+		assert.Equal(t, user.Verificated, u.Verificated)
+		assert.Equal(t, user.Role, u.Role)
 
 		assert.Nil(t, mock.ExpectationsWereMet())
 	}
 
+	assert.Nil(t, mock.ExpectationsWereMet())
 }
 
 func TestVerifyEmail(t *testing.T) {
@@ -85,6 +133,7 @@ func TestVerifyEmail(t *testing.T) {
 		err := repo.VerifyEmail(t.Context(), user.Email)
 
 		assert.Nil(t, err)
-		assert.Nil(t, mock.ExpectationsWereMet())
 	}
+
+	assert.Nil(t, mock.ExpectationsWereMet())
 }

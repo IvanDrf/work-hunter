@@ -38,5 +38,6 @@ func (w *EmailWorker) Start(ctx context.Context) {
 }
 
 func (w *EmailWorker) Stop() {
+	slog.Info("Stopping WORKER")
 	w.consumer.Close()
 }

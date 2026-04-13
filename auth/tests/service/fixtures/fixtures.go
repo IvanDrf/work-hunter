@@ -29,6 +29,15 @@ var (
 		uuid.New(),
 	}
 
+	UserIDsString = [size]string{
+		UserIDs[0].String(),
+		UserIDs[1].String(),
+		UserIDs[2].String(),
+		UserIDs[3].String(),
+		UserIDs[4].String(),
+		UserIDs[5].String(),
+	}
+
 	// unregistred users, using this in TestLoginUser
 	Unregistered = map[string]string{
 		"unregistred@gmail.com": "eruigjwkmelf",

@@ -15,8 +15,16 @@ Methods:
 type UserRepo interface {
     // create user in database
     CreateUser(ctx context.Context, user *models.User) error
+    // delete user from database
+    DeleteUser(ctx context.Context, email string) error
+
     // find user in database by his email
     FindUserByEmail(ctx context.Context, email string) (*models.User, error)
+    // find user in database by his id
+    FindUserByID(ctx context.Context, userID uuid.UUID) (*models.User, error)
+
+    // change user password in database with new
+    ChangeUserPassword(ctx context.Context, userID uuid.UUID, hashedPassword string) error
 
     // set verificated status = true by user's email
     VerifyEmail(ctx context.Context, email string) error

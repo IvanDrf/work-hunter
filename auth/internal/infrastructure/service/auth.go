@@ -8,6 +8,7 @@ import (
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/ports/jwt"
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/ports/repo"
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/rules"
+	"github.com/google/uuid"
 )
 
 type AuthService struct {
@@ -111,6 +112,121 @@ func (a *AuthService) LoginUser(ctx context.Context, email string, password stri
 
 	slog.Info("auth:LoginUser success")
 	return access, refresh, nil
+}
+
+func (a *AuthService) DeleteUser(ctx context.Context, access string, password string) error {
+	payload, err := a.jwter.GetPayload(access)
+	if err != nil {
+		slog.Info("auth:DeleteUser got invalid jwt token")
+		return models.Error{
+			Message: "invalid jwt token",
+			Code:    models.ErrCodeInvalidJWT,
+		}
+	}
+
+	userID, err := uuid.Parse(payload.UserID)
+	if err != nil {
+		slog.Info("auth:DeleteUser got invalid userID in jwt token")
+		return models.Error{
+			Message: "invalid userID in jwt token",
+			Code:    models.ErrCodeInvalidJWT,
+		}
+	}
+
+	user, err := a.userRepo.FindUserByID(ctx, userID)
+	if err != nil {
+		slog.Info("auth:DeleteUser can't find user in database with given userID")
+		return models.Error{
+			Message: "can't find user with given userID in jwt token",
+			Code:    models.ErrCodeUserNotFound,
+		}
+	}
+
+	if !rules.IsPasswordsSame(password, user.HashedPassword) {
+		slog.Info("auth:DeleteUser password in request and password in database are different, can't change password")
+		return models.Error{
+			Message: "password is incorrect",
+			Code:    models.ErrCodeInvalidPassword,
+		}
+	}
+
+	err = a.userRepo.DeleteUser(ctx, user.Email)
+	if err != nil {
+		slog.Error("auth:DeleteUser can't delete user from databse", slog.String("error", err.Error()))
+		return models.Error{
+			Message: "can't delete user",
+			Code:    models.ErrCodeInternal,
+		}
+	}
+
+	slog.Info("auth:DeleteUser success")
+	return nil
+}
+
+func (a *AuthService) ChangeUserPassword(ctx context.Context, access string, old string, new string) error {
+	payload, err := a.jwter.GetPayload(access)
+	if err != nil {
+		slog.Info("auth:ChangeUserPassword got invalid jwt token")
+		return models.Error{
+			Message: "invalid jwt token",
+			Code:    models.ErrCodeInvalidJWT,
+		}
+	}
+
+	userID, err := uuid.Parse(payload.UserID)
+	if err != nil {
+		slog.Info("auth:ChangeUserPassword got invalid userID in jwt token")
+		return models.Error{
+			Message: "invalid userID in jwt token",
+			Code:    models.ErrCodeInvalidJWT,
+		}
+	}
+
+	user, err := a.userRepo.FindUserByID(ctx, userID)
+	if err != nil {
+		slog.Info("auth:ChangeUserPassword can't find user with given userID in jwt token")
+		return models.Error{
+			Message: "can't find user with given userID",
+			Code:    models.ErrCodeUserNotFound,
+		}
+	}
+
+	if !rules.IsPasswordsSame(old, user.HashedPassword) {
+		slog.Info("auth:ChangeUserPassword old password in request and password in dataabse are different")
+		return models.Error{
+			Message: "password is incorrect",
+			Code:    models.ErrCodeInvalidPassword,
+		}
+	}
+
+	if !rules.IsPasswordCorrect(new) {
+		slog.Info("auth:ChangeUserPassword new password is incorrect, doesn't fit rules")
+		return models.Error{
+			Message: "new password is incorrect",
+			Code:    models.ErrCodeInvalidPassword,
+		}
+	}
+
+	hashed, err := rules.HashPassword(new)
+	if err != nil {
+		slog.Error("auth:ChangeUserPassword can't hash new password", slog.String("error", err.Error()))
+		return models.Error{
+			Message: "can't hash new password",
+			Code:    models.ErrCodeInternal,
+		}
+	}
+
+	err = a.userRepo.ChangeUserPassword(ctx, userID, hashed)
+	if err != nil {
+		slog.Error("auth:ChangeUserPassword can't change user password in database", slog.String("error", err.Error()))
+		return models.Error{
+			Message: "can't change user password in database",
+			Code:    models.ErrCodeInternal,
+		}
+	}
+
+	slog.Info("auth:ChangeUserPassword success")
+	return nil
 }
 
 func (a *AuthService) RefreshTokens(ctx context.Context, refresh string) (string, string, error) {
