@@ -14,6 +14,14 @@ var (
 		{Email: "fifth@gmail.com", Password: "wlekfwef", Role: string(models.EMPLOYEE)},
 	}
 
+	UnregistredUsers = []*auth_api.User{
+		{Email: "unreg@gmail.com", Password: "123456789", Role: string(models.EMPLOYEE)},
+		{Email: "kjrngmr", Password: "erjrglm", Role: string(models.EMPLOYEE)},
+		{Email: "unreg@main.ru", Password: "eroiigkml", Role: string(models.EMPLOYEE)},
+		{Email: "reg4@mail.ru", Password: "eorigmke;r,", Role: string(models.EMPLOYEE)},
+		{Email: "another@gmail.com", Password: "wlekfwef", Role: string(models.EMPLOYEE)},
+	}
+
 	InvalidRoleRequests = []*auth_api.User{
 		{Email: "first@gmail.com", Password: "123456789", Role: "ekrjgnlmker,."},
 		{Email: "second@gmail.com", Password: "erjrglm", Role: ""},

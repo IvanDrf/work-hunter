@@ -1,0 +1,77 @@
+package handlers_test
+
+import (
+	"context"
+	"testing"
+
+	"github.com/IvanDrf/work-hunter/auth/internal/interfaces/grpc/handlers"
+	"github.com/IvanDrf/work-hunter/auth/tests/common"
+	"github.com/IvanDrf/work-hunter/auth/tests/handlers/fixtures"
+	auth_api "github.com/IvanDrf/work-hunter/pkg/auth-api"
+	"github.com/stretchr/testify/assert"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+)
+
+func TestLoginHandler(t *testing.T) {
+	t.Parallel()
+
+	handlers := newHandlers()
+	// register users, so we can log in
+	registerUsers(handlers, fixtures.RegisterRequests)
+
+	t.Run("Login registred users", func(t *testing.T) {
+		testLoginUsers(t, handlers)
+	})
+
+	t.Run("Login unregistred users", func(t *testing.T) {
+		testLoginUnregistredUsers(t, handlers)
+	})
+
+	t.Run("Login with invalid password", func(t *testing.T) {
+		testLoginWithInvalidPassword(t, handlers)
+	})
+
+}
+
+// Register users with handlers
+func registerUsers(handlers *handlers.Handler, requests []*auth_api.User) {
+	for _, req := range requests {
+		handlers.Register(context.TODO(), req)
+	}
+}
+
+// Test to login registred users
+func testLoginUsers(t *testing.T, handlers *handlers.Handler) {
+	for _, req := range fixtures.RegisterRequests {
+		resp, err := handlers.Login(t.Context(), req)
+
+		assert.Nil(t, err)
+		assert.NotNil(t, resp)
+		// jwt tokens must be valid after successfull login
+		common.TestTokenValidatation(t, resp.Access, resp.Refresh, false)
+	}
+}
+
+// Test to login unregistred users
+func testLoginUnregistredUsers(t *testing.T, handlers *handlers.Handler) {
+	for _, req := range fixtures.UnregistredUsers {
+		resp, err := handlers.Login(t.Context(), req)
+
+		assert.Nil(t, resp)
+		assert.NotNil(t, err)
+		assert.Contains(t, err.Error(), status.Error(codes.NotFound, "").Error())
+	}
+}
+
+func testLoginWithInvalidPassword(t *testing.T, handlers *handlers.Handler) {
+	for _, req := range fixtures.RegisterRequests {
+		req.Password = "wrong password"
+
+		resp, err := handlers.Login(t.Context(), req)
+
+		assert.Nil(t, resp)
+		assert.NotNil(t, err)
+		assert.Contains(t, err.Error(), status.Error(codes.InvalidArgument, "").Error())
+	}
+}

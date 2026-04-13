@@ -49,6 +49,7 @@ func testRegisterNewUsers(t *testing.T, handlers *handlers.Handler) {
 
 		assert.Nil(t, err)
 		assert.NotNil(t, resp)
+		// jwt tokens must be valid after successfull registration
 		common.TestTokenValidatation(t, resp.Access, resp.Refresh, false)
 	}
 }
