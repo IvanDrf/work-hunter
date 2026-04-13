@@ -5,8 +5,16 @@ import (
 	auth_api "github.com/IvanDrf/work-hunter/pkg/auth-api"
 )
 
+const (
+	NewPassword        = "new password"
+	InvalidOldPassword = "invalid old password"
+	InvalidNewPassword = ""
+
+	InvalidUserID = "invalid user id"
+)
+
 var (
-	RegisterRequests = []*auth_api.User{
+	Users = []*auth_api.User{
 		{Email: "first@gmail.com", Password: "123456789", Role: string(models.EMPLOYEE)},
 		{Email: "second@gmail.com", Password: "erjrglm", Role: string(models.EMPLOYEE)},
 		{Email: "third@gmail.com", Password: "eroiigkml", Role: string(models.EMPLOYEE)},

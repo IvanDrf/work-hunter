@@ -18,7 +18,7 @@ func TestLoginHandler(t *testing.T) {
 
 	handlers := newHandlers()
 	// register users, so we can log in
-	registerUsers(handlers, fixtures.RegisterRequests)
+	registerUsers(handlers, fixtures.Users)
 
 	t.Run("Login registred users", func(t *testing.T) {
 		testLoginUsers(t, handlers)
@@ -34,16 +34,30 @@ func TestLoginHandler(t *testing.T) {
 
 }
 
+type Tokens struct {
+	Access  string
+	Refresh string
+}
+
 // Register users with handlers
-func registerUsers(handlers *handlers.Handler, requests []*auth_api.User) {
+func registerUsers(handlers *handlers.Handler, requests []*auth_api.User) map[string]*Tokens {
+	tokens := make(map[string]*Tokens, len(requests))
+
 	for _, req := range requests {
-		handlers.Register(context.TODO(), req)
+		resp, _ := handlers.Register(context.TODO(), req)
+
+		tokens[req.Email] = &Tokens{
+			Access:  resp.Access,
+			Refresh: resp.Refresh,
+		}
 	}
+
+	return tokens
 }
 
 // Test to login registred users
 func testLoginUsers(t *testing.T, handlers *handlers.Handler) {
-	for _, req := range fixtures.RegisterRequests {
+	for _, req := range fixtures.Users {
 		resp, err := handlers.Login(t.Context(), req)
 
 		assert.Nil(t, err)
@@ -65,7 +79,7 @@ func testLoginUnregistredUsers(t *testing.T, handlers *handlers.Handler) {
 }
 
 func testLoginWithInvalidPassword(t *testing.T, handlers *handlers.Handler) {
-	for _, req := range fixtures.RegisterRequests {
+	for _, req := range fixtures.Users {
 		req.Password = "wrong password"
 
 		resp, err := handlers.Login(t.Context(), req)

@@ -44,7 +44,7 @@ func TestRegisterHandler(t *testing.T) {
 
 // Test to register new users
 func testRegisterNewUsers(t *testing.T, handlers *handlers.Handler) {
-	for _, req := range fixtures.RegisterRequests {
+	for _, req := range fixtures.Users {
 		resp, err := handlers.Register(t.Context(), req)
 
 		assert.Nil(t, err)
@@ -56,7 +56,7 @@ func testRegisterNewUsers(t *testing.T, handlers *handlers.Handler) {
 
 // Test to register users what already registred
 func testRegisterOldUsers(t *testing.T, handlers *handlers.Handler) {
-	for _, req := range fixtures.RegisterRequests {
+	for _, req := range fixtures.Users {
 		resp, err := handlers.Register(t.Context(), req)
 
 		assert.Nil(t, resp)
