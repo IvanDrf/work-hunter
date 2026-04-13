@@ -8,18 +8,18 @@ import (
 	"github.com/google/uuid"
 )
 
-type userRepo struct {
-	storage map[string]*models.User
+type UserRepo struct {
+	Storage map[string]*models.User
 }
 
-func NewUserRepo() *userRepo {
-	return &userRepo{
-		storage: map[string]*models.User{},
+func NewUserRepo() *UserRepo {
+	return &UserRepo{
+		Storage: map[string]*models.User{},
 	}
 }
 
 // Returns new filled user repo with registred users from fixtures.Users
-func NewFilledUserRepo() *userRepo {
+func NewFilledUserRepo() *UserRepo {
 	userRepo := NewUserRepo()
 	i := 0
 	for email, password := range fixtures.Users {
@@ -36,31 +36,31 @@ func NewFilledUserRepo() *userRepo {
 	return userRepo
 }
 
-func (u *userRepo) CreateUser(ctx context.Context, user *models.User) error {
-	if u.storage == nil {
+func (u *UserRepo) CreateUser(ctx context.Context, user *models.User) error {
+	if u.Storage == nil {
 		return models.Error{
 			Message: "storage is closed",
 			Code:    models.ErrCodeInternal,
 		}
 	}
 
-	if _, ok := u.storage[user.Email]; ok {
+	if _, ok := u.Storage[user.Email]; ok {
 		return models.Error{
 			Message: "user already exists",
 			Code:    models.ErrCodeUserAlreadyExists,
 		}
 	}
 
-	u.storage[user.Email] = user
+	u.Storage[user.Email] = user
 	return nil
 }
 
-func (u *userRepo) DeleteUser(ctx context.Context, email string) error {
-	old := len(u.storage)
-	delete(u.storage, email)
+func (u *UserRepo) DeleteUser(ctx context.Context, email string) error {
+	old := len(u.Storage)
+	delete(u.Storage, email)
 
 	// if storage len doesn't change means there are no user wit given email
-	if old == len(u.storage) {
+	if old == len(u.Storage) {
 		return models.Error{
 			Message: "can't delete user with given email",
 			Code:    models.ErrCodeUserNotFound,
@@ -70,8 +70,8 @@ func (u *userRepo) DeleteUser(ctx context.Context, email string) error {
 	return nil
 }
 
-func (u *userRepo) FindUserByID(ctx context.Context, userID uuid.UUID) (*models.User, error) {
-	for _, user := range u.storage {
+func (u *UserRepo) FindUserByID(ctx context.Context, userID uuid.UUID) (*models.User, error) {
+	for _, user := range u.Storage {
 		if user.ID == userID {
 			return user, nil
 		}
@@ -83,15 +83,15 @@ func (u *userRepo) FindUserByID(ctx context.Context, userID uuid.UUID) (*models.
 	}
 }
 
-func (u *userRepo) FindUserByEmail(ctx context.Context, email string) (*models.User, error) {
-	if u.storage == nil {
+func (u *UserRepo) FindUserByEmail(ctx context.Context, email string) (*models.User, error) {
+	if u.Storage == nil {
 		return nil, models.Error{
 			Message: "storage is closed",
 			Code:    models.ErrCodeInternal,
 		}
 	}
 
-	if user, ok := u.storage[email]; ok {
+	if user, ok := u.Storage[email]; ok {
 		return user, nil
 	}
 
@@ -101,7 +101,7 @@ func (u *userRepo) FindUserByEmail(ctx context.Context, email string) (*models.U
 	}
 }
 
-func (u *userRepo) ChangeUserPassword(ctx context.Context, userID uuid.UUID, hashedPassword string) error {
+func (u *UserRepo) ChangeUserPassword(ctx context.Context, userID uuid.UUID, hashedPassword string) error {
 	user, err := u.FindUserByID(ctx, userID)
 	if err != nil {
 		return err
@@ -111,15 +111,15 @@ func (u *userRepo) ChangeUserPassword(ctx context.Context, userID uuid.UUID, has
 	return nil
 }
 
-func (u *userRepo) VerifyEmail(ctx context.Context, email string) error {
-	if u.storage == nil {
+func (u *UserRepo) VerifyEmail(ctx context.Context, email string) error {
+	if u.Storage == nil {
 		return models.Error{
 			Message: "storage is closed",
 			Code:    models.ErrCodeInternal,
 		}
 	}
 
-	if user, ok := u.storage[email]; ok {
+	if user, ok := u.Storage[email]; ok {
 		user.Verificated = true
 
 		return nil
@@ -131,6 +131,6 @@ func (u *userRepo) VerifyEmail(ctx context.Context, email string) error {
 	}
 }
 
-func (u *userRepo) Close() {
-	u.storage = nil
+func (u *UserRepo) Close() {
+	u.Storage = nil
 }
