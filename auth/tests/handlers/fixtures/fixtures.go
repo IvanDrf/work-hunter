@@ -11,7 +11,8 @@ const (
 	InvalidOldPassword = "invalid old password"
 	InvalidNewPassword = ""
 
-	InvalidUserID = "invalid user id"
+	InvalidUserID   = "invalid user id"
+	InvalidUserRole = "invalid user role"
 )
 
 var (
