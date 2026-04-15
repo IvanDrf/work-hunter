@@ -1,7 +1,6 @@
 package fixtures
 
 import (
-	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
 	auth_api "github.com/IvanDrf/work-hunter/pkg/auth-api"
 )
 
@@ -17,42 +16,42 @@ const (
 
 var (
 	Users = []*auth_api.User{
-		{Email: "first@gmail.com", Password: "123456789", Role: string(models.EMPLOYEE)},
-		{Email: "second@gmail.com", Password: "erjrglm", Role: string(models.EMPLOYEE)},
-		{Email: "third@gmail.com", Password: "eroiigkml", Role: string(models.EMPLOYEE)},
-		{Email: "fourth@gmail.com", Password: "eorigmke;r,", Role: string(models.EMPLOYEE)},
-		{Email: "fifth@gmail.com", Password: "wlekfwef", Role: string(models.EMPLOYEE)},
+		{Email: "first@gmail.com", Password: "123456789", Role: 0},
+		{Email: "second@gmail.com", Password: "erjrglm", Role: 0},
+		{Email: "third@gmail.com", Password: "eroiigkml", Role: 0},
+		{Email: "fourth@gmail.com", Password: "eorigmke;r,", Role: 0},
+		{Email: "fifth@gmail.com", Password: "wlekfwef", Role: 0},
 	}
 
 	UnregistredUsers = []*auth_api.User{
-		{Email: "unreg@gmail.com", Password: "123456789", Role: string(models.EMPLOYEE)},
-		{Email: "kjrngmr", Password: "erjrglm", Role: string(models.EMPLOYEE)},
-		{Email: "unreg@main.ru", Password: "eroiigkml", Role: string(models.EMPLOYEE)},
-		{Email: "reg4@mail.ru", Password: "eorigmke;r,", Role: string(models.EMPLOYEE)},
-		{Email: "another@gmail.com", Password: "wlekfwef", Role: string(models.EMPLOYEE)},
+		{Email: "unreg@gmail.com", Password: "123456789", Role: 0},
+		{Email: "kjrngmr", Password: "erjrglm", Role: 0},
+		{Email: "unreg@main.ru", Password: "eroiigkml", Role: 0},
+		{Email: "reg4@mail.ru", Password: "eorigmke;r,", Role: 0},
+		{Email: "another@gmail.com", Password: "wlekfwef", Role: 0},
 	}
 
 	InvalidRoleRequests = []*auth_api.User{
-		{Email: "first@gmail.com", Password: "123456789", Role: "ekrjgnlmker,."},
-		{Email: "second@gmail.com", Password: "erjrglm", Role: ""},
-		{Email: "third@gmail.com", Password: "eroiigkml", Role: "erkger"},
-		{Email: "fourth@gmail.com", Password: "eorigmke;r,", Role: "12332"},
-		{Email: "fifth@gmail.com", Password: "wlekfwef", Role: "invalid_role"},
+		{Email: "first@gmail.com", Password: "123456789", Role: -1},
+		{Email: "second@gmail.com", Password: "erjrglm", Role: -2},
+		{Email: "third@gmail.com", Password: "eroiigkml", Role: 40},
+		{Email: "fourth@gmail.com", Password: "eorigmke;r,", Role: 42},
+		{Email: "fifth@gmail.com", Password: "wlekfwef", Role: 90},
 	}
 
 	InvalidPasswordRequests = []*auth_api.User{
-		{Email: "first@gmail.com", Password: "1234", Role: string(models.EMPLOYEE)},
-		{Email: "second@gmail.com", Password: "kew2", Role: string(models.EMPLOYEE)},
-		{Email: "third@gmail.com", Password: "eroiigkmleklrjghiuwjkefmwjefhuewiwdfmjasfnhuwf", Role: string(models.EMPLOYEE)},
-		{Email: "fourth@gmail.com", Password: "", Role: string(models.EMPLOYEE)},
-		{Email: "fifth@gmail.com", Password: "_w", Role: string(models.EMPLOYEE)},
+		{Email: "first@gmail.com", Password: "1234", Role: 0},
+		{Email: "second@gmail.com", Password: "kew2", Role: 0},
+		{Email: "third@gmail.com", Password: "eroiigkmleklrjghiuwjkefmwjefhuewiwdfmjasfnhuwf", Role: 0},
+		{Email: "fourth@gmail.com", Password: "", Role: 0},
+		{Email: "fifth@gmail.com", Password: "_w", Role: 0},
 	}
 
 	InvalidEmailRequests = []*auth_api.User{
-		{Email: "erjnglmke,r", Password: "123456789", Role: string(models.EMPLOYEE)},
-		{Email: "", Password: "erjrglm", Role: string(models.EMPLOYEE)},
-		{Email: "email.com", Password: "eroiigkml", Role: string(models.EMPLOYEE)},
-		{Email: "12134", Password: "eorigmke;r,", Role: string(models.EMPLOYEE)},
-		{Email: "printf", Password: "wlekfwef", Role: string(models.EMPLOYEE)},
+		{Email: "erjnglmke,r", Password: "123456789", Role: 0},
+		{Email: "", Password: "erjrglm", Role: 0},
+		{Email: "email.com", Password: "eroiigkml", Role: 0},
+		{Email: "12134", Password: "eorigmke;r,", Role: 0},
+		{Email: "printf", Password: "wlekfwef", Role: 0},
 	}
 )

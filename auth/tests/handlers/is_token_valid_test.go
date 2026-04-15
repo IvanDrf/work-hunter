@@ -48,7 +48,7 @@ func testIsTokenValid(t *testing.T, handlers *handlers.Handler, tokens map[strin
 		payload, _ := mocks.Jwter.GetPayload(tokens.Access)
 		assert.Equal(t, payload.UserID, resp.Id)
 		assert.Equal(t, payload.Verificated, resp.Verificated)
-		// add role
+		assert.Equal(t, string(payload.Role), resp.Role.String())
 	}
 }
 
