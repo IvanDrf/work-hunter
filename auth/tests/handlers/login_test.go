@@ -78,6 +78,7 @@ func testLoginUnregistredUsers(t *testing.T, handlers *handlers.Handler) {
 	}
 }
 
+// Test to login user with invalid password
 func testLoginWithInvalidPassword(t *testing.T, handlers *handlers.Handler) {
 	for _, req := range fixtures.Users {
 		req.Password = "wrong password"

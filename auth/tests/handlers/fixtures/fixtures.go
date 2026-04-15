@@ -7,6 +7,7 @@ import (
 
 const (
 	NewPassword        = "new password"
+	InvalidPassword    = "invalid password"
 	InvalidOldPassword = "invalid old password"
 	InvalidNewPassword = ""
 
