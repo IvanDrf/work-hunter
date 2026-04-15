@@ -12,8 +12,8 @@ import (
 
 // Check if access and refresh tokens are valid and have same payload
 func TestTokenValidatation(t *testing.T, access string, refresh string, status bool) uuid.UUID {
-	pAccess := validateTokenPayload(t, access, false)
-	pRefresh := validateTokenPayload(t, refresh, false)
+	pAccess := validateTokenPayload(t, access, status)
+	pRefresh := validateTokenPayload(t, refresh, status)
 
 	comparePayloads(t, pAccess, pRefresh)
 
