@@ -16,7 +16,7 @@ import (
 func TestIsTokenValid(t *testing.T) {
 	t.Parallel()
 
-	handlers := newHandlers()
+	handlers := newHandlers(nil)
 	tokens := registerUsers(handlers, fixtures.Users)
 
 	t.Run("Test is token valid", func(t *testing.T) {

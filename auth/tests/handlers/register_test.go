@@ -3,6 +3,7 @@ package handlers_test
 import (
 	"testing"
 
+	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
 	"github.com/IvanDrf/work-hunter/auth/internal/interfaces/grpc/handlers"
 	"github.com/IvanDrf/work-hunter/auth/tests/common"
 	"github.com/IvanDrf/work-hunter/auth/tests/handlers/fixtures"
@@ -15,7 +16,8 @@ import (
 func TestRegisterHandler(t *testing.T) {
 	t.Parallel()
 
-	handlers := newHandlers()
+	emailQueue := make(chan *models.EmailMessage, len(fixtures.Users))
+	handlers := newHandlers(emailQueue)
 	t.Run("Register users", func(t *testing.T) {
 		testRegisterNewUsers(t, handlers) // using
 	})
@@ -28,17 +30,17 @@ func TestRegisterHandler(t *testing.T) {
 
 	t.Run("Register users with invalid role", func(t *testing.T) {
 		t.Parallel()
-		testRegisterInvalidRoleUsers(t, newHandlers())
+		testRegisterInvalidRoleUsers(t, newHandlers(nil))
 	})
 
 	t.Run("Register users with invalid password", func(t *testing.T) {
 		t.Parallel()
-		testRegisterInvalidPasswordUsers(t, newHandlers())
+		testRegisterInvalidPasswordUsers(t, newHandlers(nil))
 	})
 
 	t.Run("Register users with invalid email", func(t *testing.T) {
 		t.Parallel()
-		testRegisterInvalidEmailUsers(t, newHandlers())
+		testRegisterInvalidEmailUsers(t, newHandlers(nil))
 	})
 }
 

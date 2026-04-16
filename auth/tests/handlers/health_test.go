@@ -11,7 +11,7 @@ import (
 func TestHealth(t *testing.T) {
 	t.Parallel()
 
-	handlers := newHandlers()
+	handlers := newHandlers(nil)
 
 	resp, err := handlers.Health(t.Context(), &auth_api.Empty{})
 	assert.Nil(t, err)

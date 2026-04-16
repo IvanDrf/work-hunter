@@ -12,6 +12,8 @@ const (
 
 	InvalidUserID   = "invalid user id"
 	InvalidUserRole = "invalid user role"
+
+	InvalidVerificationToken = "jerngmkieemueqli-hefkw"
 )
 
 var (

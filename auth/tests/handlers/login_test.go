@@ -16,7 +16,7 @@ import (
 func TestLoginHandler(t *testing.T) {
 	t.Parallel()
 
-	handlers := newHandlers()
+	handlers := newHandlers(nil)
 	// register users, so we can log in
 	registerUsers(handlers, fixtures.Users)
 

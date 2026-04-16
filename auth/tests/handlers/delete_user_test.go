@@ -17,7 +17,7 @@ import (
 func TestDeleteUser(t *testing.T) {
 	t.Parallel()
 
-	handlers := newHandlers()
+	handlers := newHandlers(nil)
 
 	// access jwt tokens
 	tokens := registerUsers(handlers, fixtures.Users)

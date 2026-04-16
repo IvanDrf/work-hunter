@@ -17,7 +17,7 @@ import (
 func TestChangePasswordHandler(t *testing.T) {
 	t.Parallel()
 
-	handlers := newHandlers()
+	handlers := newHandlers(nil)
 	// register users, so we can change their passwords
 	tokens := registerUsers(handlers, fixtures.Users)
 

@@ -16,7 +16,7 @@ import (
 func TestRefresh(t *testing.T) {
 	t.Parallel()
 
-	handlers := newHandlers()
+	handlers := newHandlers(nil)
 
 	// access tokens
 	tokens := registerUsers(handlers, fixtures.Users)
