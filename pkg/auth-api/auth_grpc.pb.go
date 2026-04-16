@@ -43,11 +43,11 @@ type AuthClient interface {
 	// login user by username, password
 	Login(ctx context.Context, in *User, opts ...grpc.CallOption) (*JwtTokens, error)
 	// delete user with given access token and password
-	DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*DeleteUserStatus, error)
+	DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*Empty, error)
 	// change user's password from old to new
-	ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*ChangePasswordStatus, error)
+	ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*Empty, error)
 	// Send verification email if user didn't get it after registration
-	SendVerificationEmail(ctx context.Context, in *AccessToken, opts ...grpc.CallOption) (*AcceptStatus, error)
+	SendVerificationEmail(ctx context.Context, in *AccessToken, opts ...grpc.CallOption) (*Empty, error)
 	// Verify user email by token
 	VerifyEmail(ctx context.Context, in *VerifToken, opts ...grpc.CallOption) (*JwtTokens, error)
 	// if token valid retursn token payload
@@ -94,9 +94,9 @@ func (c *authClient) Login(ctx context.Context, in *User, opts ...grpc.CallOptio
 	return out, nil
 }
 
-func (c *authClient) DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*DeleteUserStatus, error) {
+func (c *authClient) DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DeleteUserStatus)
+	out := new(Empty)
 	err := c.cc.Invoke(ctx, Auth_DeleteUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -104,9 +104,9 @@ func (c *authClient) DeleteUser(ctx context.Context, in *DeleteUserRequest, opts
 	return out, nil
 }
 
-func (c *authClient) ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*ChangePasswordStatus, error) {
+func (c *authClient) ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ChangePasswordStatus)
+	out := new(Empty)
 	err := c.cc.Invoke(ctx, Auth_ChangePassword_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -114,9 +114,9 @@ func (c *authClient) ChangePassword(ctx context.Context, in *ChangePasswordReque
 	return out, nil
 }
 
-func (c *authClient) SendVerificationEmail(ctx context.Context, in *AccessToken, opts ...grpc.CallOption) (*AcceptStatus, error) {
+func (c *authClient) SendVerificationEmail(ctx context.Context, in *AccessToken, opts ...grpc.CallOption) (*Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(AcceptStatus)
+	out := new(Empty)
 	err := c.cc.Invoke(ctx, Auth_SendVerificationEmail_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -167,11 +167,11 @@ type AuthServer interface {
 	// login user by username, password
 	Login(context.Context, *User) (*JwtTokens, error)
 	// delete user with given access token and password
-	DeleteUser(context.Context, *DeleteUserRequest) (*DeleteUserStatus, error)
+	DeleteUser(context.Context, *DeleteUserRequest) (*Empty, error)
 	// change user's password from old to new
-	ChangePassword(context.Context, *ChangePasswordRequest) (*ChangePasswordStatus, error)
+	ChangePassword(context.Context, *ChangePasswordRequest) (*Empty, error)
 	// Send verification email if user didn't get it after registration
-	SendVerificationEmail(context.Context, *AccessToken) (*AcceptStatus, error)
+	SendVerificationEmail(context.Context, *AccessToken) (*Empty, error)
 	// Verify user email by token
 	VerifyEmail(context.Context, *VerifToken) (*JwtTokens, error)
 	// if token valid retursn token payload
@@ -197,13 +197,13 @@ func (UnimplementedAuthServer) Register(context.Context, *User) (*JwtTokens, err
 func (UnimplementedAuthServer) Login(context.Context, *User) (*JwtTokens, error) {
 	return nil, status.Error(codes.Unimplemented, "method Login not implemented")
 }
-func (UnimplementedAuthServer) DeleteUser(context.Context, *DeleteUserRequest) (*DeleteUserStatus, error) {
+func (UnimplementedAuthServer) DeleteUser(context.Context, *DeleteUserRequest) (*Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteUser not implemented")
 }
-func (UnimplementedAuthServer) ChangePassword(context.Context, *ChangePasswordRequest) (*ChangePasswordStatus, error) {
+func (UnimplementedAuthServer) ChangePassword(context.Context, *ChangePasswordRequest) (*Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method ChangePassword not implemented")
 }
-func (UnimplementedAuthServer) SendVerificationEmail(context.Context, *AccessToken) (*AcceptStatus, error) {
+func (UnimplementedAuthServer) SendVerificationEmail(context.Context, *AccessToken) (*Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method SendVerificationEmail not implemented")
 }
 func (UnimplementedAuthServer) VerifyEmail(context.Context, *VerifToken) (*JwtTokens, error) {
