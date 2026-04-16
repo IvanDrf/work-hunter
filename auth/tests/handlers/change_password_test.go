@@ -54,7 +54,6 @@ func testChangePassword(t *testing.T, handlers *handlers.Handler, tokens map[str
 
 		assert.Nil(t, err)
 		assert.NotNil(t, resp)
-		assert.True(t, resp.Changed)
 	}
 
 	// trying to login with new password

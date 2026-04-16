@@ -16,7 +16,7 @@ func (h *Handler) Register(ctx context.Context, user *auth_api.User) (*auth_api.
 	access, refresh, err := h.authService.RegisterUser(ctx, user.Email, user.Password, user.Role.String())
 
 	var e models.Error
-	if errors.As(err, &e) {
+	if err != nil && errors.As(err, &e) {
 		slog.Error("Register error", slog.String("error", err.Error()))
 
 		switch e.Code {

@@ -58,7 +58,6 @@ func testDeleteUser(t *testing.T, handlers *handlers.Handler, tokens map[string]
 
 		assert.Nil(t, err)
 		assert.NotNil(t, resp)
-		assert.True(t, resp.Deleted)
 
 		// after deletion user can't login
 		_, err = handlers.Login(t.Context(), req)

@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *Handler) ChangePassword(ctx context.Context, req *auth_api.ChangePasswordRequest) (*auth_api.ChangePasswordStatus, error) {
+func (h *Handler) ChangePassword(ctx context.Context, req *auth_api.ChangePasswordRequest) (*auth_api.Empty, error) {
 	slog.Info("ChangePassword got request")
 
 	err := h.authService.ChangeUserPassword(ctx, req.Access, req.Old, req.New)
@@ -33,7 +33,5 @@ func (h *Handler) ChangePassword(ctx context.Context, req *auth_api.ChangePasswo
 	}
 
 	slog.Info("ChangePassword successfull response")
-	return &auth_api.ChangePasswordStatus{
-		Changed: true,
-	}, nil
+	return &auth_api.Empty{}, nil
 }
