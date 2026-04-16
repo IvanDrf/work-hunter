@@ -19,6 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
+	Auth_Health_FullMethodName                = "/auth.Auth/Health"
 	Auth_Register_FullMethodName              = "/auth.Auth/Register"
 	Auth_Login_FullMethodName                 = "/auth.Auth/Login"
 	Auth_DeleteUser_FullMethodName            = "/auth.Auth/DeleteUser"
@@ -35,6 +36,8 @@ const (
 //
 // auth servuce by jwt
 type AuthClient interface {
+	// check service health
+	Health(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ServiceStatus, error)
 	// register user by username, password
 	Register(ctx context.Context, in *User, opts ...grpc.CallOption) (*JwtTokens, error)
 	// login user by username, password
@@ -44,7 +47,7 @@ type AuthClient interface {
 	// change user's password from old to new
 	ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*ChangePasswordStatus, error)
 	// Send verification email if user didn't get it after registration
-	SendVerificationEmail(ctx context.Context, in *Email, opts ...grpc.CallOption) (*AcceptStatus, error)
+	SendVerificationEmail(ctx context.Context, in *AccessToken, opts ...grpc.CallOption) (*AcceptStatus, error)
 	// Verify user email by token
 	VerifyEmail(ctx context.Context, in *VerifToken, opts ...grpc.CallOption) (*JwtTokens, error)
 	// if token valid retursn token payload
@@ -59,6 +62,16 @@ type authClient struct {
 
 func NewAuthClient(cc grpc.ClientConnInterface) AuthClient {
 	return &authClient{cc}
+}
+
+func (c *authClient) Health(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ServiceStatus, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ServiceStatus)
+	err := c.cc.Invoke(ctx, Auth_Health_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *authClient) Register(ctx context.Context, in *User, opts ...grpc.CallOption) (*JwtTokens, error) {
@@ -101,7 +114,7 @@ func (c *authClient) ChangePassword(ctx context.Context, in *ChangePasswordReque
 	return out, nil
 }
 
-func (c *authClient) SendVerificationEmail(ctx context.Context, in *Email, opts ...grpc.CallOption) (*AcceptStatus, error) {
+func (c *authClient) SendVerificationEmail(ctx context.Context, in *AccessToken, opts ...grpc.CallOption) (*AcceptStatus, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(AcceptStatus)
 	err := c.cc.Invoke(ctx, Auth_SendVerificationEmail_FullMethodName, in, out, cOpts...)
@@ -147,6 +160,8 @@ func (c *authClient) RefreshTokens(ctx context.Context, in *RefreshToken, opts .
 //
 // auth servuce by jwt
 type AuthServer interface {
+	// check service health
+	Health(context.Context, *Empty) (*ServiceStatus, error)
 	// register user by username, password
 	Register(context.Context, *User) (*JwtTokens, error)
 	// login user by username, password
@@ -156,7 +171,7 @@ type AuthServer interface {
 	// change user's password from old to new
 	ChangePassword(context.Context, *ChangePasswordRequest) (*ChangePasswordStatus, error)
 	// Send verification email if user didn't get it after registration
-	SendVerificationEmail(context.Context, *Email) (*AcceptStatus, error)
+	SendVerificationEmail(context.Context, *AccessToken) (*AcceptStatus, error)
 	// Verify user email by token
 	VerifyEmail(context.Context, *VerifToken) (*JwtTokens, error)
 	// if token valid retursn token payload
@@ -173,6 +188,9 @@ type AuthServer interface {
 // pointer dereference when methods are called.
 type UnimplementedAuthServer struct{}
 
+func (UnimplementedAuthServer) Health(context.Context, *Empty) (*ServiceStatus, error) {
+	return nil, status.Error(codes.Unimplemented, "method Health not implemented")
+}
 func (UnimplementedAuthServer) Register(context.Context, *User) (*JwtTokens, error) {
 	return nil, status.Error(codes.Unimplemented, "method Register not implemented")
 }
@@ -185,7 +203,7 @@ func (UnimplementedAuthServer) DeleteUser(context.Context, *DeleteUserRequest) (
 func (UnimplementedAuthServer) ChangePassword(context.Context, *ChangePasswordRequest) (*ChangePasswordStatus, error) {
 	return nil, status.Error(codes.Unimplemented, "method ChangePassword not implemented")
 }
-func (UnimplementedAuthServer) SendVerificationEmail(context.Context, *Email) (*AcceptStatus, error) {
+func (UnimplementedAuthServer) SendVerificationEmail(context.Context, *AccessToken) (*AcceptStatus, error) {
 	return nil, status.Error(codes.Unimplemented, "method SendVerificationEmail not implemented")
 }
 func (UnimplementedAuthServer) VerifyEmail(context.Context, *VerifToken) (*JwtTokens, error) {
@@ -216,6 +234,24 @@ func RegisterAuthServer(s grpc.ServiceRegistrar, srv AuthServer) {
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&Auth_ServiceDesc, srv)
+}
+
+func _Auth_Health_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServer).Health(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Auth_Health_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServer).Health(ctx, req.(*Empty))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Auth_Register_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -291,7 +327,7 @@ func _Auth_ChangePassword_Handler(srv interface{}, ctx context.Context, dec func
 }
 
 func _Auth_SendVerificationEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Email)
+	in := new(AccessToken)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -303,7 +339,7 @@ func _Auth_SendVerificationEmail_Handler(srv interface{}, ctx context.Context, d
 		FullMethod: Auth_SendVerificationEmail_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServer).SendVerificationEmail(ctx, req.(*Email))
+		return srv.(AuthServer).SendVerificationEmail(ctx, req.(*AccessToken))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -369,6 +405,10 @@ var Auth_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "auth.Auth",
 	HandlerType: (*AuthServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Health",
+			Handler:    _Auth_Health_Handler,
+		},
 		{
 			MethodName: "Register",
 			Handler:    _Auth_Register_Handler,

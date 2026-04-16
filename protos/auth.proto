@@ -6,6 +6,9 @@ option  go_package = "pkg/auth-api";
 
 // auth servuce by jwt
 service Auth {
+    // check service health
+    rpc Health(Empty) returns (ServiceStatus);
+
     // register user by username, password
     rpc Register(User) returns (JwtTokens); 
 
@@ -19,7 +22,7 @@ service Auth {
     rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordStatus);
 
     // Send verification email if user didn't get it after registration
-    rpc SendVerificationEmail(Email) returns (AcceptStatus);
+    rpc SendVerificationEmail(AccessToken) returns (AcceptStatus);
     
     // Verify user email by token
     rpc VerifyEmail(VerifToken) returns (JwtTokens);
@@ -31,11 +34,17 @@ service Auth {
     rpc RefreshTokens(RefreshToken) returns (JwtTokens);
 }
 
+enum Role {
+    ADMIN = 0;
+    EMPLOYEE = 1;
+    EMPLOYER = 2;
+}
+
 
 message User {
     string email = 1;
     string password = 2;
-    string role = 3; // ADMIN, EMPLOYEE, EMPLOYER
+    Role role = 3; // ADMIN, EMPLOYEE, EMPLOYER
 }
 
 
@@ -55,12 +64,9 @@ message JwtTokens {
 message TokenPayload {
     string id = 1;
     bool verificated = 2;
+    Role role = 3;
 }
 
-
-message Email {
-    string email = 1;
-}
 
 message VerifToken {
     string token = 1;
@@ -87,4 +93,11 @@ message ChangePasswordRequest {
 
 message ChangePasswordStatus {
     bool changed = 1;
+}
+
+message Empty {
+}
+
+message ServiceStatus {
+    int32 code = 1;
 }
