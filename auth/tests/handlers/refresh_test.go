@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func TedstRefresh(t *testing.T) {
+func TestRefresh(t *testing.T) {
 	t.Parallel()
 
 	handlers := newHandlers()
