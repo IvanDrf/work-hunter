@@ -59,8 +59,11 @@ func testChangePassword(t *testing.T, handlers *handlers.Handler, tokens map[str
 
 	// trying to login with new password
 	for _, req := range fixtures.Users {
-		req.Password = fixtures.NewPassword
-		resp, err := handlers.Login(t.Context(), req)
+		resp, err := handlers.Login(t.Context(), &auth_api.User{
+			Email:    req.Email,
+			Password: fixtures.NewPassword,
+			Role:     req.Role,
+		})
 
 		assert.Nil(t, err)
 		assert.NotNil(t, resp)
