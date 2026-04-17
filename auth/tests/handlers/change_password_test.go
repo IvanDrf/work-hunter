@@ -17,7 +17,8 @@ import (
 func TestChangePasswordHandler(t *testing.T) {
 	t.Parallel()
 
-	handlers := newHandlers(nil)
+	queue := make(chan *models.EmailMessage, 2*len(fixtures.Users))
+	handlers := newHandlers(queue)
 	// register users, so we can change their passwords
 	tokens := registerUsers(handlers, fixtures.Users)
 
