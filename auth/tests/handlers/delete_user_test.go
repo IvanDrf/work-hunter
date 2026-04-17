@@ -16,8 +16,7 @@ import (
 
 func TestDeleteUser(t *testing.T) {
 	t.Parallel()
-	queue := make(chan *models.EmailMessage, 2*len(fixtures.Users))
-	handlers := newHandlers(queue)
+	handlers := newHandlers(nil)
 
 	// access jwt tokens
 	tokens := registerUsers(handlers, fixtures.Users)
