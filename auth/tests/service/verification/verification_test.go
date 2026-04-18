@@ -4,6 +4,7 @@ import (
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
 	"github.com/IvanDrf/work-hunter/auth/internal/infrastructure/service"
 	"github.com/IvanDrf/work-hunter/auth/tests/mocks"
+	"github.com/IvanDrf/work-hunter/auth/tests/service/fixtures"
 )
 
 // email producer queue size
@@ -17,6 +18,6 @@ func newVerificationService() *service.VerificationService {
 		Queue = make(chan *models.EmailMessage, size)
 	}
 
-	userRepo, tokenRepo := mocks.NewFilledUserRepo(), mocks.NewFilledTokenRepo()
+	userRepo, tokenRepo := mocks.NewFilledUserRepo(false, fixtures.Users), mocks.NewFilledTokenRepo()
 	return service.NewVerificationService(mocks.NewEmailProducer(Queue), userRepo, tokenRepo, mocks.Jwter)
 }

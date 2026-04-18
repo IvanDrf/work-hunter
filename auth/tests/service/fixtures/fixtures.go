@@ -11,7 +11,7 @@ const size = 6
 // fixtures
 var (
 	Users = map[string]string{
-		"first@gmaill.com": "12345Qwerty",
+		"first@gmail.com":  "12345Qwerty",
 		"second@gmail.com": "hjtbgnjekmf",
 		"third@gmail.com":  "eirugjlkwe",
 		"fourth@mail.ru":   "erugjlkm",

@@ -1,7 +1,6 @@
 package handlers_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/IvanDrf/work-hunter/auth/internal/interfaces/grpc/handlers"
@@ -34,27 +33,6 @@ func TestLoginHandler(t *testing.T) {
 
 }
 
-type Tokens struct {
-	Access  string
-	Refresh string
-}
-
-// Register users with handlers
-func registerUsers(handlers *handlers.Handler, requests []*auth_api.User) map[string]*Tokens {
-	tokens := make(map[string]*Tokens, len(requests))
-
-	for _, req := range requests {
-		resp, _ := handlers.Register(context.TODO(), req)
-
-		tokens[req.Email] = &Tokens{
-			Access:  resp.Access,
-			Refresh: resp.Refresh,
-		}
-	}
-
-	return tokens
-}
-
 // Test to login registred users
 func testLoginUsers(t *testing.T, handlers *handlers.Handler) {
 	for _, req := range fixtures.Users {
@@ -81,9 +59,13 @@ func testLoginUnregistredUsers(t *testing.T, handlers *handlers.Handler) {
 // Test to login user with invalid password
 func testLoginWithInvalidPassword(t *testing.T, handlers *handlers.Handler) {
 	for _, req := range fixtures.Users {
-		req.Password = "wrong password"
+		r := &auth_api.User{
+			Email:    req.Email,
+			Password: fixtures.InvalidPassword,
+			Role:     req.Role,
+		}
 
-		resp, err := handlers.Login(t.Context(), req)
+		resp, err := handlers.Login(t.Context(), r)
 
 		assert.Nil(t, resp)
 		assert.NotNil(t, err)
