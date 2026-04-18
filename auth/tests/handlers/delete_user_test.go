@@ -22,17 +22,14 @@ func TestDeleteUser(t *testing.T) {
 	tokens := registerUsers(handlers, fixtures.Users)
 
 	t.Run("Test delete user with invalid jwt", func(t *testing.T) {
-		t.Parallel()
 		testDeleteUserInvalidJWT(t, handlers, tokens)
 	})
 
 	t.Run("Test to delete user with invalid userID in jwt", func(t *testing.T) {
-		t.Parallel()
 		testDeleteUserInvalidJWTUserID(t, handlers)
 	})
 
 	t.Run("Test to delete user with not existing userID", func(t *testing.T) {
-		t.Parallel()
 		testDeleteUserInvalidUserID(t, handlers)
 	})
 
