@@ -21,11 +21,6 @@ func TestDeleteUser(t *testing.T) {
 	// access jwt tokens
 	tokens := registerUsers(handlers, fixtures.Users)
 
-	t.Run("Test delete user", func(t *testing.T) {
-		t.Parallel()
-		testDeleteUser(t, handlers, tokens)
-	})
-
 	t.Run("Test delete user with invalid jwt", func(t *testing.T) {
 		t.Parallel()
 		testDeleteUserInvalidJWT(t, handlers, tokens)
@@ -42,8 +37,11 @@ func TestDeleteUser(t *testing.T) {
 	})
 
 	t.Run("Test to delete user with invalid password", func(t *testing.T) {
-		t.Parallel()
 		testDeleteUserInvalidPassword(t, handlers, tokens)
+	})
+
+	t.Run("Test delete user", func(t *testing.T) {
+		testDeleteUser(t, handlers, tokens)
 	})
 }
 
