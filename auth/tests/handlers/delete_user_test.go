@@ -16,29 +16,44 @@ import (
 
 func TestDeleteUser(t *testing.T) {
 	t.Parallel()
-	handlers := newHandlers(nil)
 
-	// access jwt tokens
-	tokens := registerUsers(handlers, fixtures.Users)
+	t.Run("Test delete user", func(t *testing.T) {
+		t.Parallel()
+
+		handlers := newHandlers(nil)
+		tokens := registerUsers(handlers, fixtures.Users)
+
+		testDeleteUser(t, handlers, tokens)
+	})
 
 	t.Run("Test delete user with invalid jwt", func(t *testing.T) {
+		t.Parallel()
+
+		handlers := newHandlers(nil)
+		tokens := registerUsers(handlers, fixtures.Users)
+
 		testDeleteUserInvalidJWT(t, handlers, tokens)
 	})
 
 	t.Run("Test to delete user with invalid userID in jwt", func(t *testing.T) {
-		testDeleteUserInvalidJWTUserID(t, handlers)
+		t.Parallel()
+
+		testDeleteUserInvalidJWTUserID(t, newHandlers(nil))
 	})
 
 	t.Run("Test to delete user with not existing userID", func(t *testing.T) {
-		testDeleteUserInvalidUserID(t, handlers)
+		t.Parallel()
+
+		testDeleteUserInvalidUserID(t, newHandlers(nil))
 	})
 
 	t.Run("Test to delete user with invalid password", func(t *testing.T) {
-		testDeleteUserInvalidPassword(t, handlers, tokens)
-	})
+		t.Parallel()
 
-	t.Run("Test delete user", func(t *testing.T) {
-		testDeleteUser(t, handlers, tokens)
+		handlers := newHandlers(nil)
+		tokens := registerUsers(handlers, fixtures.Users)
+
+		testDeleteUserInvalidPassword(t, handlers, tokens)
 	})
 }
 
