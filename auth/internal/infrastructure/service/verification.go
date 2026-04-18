@@ -9,6 +9,7 @@ import (
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/ports/repo"
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/ports/service"
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/rules"
+	"github.com/google/uuid"
 )
 
 type VerificationService struct {
@@ -45,6 +46,38 @@ func (v *VerificationService) SendVerificationEmail(ctx context.Context, email s
 		}
 	}
 
+	return v.sendVerificationEmailForUser(ctx, user)
+}
+
+func (v *VerificationService) ResendVerificationEmail(ctx context.Context, access string) error {
+	payload, err := v.jwter.GetPayload(access)
+	if err != nil {
+		return models.Error{
+			Message: "invalid jwt token",
+			Code:    models.ErrCodeInvalidJWT,
+		}
+	}
+
+	userID, err := uuid.Parse(payload.UserID)
+	if err != nil {
+		return models.Error{
+			Message: "invalid userID in jwt token",
+			Code:    models.ErrCodeInvalidJWT,
+		}
+	}
+
+	user, err := v.userRepo.FindUserByID(ctx, userID)
+	if err != nil {
+		return models.Error{
+			Message: "can't find user with that userID",
+			Code:    models.ErrCodeUserNotFound,
+		}
+	}
+
+	return v.sendVerificationEmailForUser(ctx, user)
+}
+
+func (v *VerificationService) sendVerificationEmailForUser(ctx context.Context, user *models.User) error {
 	if user.Verificated {
 		return models.Error{
 			Message: "user already verificated",
@@ -54,7 +87,7 @@ func (v *VerificationService) SendVerificationEmail(ctx context.Context, email s
 
 	token := rules.GenerateToken()
 
-	err = v.tokenRepo.CreateToken(ctx, email, token, rules.TokenTTL)
+	err := v.tokenRepo.CreateToken(ctx, user.Email, token, rules.TokenTTL)
 	if err != nil {
 		slog.Error("verif:SendVerifEmail service error", slog.String("error", err.Error()))
 		return models.Error{
@@ -64,7 +97,7 @@ func (v *VerificationService) SendVerificationEmail(ctx context.Context, email s
 	}
 
 	err = v.emailProducer.SendEmailInQueue(ctx, &models.EmailMessage{
-		Email: email,
+		Email: user.Email,
 		Token: token,
 		Exp:   rules.NewExpTime(),
 	})
