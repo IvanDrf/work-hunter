@@ -106,6 +106,7 @@ message ListUsersRequest {
     UserRole role = 3;
     string serch_query = 4;
     string sort_by = 5;
+    int32 offset = 6;
 }
 
 message ListUsersResponse {
