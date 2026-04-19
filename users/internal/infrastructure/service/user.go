@@ -7,7 +7,6 @@ import (
 	"log/slog"
 	"net/url"
 	"strconv"
-	"sync"
 
 	"github.com/IvanDrf/work-hunter/users/internal/domain/models"
 	repository "github.com/IvanDrf/work-hunter/users/internal/domain/ports/repo"
@@ -228,7 +227,6 @@ func (s *UserService) ListUsers(ctx context.Context, req *dto.ListUsersRequest) 
 	}, nil
 }
 
-// TODO: refactor
 func (s *UserService) UpdateUserStatus(ctx context.Context, req *dto.UpdateUserStatusRequest) (*dto.UserResponse, error) {
 	log := s.log.With(slog.String("scope", "infrastructure/service/UpdateUserStatus"))
 
@@ -237,18 +235,6 @@ func (s *UserService) UpdateUserStatus(ctx context.Context, req *dto.UpdateUserS
 		return nil, err
 	}
 
-	user := new(models.User)
-	var wg sync.WaitGroup
-	wg.Go(func() {
-		user, errGet := s.repo.GetUserByID(ctx, id)
-		if err != nil {
-			log.Error("failed to get user", slog.String("error", errGet.Error()))
-		}
-		log.Debug("user found successfully", slog.String("id", user.ID.String()))
-
-		user.Status = rules.UserStatus(req.Status)
-	})
-
 	if err = s.repo.UpdateUserStatus(ctx, id, rules.UserStatus(req.Status)); err != nil {
 		log.Error("failed to update user status", slog.String("error", err.Error()))
 		return nil, err
@@ -256,7 +242,11 @@ func (s *UserService) UpdateUserStatus(ctx context.Context, req *dto.UpdateUserS
 
 	log.Info("user status updated successfully")
 
-	wg.Wait()
+	user, err := s.repo.GetUserByID(ctx, id)
+	if err != nil {
+		log.Error("failed to get user", slog.String("error", err.Error()))
+	}
+	log.Debug("user found successfully", slog.String("id", user.ID.String()))
 
 	return modelToResp(user, log)
 }
