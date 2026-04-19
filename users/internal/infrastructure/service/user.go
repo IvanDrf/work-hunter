@@ -222,15 +222,9 @@ func (s *UserService) ListUsers(ctx context.Context, req *dto.ListUsersRequest) 
 		usersResp = append(usersResp, userResp)
 	}
 
-	var hasNextPage bool
-	if len(users) < int(totalCount) {
-		hasNextPage = true
-	}
-
 	return &dto.ListUsersResponse{
 		Users:      usersResp,
 		TotalCount: totalCount,
-		HasNext:    hasNextPage,
 	}, nil
 }
 

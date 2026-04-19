@@ -55,7 +55,6 @@ type ListUsersRequest struct {
 type ListUsersResponse struct {
 	Users      []*UserResponse
 	TotalCount int32
-	HasNext    bool
 }
 
 // DTO for updating user status
