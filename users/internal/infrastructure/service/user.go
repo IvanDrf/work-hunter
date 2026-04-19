@@ -203,6 +203,13 @@ func (s *UserService) ListUsers(ctx context.Context, req *dto.ListUsersRequest) 
 		log.Error("failed to list users", slog.String("error", err.Error()))
 		return nil, err
 	}
+	if totalCount == 0 {
+		log.Error("users not found")
+		return nil, models.Error{
+			Message: "users not found",
+			Code:    models.ErrCodeUserNotFound,
+		}
+	}
 	log.Info("users listed successfully", slog.Int("count", len(users)))
 
 	usersResp := make([]*dto.UserResponse, 0, len(users))

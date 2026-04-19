@@ -34,5 +34,4 @@ func (h *Handler) CreateProfile(ctx context.Context, req *user_api.CreateProfile
 
 	log.Info("Get profile successfully response")
 	return convertUserResponseToUserProfile(user), nil
-
 }

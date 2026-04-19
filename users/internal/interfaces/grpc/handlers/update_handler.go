@@ -7,6 +7,7 @@ import (
 
 	user_api "github.com/IvanDrf/work-hunter/pkg/user-api"
 	"github.com/IvanDrf/work-hunter/users/internal/domain/models"
+	"github.com/IvanDrf/work-hunter/users/internal/interfaces/grpc/dto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -36,5 +37,32 @@ func (h *Handler) UpdateProfile(ctx context.Context, req *user_api.UpdateProfile
 	}
 
 	log.Info("Update profile successfully response")
+	return convertUserResponseToUserProfile(user), nil
+}
+
+func (h *Handler) UpdateUserStatus(ctx context.Context, req *user_api.UpdateUserStatusRequest) (*user_api.UserProfile, error) {
+	log := h.log.With(slog.String("scope", "interfaces/grpc/handlers/UpdateUserStatus"))
+	log.Info("UpdateUserStatus got request")
+
+	user, err := h.UserService.UpdateUserStatus(ctx, &dto.UpdateUserStatusRequest{
+		ID:     req.UserId,
+		Status: user_api.UserStatus_name[int32(req.Status)],
+	})
+
+	var e models.Error
+	if errors.As(err, &e) {
+		log.Error("Update user status error", slog.String("error", e.Error()))
+
+		switch e.Code {
+		case models.ErrCodeInternal:
+			return nil, status.Error(codes.Internal, e.Message)
+		case models.ErrCodeUserNotFound:
+			return nil, status.Error(codes.NotFound, e.Message)
+		default:
+			return nil, status.Error(codes.InvalidArgument, e.Message)
+		}
+	}
+
+	log.Info("Update user status successfully response")
 	return convertUserResponseToUserProfile(user), nil
 }

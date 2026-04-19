@@ -66,3 +66,16 @@ func convertUserResponseToUserProfile(user *dto.UserResponse) *user_api.UserProf
 		Metadata:    user.Metadata,
 	}
 }
+
+func convertListDtoToListResp(dto *dto.ListUsersResponse) *user_api.ListUsersResponse {
+	resp := &user_api.ListUsersResponse{
+		Users:      make([]*user_api.UserProfile, len(dto.Users)),
+		TotalCount: dto.TotalCount,
+	}
+
+	for _, val := range dto.Users {
+		resp.Users = append(resp.Users, convertUserResponseToUserProfile(val))
+	}
+
+	return resp
+}
