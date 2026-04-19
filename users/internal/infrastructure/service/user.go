@@ -228,6 +228,7 @@ func (s *UserService) ListUsers(ctx context.Context, req *dto.ListUsersRequest) 
 	}, nil
 }
 
+// TODO: refactor
 func (s *UserService) UpdateUserStatus(ctx context.Context, req *dto.UpdateUserStatusRequest) (*dto.UserResponse, error) {
 	log := s.log.With(slog.String("scope", "infrastructure/service/UpdateUserStatus"))
 
