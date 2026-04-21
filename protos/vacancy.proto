@@ -12,7 +12,7 @@ service Vacancy {
 
     // Find vacancy by it's id
     // If vacancy has status - MODERATING only moderator or user who created this vacancy can see it
-    rpc FindVacancyByID(FindVacancyByTagsRequest) returns (Vacancy);
+    rpc FindVacancyByID(FindVacancyByTagsRequest) returns (VacancyInfo);
     
     // Find vacancy by tags
     // If vacancy has status - MODERATING only moderator or user who created this vacancy can see it 
@@ -71,7 +71,7 @@ message Response {
     ResponseStatus status = 2;
 }
 
-message Vacancy {
+message VacancyInfo {
     optional uint64 vacancy_id = 1;
 
     string title = 2; 
@@ -109,7 +109,7 @@ message Vacancy {
 }
 
 message CreateVacancyRequest {
-    Vacancy vacancy = 1;
+    VacancyInfo vacancy = 1;
     
     common.UserInfo user_info = 2;
 }
@@ -178,7 +178,7 @@ message FindVacancyByTagsRequest {
 }
 
 message Vacancies {
-    repeated Vacancy vacancies = 1;
+    repeated VacancyInfo vacancies = 1;
 
     uint32 limit = 2;
     uint32 offset = 3;
