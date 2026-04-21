@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
+	"github.com/IvanDrf/work-hunter/auth/internal/domain/rules"
 	"github.com/IvanDrf/work-hunter/auth/tests/service/fixtures"
 	"github.com/google/uuid"
 )
@@ -19,15 +20,17 @@ func NewUserRepo() *UserRepo {
 }
 
 // Returns new filled user repo with registred users from fixtures.Users
-func NewFilledUserRepo() *UserRepo {
+func NewFilledUserRepo(verificated bool, users map[string]string) *UserRepo {
 	userRepo := NewUserRepo()
 	i := 0
-	for email, password := range fixtures.Users {
+	for email, password := range users {
+		psw, _ := rules.HashPassword(password)
+
 		userRepo.CreateUser(context.TODO(), &models.User{
 			ID:             fixtures.UserIDs[i],
 			Email:          email,
-			HashedPassword: password,
-			Verificated:    false,
+			HashedPassword: psw,
+			Verificated:    verificated,
 		})
 
 		i++

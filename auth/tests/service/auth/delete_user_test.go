@@ -7,8 +7,8 @@ import (
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/ports/jwt"
 	"github.com/IvanDrf/work-hunter/auth/internal/infrastructure/service"
+	"github.com/IvanDrf/work-hunter/auth/tests/mocks"
 	"github.com/IvanDrf/work-hunter/auth/tests/service/fixtures"
-	"github.com/IvanDrf/work-hunter/auth/tests/service/mocks"
 	"github.com/stretchr/testify/assert"
 )
 
