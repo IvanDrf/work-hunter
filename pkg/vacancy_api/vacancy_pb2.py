@@ -4,6 +4,8 @@
 # source: vacancy.proto
 # Protobuf Python Version: 6.31.1
 """Generated protocol buffer code."""
+from ..common import common_pb2 as common__pb2
+from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import descriptor_pool as _descriptor_pool
 from google.protobuf import runtime_version as _runtime_version
@@ -22,49 +24,45 @@ _runtime_version.ValidateProtobufRuntimeVersion(
 _sym_db = _symbol_database.Default()
 
 
-from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2
-import common_pb2 as common__pb2
-
-
 DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rvacancy.proto\x12\x07vacancy\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x0c\x63ommon.proto\"D\n\x08Response\x12\x0f\n\x07message\x18\x01 \x01(\t\x12\'\n\x06status\x18\x02 \x01(\x0e\x32\x17.vacancy.ResponseStatus\"\xec\x07\n\x0bVacancyInfo\x12\x17\n\nvacancy_id\x18\x01 \x01(\x04H\x00\x88\x01\x01\x12\r\n\x05title\x18\x02 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x03 \x01(\t\x12\x14\n\x0crequirements\x18\x04 \x01(\t\x12\x12\n\nconditions\x18\x05 \x01(\t\x12\x12\n\nsalary_min\x18\x06 \x01(\x04\x12\x12\n\nsalary_max\x18\x07 \x01(\x04\x12#\n\x08\x63urrency\x18\x08 \x01(\x0e\x32\x11.vacancy.Currency\x12\x11\n\x04\x63ity\x18\t \x01(\tH\x01\x88\x01\x01\x12\x12\n\x05metro\x18\n \x01(\tH\x02\x88\x01\x01\x12(\n\x0bremote_type\x18\x0b \x01(\x0e\x32\x13.vacancy.RemoteType\x12$\n\ttime_type\x18\x0c \x01(\x0e\x32\x11.vacancy.TimeType\x12\x1b\n\x0e\x65xperience_min\x18\r \x01(\rH\x03\x88\x01\x01\x12\x1b\n\x0e\x65xperience_max\x18\x0e \x01(\rH\x04\x88\x01\x01\x12\x33\n\ncreated_at\x18\x0f \x01(\x0b\x32\x1a.google.protobuf.TimestampH\x05\x88\x01\x01\x12\x33\n\nupdated_at\x18\x10 \x01(\x0b\x32\x1a.google.protobuf.TimestampH\x06\x88\x01\x01\x12\x35\n\x0cpublished_at\x18\x11 \x01(\x0b\x32\x1a.google.protobuf.TimestampH\x07\x88\x01\x01\x12\x32\n\tclosed_at\x18\x12 \x01(\x0b\x32\x1a.google.protobuf.TimestampH\x08\x88\x01\x01\x12+\n\x06status\x18\x13 \x01(\x0e\x32\x16.vacancy.VacancyStatusH\t\x88\x01\x01\x12\x37\n\x0emoderated_time\x18\x14 \x01(\x0b\x32\x1a.google.protobuf.TimestampH\n\x88\x01\x01\x12\x1f\n\x12moderator_comments\x18\x15 \x01(\tH\x0b\x88\x01\x01\x12\x12\n\x05views\x18\x16 \x01(\x04H\x0c\x88\x01\x01\x12\x1f\n\x12\x61pplications_count\x18\x17 \x01(\x04H\r\x88\x01\x01\x12\x0c\n\x04tags\x18\x18 \x03(\tB\r\n\x0b_vacancy_idB\x07\n\x05_cityB\x08\n\x06_metroB\x11\n\x0f_experience_minB\x11\n\x0f_experience_maxB\r\n\x0b_created_atB\r\n\x0b_updated_atB\x0f\n\r_published_atB\x0c\n\n_closed_atB\t\n\x07_statusB\x11\n\x0f_moderated_timeB\x15\n\x13_moderator_commentsB\x08\n\x06_viewsB\x15\n\x13_applications_count\"b\n\x14\x43reateVacancyRequest\x12%\n\x07vacancy\x18\x01 \x01(\x0b\x32\x14.vacancy.VacancyInfo\x12#\n\tuser_info\x18\x02 \x01(\x0b\x32\x10.common.UserInfo\"+\n\x15\x43reateVacancyResponse\x12\x12\n\nvacancy_id\x18\x01 \x01(\x04\"\xb6\t\n\x14UpdateVacancyRequest\x12\x12\n\nvacancy_id\x18\x01 \x01(\x04\x12\x12\n\x05title\x18\x02 \x01(\tH\x00\x88\x01\x01\x12\x18\n\x0b\x64\x65scription\x18\x03 \x01(\tH\x01\x88\x01\x01\x12\x19\n\x0crequirements\x18\x04 \x01(\tH\x02\x88\x01\x01\x12\x17\n\nconditions\x18\x05 \x01(\tH\x03\x88\x01\x01\x12\x17\n\nsalary_min\x18\x06 \x01(\x04H\x04\x88\x01\x01\x12\x17\n\nsalary_max\x18\x07 \x01(\x04H\x05\x88\x01\x01\x12(\n\x08\x63urrency\x18\x08 \x01(\x0e\x32\x11.vacancy.CurrencyH\x06\x88\x01\x01\x12\x11\n\x04\x63ity\x18\t \x01(\tH\x07\x88\x01\x01\x12\x12\n\x05metro\x18\n \x01(\tH\x08\x88\x01\x01\x12-\n\x0bremote_type\x18\x0b \x01(\x0e\x32\x13.vacancy.RemoteTypeH\t\x88\x01\x01\x12)\n\ttime_type\x18\x0c \x01(\x0e\x32\x11.vacancy.TimeTypeH\n\x88\x01\x01\x12\x1b\n\x0e\x65xperience_min\x18\r \x01(\rH\x0b\x88\x01\x01\x12\x1b\n\x0e\x65xperience_max\x18\x0e \x01(\rH\x0c\x88\x01\x01\x12\x33\n\ncreated_at\x18\x0f \x01(\x0b\x32\x1a.google.protobuf.TimestampH\r\x88\x01\x01\x12\x33\n\nupdated_at\x18\x10 \x01(\x0b\x32\x1a.google.protobuf.TimestampH\x0e\x88\x01\x01\x12\x35\n\x0cpublished_at\x18\x11 \x01(\x0b\x32\x1a.google.protobuf.TimestampH\x0f\x88\x01\x01\x12\x32\n\tclosed_at\x18\x12 \x01(\x0b\x32\x1a.google.protobuf.TimestampH\x10\x88\x01\x01\x12+\n\x06status\x18\x13 \x01(\x0e\x32\x16.vacancy.VacancyStatusH\x11\x88\x01\x01\x12\x37\n\x0emoderated_time\x18\x14 \x01(\x0b\x32\x1a.google.protobuf.TimestampH\x12\x88\x01\x01\x12\x1f\n\x12moderator_comments\x18\x15 \x01(\tH\x13\x88\x01\x01\x12\x12\n\x05views\x18\x16 \x01(\x04H\x14\x88\x01\x01\x12\x1f\n\x12\x61pplications_count\x18\x17 \x01(\x04H\x15\x88\x01\x01\x12\x0c\n\x04tags\x18\x18 \x03(\t\x12#\n\tuser_info\x18\x19 \x01(\x0b\x32\x10.common.UserInfoB\x08\n\x06_titleB\x0e\n\x0c_descriptionB\x0f\n\r_requirementsB\r\n\x0b_conditionsB\r\n\x0b_salary_minB\r\n\x0b_salary_maxB\x0b\n\t_currencyB\x07\n\x05_cityB\x08\n\x06_metroB\x0e\n\x0c_remote_typeB\x0c\n\n_time_typeB\x11\n\x0f_experience_minB\x11\n\x0f_experience_maxB\r\n\x0b_created_atB\r\n\x0b_updated_atB\x0f\n\r_published_atB\x0c\n\n_closed_atB\t\n\x07_statusB\x11\n\x0f_moderated_timeB\x15\n\x13_moderator_commentsB\x08\n\x06_viewsB\x15\n\x13_applications_count\"O\n\x14\x44\x65leteVacancyRequest\x12\x12\n\nvacancy_id\x18\x01 \x01(\x04\x12#\n\tuser_info\x18\x02 \x01(\x0b\x32\x10.common.UserInfo\"Q\n\x16\x46indVacancyByIDRequest\x12\x12\n\nvacancy_id\x18\x01 \x01(\x04\x12#\n\tuser_info\x18\x02 \x01(\x0b\x32\x10.common.UserInfo\"l\n\x18\x46indVacancyByTagsRequest\x12\x0c\n\x04tags\x18\x01 \x03(\t\x12\r\n\x05limit\x18\x02 \x01(\r\x12\x0e\n\x06offset\x18\x03 \x01(\r\x12#\n\tuser_info\x18\x04 \x01(\x0b\x32\x10.common.UserInfo\"S\n\tVacancies\x12\'\n\tvacancies\x18\x01 \x03(\x0b\x32\x14.vacancy.VacancyInfo\x12\r\n\x05limit\x18\x02 \x01(\r\x12\x0e\n\x06offset\x18\x03 \x01(\r\"S\n\x1c\x46indVacanciesByAuthorRequest\x12\x0e\n\x06\x61uthor\x18\x01 \x01(\t\x12#\n\tuser_info\x18\x02 \x01(\x0b\x32\x10.common.UserInfo\"f\n\x17SetVacancyStatusRequest\x12&\n\x06status\x18\x01 \x01(\x0e\x32\x16.vacancy.VacancyStatus\x12#\n\tuser_info\x18\x02 \x01(\x0b\x32\x10.common.UserInfo*9\n\nRemoteType\x12\n\n\x06OFFICE\x10\x00\x12\n\n\x06REMOTE\x10\x01\x12\n\n\x06HYBRID\x10\x02\x12\x07\n\x03\x41NY\x10\x03*\x1e\n\x08TimeType\x12\x08\n\x04\x46ULL\x10\x00\x12\x08\n\x04PART\x10\x01*%\n\x08\x43urrency\x12\x07\n\x03RUB\x10\x00\x12\x07\n\x03USD\x10\x01\x12\x07\n\x03\x45UR\x10\x02*T\n\rVacancyStatus\x12\x0e\n\nMODERATING\x10\x00\x12\r\n\tPUBLISHED\x10\x01\x12\x0b\n\x07UPDATED\x10\x02\x12\n\n\x06\x43LOSED\x10\x03\x12\x0b\n\x07\x44\x45LETED\x10\x04*G\n\x0eResponseStatus\x12\x0b\n\x07SUCCESS\x10\x00\x12\n\n\x06\x46\x41ILED\x10\x01\x12\r\n\tNOT_FOUND\x10\x02\x12\r\n\tFORBIDDEN\x10\x03\x32\x94\x04\n\x07Vacancy\x12N\n\rCreateVacancy\x12\x1d.vacancy.CreateVacancyRequest\x1a\x1e.vacancy.CreateVacancyResponse\x12J\n\x0f\x46indVacancyByID\x12!.vacancy.FindVacancyByTagsRequest\x1a\x14.vacancy.VacancyInfo\x12J\n\x13\x46indVacanciesByTags\x12\x1f.vacancy.FindVacancyByIDRequest\x1a\x12.vacancy.Vacancies\x12R\n\x15\x46indVacanciesByAuthor\x12%.vacancy.FindVacanciesByAuthorRequest\x1a\x12.vacancy.Vacancies\x12\x41\n\rUpdateVacancy\x12\x1d.vacancy.UpdateVacancyRequest\x1a\x11.vacancy.Response\x12\x41\n\rDeleteVacancy\x12\x1d.vacancy.DeleteVacancyRequest\x1a\x11.vacancy.Response\x12G\n\x10SetVacancyStatus\x12 .vacancy.SetVacancyStatusRequest\x1a\x11.vacancy.Responseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'vacancy_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
-  DESCRIPTOR._loaded_options = None
-  _globals['_REMOTETYPE']._serialized_start=3052
-  _globals['_REMOTETYPE']._serialized_end=3109
-  _globals['_TIMETYPE']._serialized_start=3111
-  _globals['_TIMETYPE']._serialized_end=3141
-  _globals['_CURRENCY']._serialized_start=3143
-  _globals['_CURRENCY']._serialized_end=3180
-  _globals['_VACANCYSTATUS']._serialized_start=3182
-  _globals['_VACANCYSTATUS']._serialized_end=3266
-  _globals['_RESPONSESTATUS']._serialized_start=3268
-  _globals['_RESPONSESTATUS']._serialized_end=3339
-  _globals['_RESPONSE']._serialized_start=73
-  _globals['_RESPONSE']._serialized_end=141
-  _globals['_VACANCYINFO']._serialized_start=144
-  _globals['_VACANCYINFO']._serialized_end=1148
-  _globals['_CREATEVACANCYREQUEST']._serialized_start=1150
-  _globals['_CREATEVACANCYREQUEST']._serialized_end=1248
-  _globals['_CREATEVACANCYRESPONSE']._serialized_start=1250
-  _globals['_CREATEVACANCYRESPONSE']._serialized_end=1293
-  _globals['_UPDATEVACANCYREQUEST']._serialized_start=1296
-  _globals['_UPDATEVACANCYREQUEST']._serialized_end=2502
-  _globals['_DELETEVACANCYREQUEST']._serialized_start=2504
-  _globals['_DELETEVACANCYREQUEST']._serialized_end=2583
-  _globals['_FINDVACANCYBYIDREQUEST']._serialized_start=2585
-  _globals['_FINDVACANCYBYIDREQUEST']._serialized_end=2666
-  _globals['_FINDVACANCYBYTAGSREQUEST']._serialized_start=2668
-  _globals['_FINDVACANCYBYTAGSREQUEST']._serialized_end=2776
-  _globals['_VACANCIES']._serialized_start=2778
-  _globals['_VACANCIES']._serialized_end=2861
-  _globals['_FINDVACANCIESBYAUTHORREQUEST']._serialized_start=2863
-  _globals['_FINDVACANCIESBYAUTHORREQUEST']._serialized_end=2946
-  _globals['_SETVACANCYSTATUSREQUEST']._serialized_start=2948
-  _globals['_SETVACANCYSTATUSREQUEST']._serialized_end=3050
-  _globals['_VACANCY']._serialized_start=3342
-  _globals['_VACANCY']._serialized_end=3874
+    DESCRIPTOR._loaded_options = None
+    _globals['_REMOTETYPE']._serialized_start = 3052
+    _globals['_REMOTETYPE']._serialized_end = 3109
+    _globals['_TIMETYPE']._serialized_start = 3111
+    _globals['_TIMETYPE']._serialized_end = 3141
+    _globals['_CURRENCY']._serialized_start = 3143
+    _globals['_CURRENCY']._serialized_end = 3180
+    _globals['_VACANCYSTATUS']._serialized_start = 3182
+    _globals['_VACANCYSTATUS']._serialized_end = 3266
+    _globals['_RESPONSESTATUS']._serialized_start = 3268
+    _globals['_RESPONSESTATUS']._serialized_end = 3339
+    _globals['_RESPONSE']._serialized_start = 73
+    _globals['_RESPONSE']._serialized_end = 141
+    _globals['_VACANCYINFO']._serialized_start = 144
+    _globals['_VACANCYINFO']._serialized_end = 1148
+    _globals['_CREATEVACANCYREQUEST']._serialized_start = 1150
+    _globals['_CREATEVACANCYREQUEST']._serialized_end = 1248
+    _globals['_CREATEVACANCYRESPONSE']._serialized_start = 1250
+    _globals['_CREATEVACANCYRESPONSE']._serialized_end = 1293
+    _globals['_UPDATEVACANCYREQUEST']._serialized_start = 1296
+    _globals['_UPDATEVACANCYREQUEST']._serialized_end = 2502
+    _globals['_DELETEVACANCYREQUEST']._serialized_start = 2504
+    _globals['_DELETEVACANCYREQUEST']._serialized_end = 2583
+    _globals['_FINDVACANCYBYIDREQUEST']._serialized_start = 2585
+    _globals['_FINDVACANCYBYIDREQUEST']._serialized_end = 2666
+    _globals['_FINDVACANCYBYTAGSREQUEST']._serialized_start = 2668
+    _globals['_FINDVACANCYBYTAGSREQUEST']._serialized_end = 2776
+    _globals['_VACANCIES']._serialized_start = 2778
+    _globals['_VACANCIES']._serialized_end = 2861
+    _globals['_FINDVACANCIESBYAUTHORREQUEST']._serialized_start = 2863
+    _globals['_FINDVACANCIESBYAUTHORREQUEST']._serialized_end = 2946
+    _globals['_SETVACANCYSTATUSREQUEST']._serialized_start = 2948
+    _globals['_SETVACANCYSTATUSREQUEST']._serialized_end = 3050
+    _globals['_VACANCY']._serialized_start = 3342
+    _globals['_VACANCY']._serialized_end = 3874
 # @@protoc_insertion_point(module_scope)
