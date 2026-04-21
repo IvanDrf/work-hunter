@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package common;
+
+enum UserRole {
+    ADMIN = 0;
+    EMPLOYEE = 1;
+    EMPLOYER = 2;
+}
+
+message UserInfo {
+    UserRole role = 1;
+    string user_id = 2; // uuid
+}

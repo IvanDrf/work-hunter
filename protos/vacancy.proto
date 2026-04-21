@@ -1,0 +1,197 @@
+syntax = "proto3";
+
+package vacancy;
+
+import "google/protobuf/timestamp.proto";
+import "common.proto";
+
+// Vacancy service
+service Vacancy {
+    // Create vacancy, returns vacancy_id if success
+    rpc CreateVacancy(CreateVacancyRequest) returns (CreateVacancyResponse);
+
+    // Find vacancy by it's id
+    // If vacancy has status - MODERATING only moderator or user who created this vacancy can see it
+    rpc FindVacancyByID(FindVacancyByTagsRequest) returns (Vacancy);
+    
+    // Find vacancy by tags
+    // If vacancy has status - MODERATING only moderator or user who created this vacancy can see it 
+    rpc FindVacanciesByTags(FindVacancyByIDRequest) returns (Vacancies);
+
+    // Find vacancies by author name
+    // If vacancy has status - MODERATING only moderator or user who created this vacancy can see it  
+    rpc FindVacanciesByAuthor(FindVacanciesByAuthorRequest) returns (Vacancies);
+
+    // Update vacancy information
+    rpc UpdateVacancy(UpdateVacancyRequest) returns (Response);
+
+    // Delete vacancy by user who created it or by moderator
+    rpc DeleteVacancy(DeleteVacancyRequest) returns (Response);
+
+    // Set vacancy status by moderator
+    // For example, from MODERATING to PUBLISHED
+    rpc SetVacancyStatus(SetVacancyStatusRequest) returns (Response);
+}
+
+enum RemoteType {
+    OFFICE = 0;
+    REMOTE = 1;
+    HYBRID = 2;
+    ANY = 3;
+}
+
+enum TimeType {
+    FULL = 0;
+    PART = 1;
+}
+
+enum Currency {
+    RUB = 0;
+    USD = 1;
+    EUR = 2;
+}
+
+enum VacancyStatus {
+    MODERATING = 0;
+    PUBLISHED = 1;
+    UPDATED = 2;
+    CLOSED = 3;
+    DELETED = 4;
+}
+
+enum ResponseStatus {
+    SUCCESS = 0;
+    FAILED = 1;
+    NOT_FOUND = 2;
+    FORBIDDEN = 3;
+}
+
+message Response {
+    string message = 1;
+    ResponseStatus status = 2;
+}
+
+message Vacancy {
+    optional uint64 vacancy_id = 1;
+
+    string title = 2; 
+    string description = 3;
+
+    string requirements = 4;
+    string conditions = 5;
+
+    uint64 salary_min =  6;
+    uint64 salary_max = 7; 
+    Currency currency = 8;
+
+    optional string city = 9;
+    optional string metro = 10;
+
+    RemoteType remote_type = 11;
+    TimeType time_type = 12;
+    
+    optional uint32 experience_min = 13;
+    optional uint32 experience_max = 14;
+
+    optional google.protobuf.Timestamp created_at = 15;
+    optional google.protobuf.Timestamp updated_at = 16;
+    optional google.protobuf.Timestamp published_at = 17;
+    optional google.protobuf.Timestamp closed_at = 18;
+
+    optional VacancyStatus status = 19;
+    optional google.protobuf.Timestamp moderated_time = 20;
+    optional string moderator_comments = 21;
+    
+    optional uint64 views = 22;
+    optional uint64 applications_count = 23;
+
+    repeated string tags = 24; // vacancies tags: golang, javascript, manager
+}
+
+message CreateVacancyRequest {
+    Vacancy vacancy = 1;
+    
+    common.UserInfo user_info = 2;
+}
+
+message CreateVacancyResponse {
+    uint64 vacancy_id = 1;
+}
+
+message UpdateVacancyRequest {
+    uint64 vacancy_id = 1;
+
+    optional string title = 2; 
+    optional string description = 3;
+
+    optional string requirements = 4;
+    optional string conditions = 5;
+
+    optional uint64 salary_min =  6;
+    optional uint64 salary_max = 7; 
+    optional Currency currency = 8;
+
+    optional string city = 9;
+    optional string metro = 10;
+
+    optional RemoteType remote_type = 11;
+    optional TimeType time_type = 12;
+    
+    optional uint32 experience_min = 13;
+    optional uint32 experience_max = 14;
+
+    optional google.protobuf.Timestamp created_at = 15;
+    optional google.protobuf.Timestamp updated_at = 16;
+    optional google.protobuf.Timestamp published_at = 17;
+    optional google.protobuf.Timestamp closed_at = 18;
+
+    optional VacancyStatus status = 19;
+    optional google.protobuf.Timestamp moderated_time = 20;
+    optional string moderator_comments = 21;
+    
+    optional uint64 views = 22;
+    optional uint64 applications_count = 23;
+
+    repeated string tags = 24; // vacancies tags: golang, javascript, manager
+
+    common.UserInfo user_info = 25;
+}
+
+message DeleteVacancyRequest {
+    uint64 vacancy_id = 1;
+
+    common.UserInfo user_info = 2;
+}
+
+message FindVacancyByIDRequest {
+    uint64 vacancy_id = 1;
+
+    common.UserInfo user_info = 2;
+}
+
+message FindVacancyByTagsRequest {
+    repeated string tags = 1;
+    uint32 limit = 2;
+    uint32 offset = 3;
+
+    common.UserInfo user_info = 4;
+}
+
+message Vacancies {
+    repeated Vacancy vacancies = 1;
+
+    uint32 limit = 2;
+    uint32 offset = 3;
+}
+
+message FindVacanciesByAuthorRequest {
+    string author = 1; // author name
+
+    common.UserInfo user_info = 2;
+}
+
+message SetVacancyStatusRequest {
+    VacancyStatus status = 1;
+
+    common.UserInfo user_info = 2;
+}
