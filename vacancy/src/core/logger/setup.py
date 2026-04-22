@@ -1,4 +1,5 @@
-from logging import basicConfig, DEBUG, INFO, ERROR, CRITICAL, WARNING
+from logging import CRITICAL, DEBUG, ERROR, INFO, WARNING, basicConfig
+
 
 levels = {
     'debug': DEBUG,

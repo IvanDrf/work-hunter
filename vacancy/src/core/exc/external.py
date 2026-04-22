@@ -1,10 +1,7 @@
-class ExternalError(Exception):
-    def __init__(self, *args: object) -> None:
-        if args:
-            self.message = args[0]
-        else:
-            self.message = None
+from src.core.exc.base import BaseError
 
+
+class ExternalError(BaseError):
     def __str__(self) -> str:
         if self.message is not None:
             return f'ExternalError: {self.message}'
