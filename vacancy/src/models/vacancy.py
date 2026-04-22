@@ -4,7 +4,33 @@ from sqlalchemy import BIGINT, INT, TIMESTAMP, VARCHAR, CheckConstraint, Enum, T
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.models.base import Base
-from src.models.types import Currency, RemoteType, TimeType, VacancyStatus
+from enum import Enum as PyEnum
+
+
+class RemoteType(PyEnum):
+    OFFICE = 0
+    REMOTE = 1
+    HYBRID = 2
+    ANY = 3
+
+
+class TimeType(PyEnum):
+    FULL = 0
+    PART = 1
+
+
+class Currency(PyEnum):
+    RUB = 0
+    USD = 1
+    EUR = 2
+
+
+class VacancyStatus(PyEnum):
+    MODERATING = 0
+    PUBLISHED = 1
+    UPDATED = 2
+    CLOSED = 3
+    DELETED = 4
 
 
 class VacancyORM(Base):
