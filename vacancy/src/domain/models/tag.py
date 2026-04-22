@@ -1,7 +1,7 @@
 from sqlalchemy import BIGINT, VARCHAR
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.models.base import Base
+from src.domain.models.base import Base
 
 
 class TagORM(Base):

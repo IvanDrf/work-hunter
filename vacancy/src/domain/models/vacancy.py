@@ -1,10 +1,10 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum as PyEnum
 
-from sqlalchemy import BIGINT, INT, TIMESTAMP, VARCHAR, CheckConstraint, Enum, Text
+from sqlalchemy import BIGINT, INT, TIMESTAMP, UUID, VARCHAR, CheckConstraint, Enum, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.models.base import Base
+from src.domain.models.base import Base
 
 
 class RemoteType(PyEnum):
@@ -39,6 +39,9 @@ class VacancyORM(Base):
     vacancy_id: Mapped[int] = mapped_column(
         BIGINT, primary_key=True, autoincrement=True, index=True
     )
+    author_id: Mapped[UUID] = mapped_column(
+        UUID, index=True, nullable=False
+    )
 
     title: Mapped[str] = mapped_column(VARCHAR(150), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
@@ -70,7 +73,7 @@ class VacancyORM(Base):
         INT, CheckConstraint('experience_max >= 0', name='check_non_negative_max_exp'), nullable=True
     )
 
-    created_at: Mapped[datetime] = mapped_column(TIMESTAMP, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(TIMESTAMP, nullable=True)
     published_at: Mapped[datetime] = mapped_column(TIMESTAMP, nullable=True)
     closed_at: Mapped[datetime] = mapped_column(TIMESTAMP, nullable=True)

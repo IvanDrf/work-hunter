@@ -4,7 +4,7 @@ from grpc import ServicerContext, StatusCode
 from pkg.vacancy_api.vacancy_pb2 import CreateVacancyRequest, CreateVacancyResponse
 from pkg.vacancy_api.vacancy_pb2_grpc import VacancyServicer
 
-from src.api.dependencies import IVacancyService
+from src.api.dependencies.service import IVacancyService
 from src.core.exc.internal import InternalError
 from src.core.exc.invalid_argument import ArgumentError
 

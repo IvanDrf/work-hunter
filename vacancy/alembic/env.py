@@ -7,10 +7,10 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 
-from src.models.base import Base
-from src.models.vacancy import VacancyORM
-from src.models.tag import TagORM
-from src.models.association import association_table
+from src.domain.models.base import Base
+from src.domain.models.vacancy import VacancyORM
+from src.domain.models.tag import TagORM
+from src.domain.models.association import association_table
 from src.core.config.config import Config
 
 # this is the Alembic Config object, which provides

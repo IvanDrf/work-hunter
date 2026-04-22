@@ -1,6 +1,6 @@
 from sqlalchemy import Column, ForeignKey, Table
 
-from src.models.base import Base
+from src.domain.models.base import Base
 
 
 association_table = Table(
