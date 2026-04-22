@@ -1,10 +1,10 @@
 from datetime import datetime
+from enum import Enum as PyEnum
 
 from sqlalchemy import BIGINT, INT, TIMESTAMP, VARCHAR, CheckConstraint, Enum, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.models.base import Base
-from enum import Enum as PyEnum
 
 
 class RemoteType(PyEnum):
