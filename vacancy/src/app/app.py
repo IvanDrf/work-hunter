@@ -10,8 +10,8 @@ class App:
 
         self.fabric: Fabric = Fabric(config)
 
-    def init(self) -> None:
-        handlers = self.fabric.new_handlers()
+    async def init(self) -> None:
+        handlers = await self.fabric.new_handlers()
 
         self.server.register(handlers)
 
