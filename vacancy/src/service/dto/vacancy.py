@@ -1,11 +1,12 @@
 from datetime import datetime, timezone
 
 from pkg.common.common_pb2 import UserInfo
-from pkg.vacancy_api.vacancy_pb2 import (
-    VacancyInfo,
-    Currency as PBCurrency, VacancyStatus as PBVacancyStatus,
-    RemoteType as PBRemoteType, TimeType as PBTimeType
-)
+from pkg.vacancy_api.vacancy_pb2 import Currency as PBCurrency
+from pkg.vacancy_api.vacancy_pb2 import RemoteType as PBRemoteType
+from pkg.vacancy_api.vacancy_pb2 import TimeType as PBTimeType
+from pkg.vacancy_api.vacancy_pb2 import VacancyInfo
+from pkg.vacancy_api.vacancy_pb2 import VacancyStatus as PBVacancyStatus
+
 from src.domain.models.vacancy import VacancyORM, VacancyStatus
 
 

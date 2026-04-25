@@ -1,10 +1,10 @@
 from pkg.common.common_pb2 import UserInfo
 from pkg.vacancy_api.vacancy_pb2 import VacancyInfo
 
+from src.core.exc.external import ExternalError
 from src.domain.rules.vacancy import check_vacancy_fields
 from src.service.dependencies.repo import IVacancyRepo
 from src.service.dto.vacancy import create_vacancy_dto, vacancy_info_dto
-from src.core.exc.external import ExternalError
 
 
 class VacancyService:

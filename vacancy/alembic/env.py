@@ -1,17 +1,15 @@
 import asyncio
 from logging.config import fileConfig
 
+from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
-
-from alembic import context
-
-from src.domain.models.base import Base
-from src.domain.models.vacancy import VacancyORM
-from src.domain.models.tag import TagORM
-from src.domain.models.association import association_table
 from src.core.config.config import Config
+from src.domain.models.association import association_table
+from src.domain.models.base import Base
+from src.domain.models.tag import TagORM
+from src.domain.models.vacancy import VacancyORM
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

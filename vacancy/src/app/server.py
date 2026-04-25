@@ -3,7 +3,9 @@ from typing import Final
 
 from grpc.aio import server
 from grpc_reflection.v1alpha.reflection import SERVICE_NAME, enable_server_reflection
+from pkg.vacancy_api.vacancy_pb2_grpc import add_VacancyServicer_to_server
 
+from src.api.handlers import VacancyHandlers
 from src.core.config.app import AppConfig
 from src.core.exc.internal import InternalError
 
@@ -16,12 +18,11 @@ class Server:
         self.port: int = config.port
         self.server = None
 
-    def register(self, handlers) -> None:
-        self.server = server(
-            ThreadPoolExecutor(max_workers=self.WORKERS), handlers
-        )
-        self.server.add_insecure_port(f'{self.host}:{self.port}')
+    def register(self, handlers: VacancyHandlers) -> None:
+        self.server = server(ThreadPoolExecutor(max_workers=self.WORKERS))
+        add_VacancyServicer_to_server(handlers, self.server)
 
+        self.server.add_insecure_port(f'{self.host}:{self.port}')
         enable_server_reflection(SERVICE_NAME, self.server)
 
     async def run(self) -> None:
