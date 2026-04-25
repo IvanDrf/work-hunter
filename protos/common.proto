@@ -11,4 +11,5 @@ enum UserRole {
 message UserInfo {
     UserRole role = 1;
     string user_id = 2; // uuid
+    bool verificated = 3;
 }
