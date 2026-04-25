@@ -266,11 +266,13 @@ class FindVacanciesByAuthorRequest(_message.Message):
 
 
 class SetVacancyStatusRequest(_message.Message):
-    __slots__ = ("status", "user_info")
+    __slots__ = ("vacancy_id", "status", "user_info")
+    VACANCY_ID_FIELD_NUMBER: _ClassVar[int]
     STATUS_FIELD_NUMBER: _ClassVar[int]
     USER_INFO_FIELD_NUMBER: _ClassVar[int]
+    vacancy_id: int
     status: VacancyStatus
     user_info: _common_pb2.UserInfo
 
-    def __init__(self, status: _Optional[_Union[VacancyStatus, str]] = ...,
-                 user_info: _Optional[_Union[_common_pb2.UserInfo, _Mapping]] = ...) -> None: ...
+    def __init__(self, vacancy_id: _Optional[int] = ..., status: _Optional[_Union[VacancyStatus, str]]
+                 = ..., user_info: _Optional[_Union[_common_pb2.UserInfo, _Mapping]] = ...) -> None: ...

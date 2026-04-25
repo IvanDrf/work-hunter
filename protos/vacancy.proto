@@ -191,7 +191,8 @@ message FindVacanciesByAuthorRequest {
 }
 
 message SetVacancyStatusRequest {
-    VacancyStatus status = 1;
+    uint64 vacancy_id = 1;
+    VacancyStatus status = 2;
 
-    common.UserInfo user_info = 2;
+    common.UserInfo user_info = 3;
 }

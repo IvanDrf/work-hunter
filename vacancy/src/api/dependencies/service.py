@@ -1,25 +1,25 @@
 from typing import Protocol
 
-from pkg.vacancy_api.vacancy_pb2 import (CreateVacancyRequest, DeleteVacancyRequest, FindVacanciesByAuthorRequest,
-                                         FindVacancyByIDRequest, SetVacancyStatusRequest, UpdateVacancyRequest,
-                                         Vacancies, VacancyInfo,)
+from pkg.common.common_pb2 import UserInfo
+from pkg.vacancy_api.vacancy_pb2 import UpdateVacancyRequest, Vacancies, VacancyInfo
+from pkg.vacancy_api.vacancy_pb2 import VacancyStatus as PBVacancyStatus
 
 
 class IVacancyService(Protocol):
-    async def create_vacancy(self, request: CreateVacancyRequest) -> int:
+    async def create_vacancy(self, vacancy: VacancyInfo, user_info: UserInfo) -> int:
         ...
 
-    async def find_vacancy_by_id(self, request: FindVacancyByIDRequest) -> VacancyInfo:
+    async def find_vacancy_by_id(self, vacancy_id: int, user_info: UserInfo) -> VacancyInfo | None:
         ...
 
-    async def find_vacancies_by_author(self, request: FindVacanciesByAuthorRequest) -> Vacancies:
+    async def find_vacancies_by_author(self, author: str, user_info: UserInfo) -> Vacancies:
         ...
 
     async def update_vacancy(self, request: UpdateVacancyRequest) -> None:
         ...
 
-    async def delete_vacancy(self, request: DeleteVacancyRequest) -> None:
+    async def delete_vacancy(self, vacancy_id: int, user_info: UserInfo) -> None:
         ...
 
-    async def set_vacancy_status(self, request: SetVacancyStatusRequest) -> None:
+    async def set_vacancy_status(self, vacancy_id: int, status: PBVacancyStatus, user_info: UserInfo) -> None:
         ...

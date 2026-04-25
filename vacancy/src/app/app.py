@@ -1,4 +1,4 @@
-from src.app.fabric.fabric import Fabric
+from src.app.fabric import Fabric
 from src.app.server import Server
 from src.core.config.config import Config
 

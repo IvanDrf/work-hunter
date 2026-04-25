@@ -1,7 +1,9 @@
-from pkg.common.common_pb2 import UserInfo
+from pkg.common.common_pb2 import UserInfo, UserRole
 from pkg.vacancy_api.vacancy_pb2 import VacancyInfo
 
-from src.core.exc.external import ExternalError
+from src.core.exc.access import AccessError
+from src.core.exc.argument import ArgumentError
+from src.domain.models.vacancy import VacancyStatus
 from src.domain.rules.vacancy import check_vacancy_fields
 from src.service.dependencies.repo import IVacancyRepo
 from src.service.dto.vacancy import create_vacancy_dto, vacancy_info_dto
@@ -14,11 +16,13 @@ class VacancyService:
     async def create_vacancy(self, vacancy: VacancyInfo, user_info: UserInfo) -> int:
         '''
         Raises:
-            ExternalError: from vacancy field validation
+            AccessError: if user is not verificated
+            ArgumentError: if field of vacancy is invalid
             InternalError: from vacancy_repo
         '''
+
         if not user_info.verificated:
-            raise ExternalError(
+            raise AccessError(
                 '''user is not verificated, can't create vacancy '''
             )
 
@@ -27,17 +31,26 @@ class VacancyService:
         vacancy_id = await self.vacancy_repo.create_vacancy(create_vacancy_dto(vacancy, user_info))
         return vacancy_id
 
-    async def find_vacancy_by_id(self, vacancy_id: int) -> VacancyInfo | None:
+    async def find_vacancy_by_id(self, vacancy_id: int, user_info: UserInfo) -> VacancyInfo | None:
         '''
         Raises:
-            ExternalError: if vacancy_id < 0
+            ArgumentError: if vacancy_id < 0
+            AccessError: if vacancy is moderating now and user trying to find vacancy but he is not admin
             InternalError: from vacancy_repo
         '''
 
         if vacancy_id < 0:
-            raise ExternalError(
+            raise ArgumentError(
                 f'vacancy must be non negative number, {vacancy_id=}'
             )
 
         vacancy = await self.vacancy_repo.find_vacancy_by_id(vacancy_id)
-        return None if vacancy is None else vacancy_info_dto(vacancy)
+        if vacancy is None:
+            return None
+
+        if vacancy.status == VacancyStatus.MODERATING and user_info.role != UserRole.ADMIN:
+            raise AccessError(
+                '''this vacancy is moderating now, you can't see it now '''
+            )
+
+        return vacancy_info_dto(vacancy)
