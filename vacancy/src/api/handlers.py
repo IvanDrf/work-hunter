@@ -3,7 +3,7 @@ from pkg.vacancy_api.vacancy_pb2 import CreateVacancyRequest, CreateVacancyRespo
 from pkg.vacancy_api.vacancy_pb2_grpc import VacancyServicer
 
 from src.api.dependencies.service import IVacancyService
-from src.core.exc.not_found import NotFoundError
+from src.core.exc import NotFoundError
 from src.utils.handle_errors import handle_errors
 
 

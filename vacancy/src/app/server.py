@@ -1,3 +1,4 @@
+import logging
 from concurrent.futures import ThreadPoolExecutor
 from typing import Final
 
@@ -28,6 +29,8 @@ class Server:
     async def run(self) -> None:
         if self.server is None:
             raise InternalError('server is not registred')
+
+        logging.info(f'Starting server {self.host}:{self.port}')
 
         await self.server.start()
         await self.server.wait_for_termination()

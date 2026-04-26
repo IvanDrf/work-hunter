@@ -1,9 +1,10 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from enum import Enum as PyEnum
 
 from sqlalchemy import BIGINT, INT, TIMESTAMP, UUID, VARCHAR, CheckConstraint, Enum, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from src.domain.models.association import VacanciesTagsORM
 from src.domain.models.base import Base
 
 
@@ -73,13 +74,16 @@ class VacancyORM(Base):
         INT, CheckConstraint('experience_max >= 0', name='check_non_negative_max_exp'), nullable=True
     )
 
-    created_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True), nullable=False
+    )
     updated_at: Mapped[datetime] = mapped_column(TIMESTAMP, nullable=True)
     published_at: Mapped[datetime] = mapped_column(TIMESTAMP, nullable=True)
     closed_at: Mapped[datetime] = mapped_column(TIMESTAMP, nullable=True)
 
     status: Mapped[VacancyStatus] = mapped_column(
-        Enum(VacancyStatus), nullable=False)
+        Enum(VacancyStatus), nullable=False
+    )
     moderated_at: Mapped[datetime] = mapped_column(TIMESTAMP, nullable=True)
     moderator_comments: Mapped[str] = mapped_column(Text, nullable=True)
 
@@ -91,6 +95,7 @@ class VacancyORM(Base):
         BIGINT, CheckConstraint('applications_count >= 0', name='check_non_negative_applications'), nullable=False, default=0
     )
 
-    tags = relationship(
-        'TagORM', secondary='vacancies_to_tags', back_populates='vacancies'
+    tags: Mapped[list['TagORM']] = relationship(  # type: ignore
+        back_populates='vacancies', secondary='vacancies_to_tags',
+        cascade='save-update, merge, delete'
     )

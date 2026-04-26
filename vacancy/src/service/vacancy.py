@@ -1,8 +1,7 @@
 from pkg.common.common_pb2 import UserInfo, UserRole
 from pkg.vacancy_api.vacancy_pb2 import VacancyInfo
 
-from src.core.exc.access import AccessError
-from src.core.exc.argument import ArgumentError
+from src.core.exc import AccessError, ArgumentError
 from src.domain.models.vacancy import VacancyStatus
 from src.domain.rules.vacancy import check_vacancy_fields
 from src.service.dependencies.repo import IVacancyRepo

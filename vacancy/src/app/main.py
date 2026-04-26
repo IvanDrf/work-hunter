@@ -1,8 +1,9 @@
-from asyncio import run
 from argparse import ArgumentParser
+from asyncio import run
 
 from src.app.app import App
 from src.core.config.config import Config
+from src.core.logger.setup import setup_logger
 
 
 async def main() -> None:
@@ -11,6 +12,7 @@ async def main() -> None:
     args, _ = parser.parse_known_args()
 
     config = Config.load_from_yaml(args.config)
+    setup_logger(config.app.logger_level)
 
     app = App(config)
     await app.init()

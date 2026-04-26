@@ -7,7 +7,8 @@ from pkg.vacancy_api.vacancy_pb2 import TimeType as PBTimeType
 from pkg.vacancy_api.vacancy_pb2 import VacancyInfo
 from pkg.vacancy_api.vacancy_pb2 import VacancyStatus as PBVacancyStatus
 
-from src.domain.models.vacancy import VacancyORM, VacancyStatus
+from src.domain.models.tag import TagORM
+from src.domain.models.vacancy import Currency, RemoteType, TimeType, VacancyORM, VacancyStatus
 
 
 def create_vacancy_dto(vacancy: VacancyInfo, user_info: UserInfo) -> VacancyORM:
@@ -22,13 +23,13 @@ def create_vacancy_dto(vacancy: VacancyInfo, user_info: UserInfo) -> VacancyORM:
 
         salary_min=vacancy.salary_min,
         salary_max=vacancy.salary_max,
-        currenct=vacancy.currency,
+        currency=Currency(vacancy.currency),
 
         city=None if vacancy.city == '' else vacancy.city,
         metro=None if vacancy.metro == '' else vacancy.metro,
 
-        remote_type=vacancy.remote_type,
-        time_type=vacancy.time_type,
+        remote_type=RemoteType(vacancy.remote_type),
+        time_type=TimeType(vacancy.time_type),
 
         experience_min=None if vacancy.experience_min == 0 else vacancy.experience_min,
         experience_max=None if vacancy.experience_max == 0 else vacancy.experience_max,
@@ -44,6 +45,7 @@ def create_vacancy_dto(vacancy: VacancyInfo, user_info: UserInfo) -> VacancyORM:
 
         views=0,
         applications_count=0,
+        tags=[TagORM(tag=t) for t in vacancy.tags]
     )
 
 
@@ -80,4 +82,5 @@ def vacancy_info_dto(vacancy: VacancyORM) -> VacancyInfo:
 
         views=vacancy.views,
         applications_count=vacancy.applications_count,
+        tags=vacancy.tags
     )

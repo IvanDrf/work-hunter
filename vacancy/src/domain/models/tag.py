@@ -15,6 +15,7 @@ class TagORM(Base):
         VARCHAR(40), nullable=False, unique=True, index=True
     )
 
-    vacancies = relationship(
-        'VacancyORM', secondary='vacancies_to_tags', back_populates='tags'
+    vacancies: Mapped[list['VacancyORM']] = relationship(  # type: ignore
+        back_populates='tags', secondary='vacancies_to_tags',
+        cascade='save-update, merge, delete'
     )
