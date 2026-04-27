@@ -43,12 +43,12 @@ class VacancyStub(object):
             _registered_method=True)
         self.FindVacancyByID = channel.unary_unary(
             '/vacancy.Vacancy/FindVacancyByID',
-            request_serializer=vacancy__pb2.FindVacancyByTagsRequest.SerializeToString,
+            request_serializer=vacancy__pb2.FindVacancyByIDRequest.SerializeToString,
             response_deserializer=vacancy__pb2.VacancyInfo.FromString,
             _registered_method=True)
         self.FindVacanciesByTags = channel.unary_unary(
             '/vacancy.Vacancy/FindVacanciesByTags',
-            request_serializer=vacancy__pb2.FindVacancyByIDRequest.SerializeToString,
+            request_serializer=vacancy__pb2.FindVacancyByTagsRequest.SerializeToString,
             response_deserializer=vacancy__pb2.Vacancies.FromString,
             _registered_method=True)
         self.FindVacanciesByAuthor = channel.unary_unary(
@@ -140,12 +140,12 @@ def add_VacancyServicer_to_server(servicer, server):
         ),
         'FindVacancyByID': grpc.unary_unary_rpc_method_handler(
             servicer.FindVacancyByID,
-            request_deserializer=vacancy__pb2.FindVacancyByTagsRequest.FromString,
+            request_deserializer=vacancy__pb2.FindVacancyByIDRequest.FromString,
             response_serializer=vacancy__pb2.VacancyInfo.SerializeToString,
         ),
         'FindVacanciesByTags': grpc.unary_unary_rpc_method_handler(
             servicer.FindVacanciesByTags,
-            request_deserializer=vacancy__pb2.FindVacancyByIDRequest.FromString,
+            request_deserializer=vacancy__pb2.FindVacancyByTagsRequest.FromString,
             response_serializer=vacancy__pb2.Vacancies.SerializeToString,
         ),
         'FindVacanciesByAuthor': grpc.unary_unary_rpc_method_handler(
@@ -224,7 +224,7 @@ class Vacancy(object):
             request,
             target,
             '/vacancy.Vacancy/FindVacancyByID',
-            vacancy__pb2.FindVacancyByTagsRequest.SerializeToString,
+            vacancy__pb2.FindVacancyByIDRequest.SerializeToString,
             vacancy__pb2.VacancyInfo.FromString,
             options,
             channel_credentials,
@@ -251,7 +251,7 @@ class Vacancy(object):
             request,
             target,
             '/vacancy.Vacancy/FindVacanciesByTags',
-            vacancy__pb2.FindVacancyByIDRequest.SerializeToString,
+            vacancy__pb2.FindVacancyByTagsRequest.SerializeToString,
             vacancy__pb2.Vacancies.FromString,
             options,
             channel_credentials,

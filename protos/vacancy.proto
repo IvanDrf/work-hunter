@@ -12,11 +12,11 @@ service Vacancy {
 
     // Find vacancy by it's id
     // If vacancy has status - MODERATING only moderator or user who created this vacancy can see it
-    rpc FindVacancyByID(FindVacancyByTagsRequest) returns (VacancyInfo);
+    rpc FindVacancyByID(FindVacancyByIDRequest) returns (VacancyInfo);
     
     // Find vacancy by tags
     // If vacancy has status - MODERATING only moderator or user who created this vacancy can see it 
-    rpc FindVacanciesByTags(FindVacancyByIDRequest) returns (Vacancies);
+    rpc FindVacanciesByTags(FindVacancyByTagsRequest) returns (Vacancies);
 
     // Find vacancies by author name
     // If vacancy has status - MODERATING only moderator or user who created this vacancy can see it  
