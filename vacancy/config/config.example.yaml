@@ -1,0 +1,13 @@
+app:
+  host: localhost
+  port: 50052
+  logger_level: info
+
+database:
+  host: localhost
+  port: 5434
+
+  username: username
+  password: password
+
+  db_name: vacancy
