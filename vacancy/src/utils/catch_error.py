@@ -12,7 +12,8 @@ logger_levels = {
 
 
 def catch_rise_error(
-    expect_error: tuple[type[Exception]] | type[Exception], raise_error: type[Exception],
+    expect_error: tuple[type[Exception]] | type[Exception],
+    raise_error: type[Exception],
     logger_level: str, message: str,
 ):
     def decorator(func):

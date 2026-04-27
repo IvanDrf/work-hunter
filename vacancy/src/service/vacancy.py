@@ -2,7 +2,7 @@ from pkg.common.common_pb2 import UserInfo, UserRole
 from pkg.vacancy_api.vacancy_pb2 import VacancyInfo
 
 from src.core.exc import AccessError, ArgumentError
-from src.domain.models.vacancy import VacancyStatus
+from src.domain.models.vacancy import VacancyORM, VacancyStatus
 from src.domain.rules.vacancy import check_vacancy_fields
 from src.service.dependencies.repo import IVacancyRepo
 from src.service.dto.vacancy import create_vacancy_dto, vacancy_info_dto
@@ -47,9 +47,13 @@ class VacancyService:
         if vacancy is None:
             return None
 
-        if vacancy.status == VacancyStatus.MODERATING and user_info.role != UserRole.ADMIN:
+        if not has_right_to_vacancy(vacancy, user_info):
             raise AccessError(
                 '''this vacancy is moderating now, you can't see it now '''
             )
 
         return vacancy_info_dto(vacancy)
+
+
+def has_right_to_vacancy(vacancy: VacancyORM, user_info: UserInfo) -> bool:
+    return vacancy.status == VacancyStatus.MODERATING and user_info.role != UserRole.ADMIN and vacancy.author_id != user_info.user_id

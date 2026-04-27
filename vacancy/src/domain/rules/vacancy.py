@@ -1,6 +1,6 @@
 from pkg.vacancy_api.vacancy_pb2 import VacancyInfo
 
-from src.core.exc.argument import ArgumentError
+from src.core.exc import ArgumentError
 
 
 def check_vacancy_fields(vacancy: VacancyInfo) -> None:

@@ -1,11 +1,7 @@
 from datetime import datetime, timezone
 
 from pkg.common.common_pb2 import UserInfo
-from pkg.vacancy_api.vacancy_pb2 import Currency as PBCurrency
-from pkg.vacancy_api.vacancy_pb2 import RemoteType as PBRemoteType
-from pkg.vacancy_api.vacancy_pb2 import TimeType as PBTimeType
 from pkg.vacancy_api.vacancy_pb2 import VacancyInfo
-from pkg.vacancy_api.vacancy_pb2 import VacancyStatus as PBVacancyStatus
 
 from src.domain.models.tag import TagORM
 from src.domain.models.vacancy import Currency, RemoteType, TimeType, VacancyORM, VacancyStatus
@@ -60,13 +56,13 @@ def vacancy_info_dto(vacancy: VacancyORM) -> VacancyInfo:
 
         salary_min=vacancy.salary_min,
         salary_max=vacancy.salary_max,
-        currency=PBCurrency(vacancy.currency.value),
+        currency=vacancy.currency.name,
 
         city=vacancy.city,
         metro=vacancy.metro,
 
-        remote_type=PBRemoteType(vacancy.remote_type.value),
-        time_type=PBTimeType(vacancy.time_type.value),
+        remote_type=vacancy.remote_type.name,
+        time_type=vacancy.time_type.name,
 
         experience_min=vacancy.experience_min,
         experience_max=vacancy.experience_max,
@@ -76,11 +72,11 @@ def vacancy_info_dto(vacancy: VacancyORM) -> VacancyInfo:
         published_at=vacancy.published_at,
         closed_at=vacancy.closed_at,
 
-        status=PBVacancyStatus(vacancy.status.value),
+        status=vacancy.status.name,
         moderated_time=vacancy.moderated_at,
         moderator_comments=vacancy.moderator_comments,
 
         views=vacancy.views,
         applications_count=vacancy.applications_count,
-        tags=vacancy.tags
+        tags=[tag.tag for tag in vacancy.tags]
     )
