@@ -43,14 +43,11 @@ class VacancyRepo:
     @catch_rise_error(SQLAlchemyError, InternalError, 'critical', '''can't find vacancies with given tags''')
     async def find_vacancies_with_tags(self, tags: list[str], offset: int, limit: int) -> list[VacancyORM] | None:
         async with self.session_maker() as session:
-            query = select(TagORM).where(TagORM.tag.in_(tags))
-
-            res = await session.execute(query)
-            tag_ids = set(row[0] for row in res)
-
-            query = select(VacancyORM).join(
-                VacanciesTagsORM, VacanciesTagsORM.vacancy_id == VacancyORM.vacancy_id
-            ).where(and_(VacanciesTagsORM.tag_id.in_(tag_ids), VacancyORM.status == VacancyStatus.PUBLISHED)).offset(offset).limit(limit)
+            query = select(VacancyORM)\
+                .join(VacanciesTagsORM, VacanciesTagsORM.vacancy_id == VacancyORM.vacancy_id)\
+                .join(TagORM, TagORM.tag_id == VacanciesTagsORM.tag_id)\
+                .where(TagORM.tag.in_(tags))\
+                .offset(offset).limit(limit).options(selectinload(VacancyORM.tags))
 
             res = await session.execute(query)
             vacancies = list(res.scalars())

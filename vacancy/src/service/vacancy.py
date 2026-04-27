@@ -1,19 +1,10 @@
-from typing import Final
-
-from pkg.common.common_pb2 import UserInfo, UserRole
+from pkg.common.common_pb2 import UserInfo
 from pkg.vacancy_api.vacancy_pb2 import Vacancies, VacancyInfo
 
 from src.core.exc import AccessError, ArgumentError
-from src.domain.models.vacancy import VacancyORM, VacancyStatus
-from src.domain.rules.vacancy import check_vacancy_fields
+from src.domain.rules.vacancy import check_vacancy_fields, has_right_to_vacancy, is_vacancy_id_valid
 from src.service.dependencies.repo import IVacancyRepo
 from src.service.dto.vacancy import create_vacancy_dto, find_vacancies_with_tags_dto, vacancy_info_dto
-
-
-MIN_LIMIT: Final[int] = 5
-MAX_LIMIT: Final[int] = 30
-
-MAX_TAGS_AMOUNT: Final[int] = 15
 
 
 class VacancyService:
@@ -46,7 +37,7 @@ class VacancyService:
             InternalError: from vacancy_repo
         '''
 
-        if vacancy_id < 0:
+        if not is_vacancy_id_valid(vacancy_id):
             raise ArgumentError(
                 f'vacancy must be non negative number, {vacancy_id=}'
             )
@@ -63,26 +54,14 @@ class VacancyService:
         return vacancy_info_dto(vacancy)
 
     async def find_vacancies_with_tags(self, tags: list[str], offset: int, limit: int) -> Vacancies | None:
-        if offset < 0:
-            raise ArgumentError(
-                f'offset must be a non negative number, {offset=}')
-
-        if not (MIN_LIMIT < limit < MAX_LIMIT):
-            raise ArgumentError(
-                f'limit must be in range ({MIN_LIMIT}, {MAX_LIMIT}), but {limit=}'
-            )
-
-        if len(tags) == 0 or len(tags) > MAX_TAGS_AMOUNT:
-            raise ArgumentError(
-                f'invalid tags amount: {len(tags)}, must be less than {MAX_TAGS_AMOUNT=}'
-            )
+        '''
+        Raises:
+            ArgumentError: if offset < MIN_OFFSET, limit is invalid, amount of tags is invalid
+            InternalError: from vacancy_repo
+        '''
 
         vacancies = await self.vacancy_repo.find_vacancies_with_tags(tags, offset, limit)
         if vacancies is None:
             return None
 
         return Vacancies(vacancies=find_vacancies_with_tags_dto(vacancies), limit=limit, offset=offset)
-
-
-def has_right_to_vacancy(vacancy: VacancyORM, user_info: UserInfo) -> bool:
-    return vacancy.status == VacancyStatus.MODERATING and user_info.role != UserRole.ADMIN and vacancy.author_id != user_info.user_id
