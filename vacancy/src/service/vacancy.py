@@ -13,6 +13,8 @@ from src.service.dto.vacancy import create_vacancy_dto, find_vacancies_with_tags
 MIN_LIMIT: Final[int] = 5
 MAX_LIMIT: Final[int] = 30
 
+MAX_TAGS_AMOUNT: Final[int] = 15
+
 
 class VacancyService:
     def __init__(self, vacancy_repo: IVacancyRepo) -> None:
@@ -70,9 +72,9 @@ class VacancyService:
                 f'limit must be in range ({MIN_LIMIT}, {MAX_LIMIT}), but {limit=}'
             )
 
-        if len(tags) == 0:
+        if len(tags) == 0 or len(tags) > MAX_TAGS_AMOUNT:
             raise ArgumentError(
-                f'no tags were given'
+                f'invalid tags amount: {len(tags)}, must be less than {MAX_TAGS_AMOUNT=}'
             )
 
         vacancies = await self.vacancy_repo.find_vacancies_with_tags(tags, offset, limit)
