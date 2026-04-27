@@ -1,11 +1,17 @@
+from typing import Final
+
 from pkg.common.common_pb2 import UserInfo, UserRole
-from pkg.vacancy_api.vacancy_pb2 import VacancyInfo
+from pkg.vacancy_api.vacancy_pb2 import Vacancies, VacancyInfo
 
 from src.core.exc import AccessError, ArgumentError
 from src.domain.models.vacancy import VacancyORM, VacancyStatus
 from src.domain.rules.vacancy import check_vacancy_fields
 from src.service.dependencies.repo import IVacancyRepo
-from src.service.dto.vacancy import create_vacancy_dto, vacancy_info_dto
+from src.service.dto.vacancy import create_vacancy_dto, find_vacancies_with_tags_dto, vacancy_info_dto
+
+
+MIN_LIMIT: Final[int] = 5
+MAX_LIMIT: Final[int] = 30
 
 
 class VacancyService:
@@ -53,6 +59,27 @@ class VacancyService:
             )
 
         return vacancy_info_dto(vacancy)
+
+    async def find_vacancies_with_tags(self, tags: list[str], offset: int, limit: int) -> Vacancies | None:
+        if offset < 0:
+            raise ArgumentError(
+                f'offset must be a non negative number, {offset=}')
+
+        if not (MIN_LIMIT < limit < MAX_LIMIT):
+            raise ArgumentError(
+                f'limit must be in range ({MIN_LIMIT}, {MAX_LIMIT}), but {limit=}'
+            )
+
+        if len(tags) == 0:
+            raise ArgumentError(
+                f'no tags were given'
+            )
+
+        vacancies = await self.vacancy_repo.find_vacancies_with_tags(tags, offset, limit)
+        if vacancies is None:
+            return None
+
+        return Vacancies(vacancies=find_vacancies_with_tags_dto(vacancies), limit=limit, offset=offset)
 
 
 def has_right_to_vacancy(vacancy: VacancyORM, user_info: UserInfo) -> bool:

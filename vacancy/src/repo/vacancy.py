@@ -1,11 +1,12 @@
-from sqlalchemy import select, and_
+from sqlalchemy import and_, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from sqlalchemy.orm import selectinload
 
 from src.core.exc.internal import InternalError
-from src.domain.models import TagORM, VacancyORM, VacanciesTagsORM
+from src.domain.models import TagORM, VacanciesTagsORM, VacancyORM
+from src.domain.models.vacancy import VacancyStatus
 from src.utils.catch_error import catch_rise_error
 
 
@@ -40,7 +41,7 @@ class VacancyRepo:
             return res.scalar_one_or_none()
 
     @catch_rise_error(SQLAlchemyError, InternalError, 'critical', '''can't find vacancies with given tags''')
-    async def find_vacancies_with_tags(self, tags: list[str], limit: int, offset: int) -> list[VacancyORM]:
+    async def find_vacancies_with_tags(self, tags: list[str], offset: int, limit: int) -> list[VacancyORM] | None:
         async with self.session_maker() as session:
             query = select(TagORM).where(TagORM.tag.in_(tags))
 
@@ -49,7 +50,9 @@ class VacancyRepo:
 
             query = select(VacancyORM).join(
                 VacanciesTagsORM, VacanciesTagsORM.vacancy_id == VacancyORM.vacancy_id
-            ).where(VacanciesTagsORM.tag_id.in_(tag_ids)).offset(offset).limit(limit)
+            ).where(and_(VacanciesTagsORM.tag_id.in_(tag_ids), VacancyORM.status == VacancyStatus.PUBLISHED)).offset(offset).limit(limit)
 
             res = await session.execute(query)
-            return list(res.scalars())
+            vacancies = list(res.scalars())
+
+            return vacancies if len(vacancies) > 0 else None
