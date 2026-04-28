@@ -1,10 +1,11 @@
-from pkg.common.common_pb2 import UserInfo
-from pkg.vacancy_api.vacancy_pb2 import Vacancies, VacancyInfo
+from pkg.common.common_pb2 import UserInfo, UserRole
+from pkg.vacancy_api.vacancy_pb2 import Vacancies, VacancyInfo, VacancyStatus as PBVacancyStatus
 
 from src.core.exc import AccessError, ArgumentError
 from src.domain.rules.vacancy import check_vacancy_fields, has_right_to_vacancy, is_vacancy_id_valid
 from src.service.dependencies.repo import IVacancyRepo
 from src.service.dto.vacancy import create_vacancy_dto, find_vacancies_with_tags_dto, vacancy_info_dto
+from src.domain.models.vacancy import VacancyStatus
 
 
 class VacancyService:
@@ -39,7 +40,7 @@ class VacancyService:
 
         if not is_vacancy_id_valid(vacancy_id):
             raise ArgumentError(
-                f'vacancy must be non negative number, {vacancy_id=}'
+                f'vacancy_id must be non negative number, {vacancy_id=}'
             )
 
         vacancy = await self.vacancy_repo.find_vacancy_by_id(vacancy_id)
@@ -65,3 +66,16 @@ class VacancyService:
             return None
 
         return Vacancies(vacancies=find_vacancies_with_tags_dto(vacancies), limit=limit, offset=offset)
+
+    async def set_vacancy_status(self, vacancy_id: int, status: PBVacancyStatus, user_info: UserInfo) -> None:
+        if user_info.role != UserRole.ADMIN:
+            raise AccessError(
+                '''you can't change vacancy status, you are not admin'''
+            )
+
+        if not is_vacancy_id_valid(vacancy_id):
+            raise ArgumentError(
+                f'vacancy_id must be non negative number, {vacancy_id=}'
+            )
+
+        await self.vacancy_repo.set_vacancy_status(vacancy_id, VacancyStatus(status))

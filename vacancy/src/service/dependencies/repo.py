@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from src.domain.models.vacancy import VacancyORM
+from src.domain.models.vacancy import VacancyORM, VacancyStatus
 
 
 class IVacancyRepo(Protocol):
@@ -11,4 +11,7 @@ class IVacancyRepo(Protocol):
         ...
 
     async def find_vacancies_with_tags(self, tags: list[str], offset: int, limit: int) -> list[VacancyORM] | None:
+        ...
+
+    async def set_vacancy_status(self, vacancy_id: int, status: VacancyStatus) -> None:
         ...
