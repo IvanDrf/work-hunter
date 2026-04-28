@@ -1,5 +1,6 @@
 import logging
 from functools import wraps
+from typing import Literal
 
 
 logger_levels = {
@@ -14,7 +15,8 @@ logger_levels = {
 def catch_rise_error(
     expect_error: tuple[type[Exception]] | type[Exception],
     raise_error: type[Exception],
-    logger_level: str, message: str,
+    logger_level: Literal['debug', 'info', 'warning', 'error', 'critical'],
+    message: str,
 ):
     def decorator(func):
         @wraps(func)

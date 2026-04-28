@@ -80,3 +80,7 @@ def vacancy_info_dto(vacancy: VacancyORM) -> VacancyInfo:
         applications_count=vacancy.applications_count,
         tags=[tag.tag for tag in vacancy.tags]
     )
+
+
+def find_vacancies_with_tags_dto(vacancies: list[VacancyORM]) -> list[VacancyInfo]:
+    return [vacancy_info_dto(vacancy) for vacancy in vacancies]
