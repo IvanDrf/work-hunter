@@ -66,5 +66,7 @@ class VacancyRepo:
             res = await session.execute(query)
             if res.one_or_none() is None:
                 raise InternalError(
-                    f'''can't update vacancy status with given {vacancy_id=}'''
+                    f'''can't update vacancy status with given {vacancy_id=}, does this vacancy exists?'''
                 )
+
+            await session.commit()

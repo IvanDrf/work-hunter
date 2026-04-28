@@ -1,7 +1,7 @@
 from grpc import ServicerContext
 from pkg.vacancy_api.vacancy_pb2 import (CreateVacancyRequest, CreateVacancyResponse, FindVacancyByIDRequest,
-                                         FindVacancyByTagsRequest, Response, SetVacancyStatusRequest, Vacancies,
-                                         VacancyInfo,)
+                                         FindVacancyByTagsRequest, Response, ResponseStatus, SetVacancyStatusRequest,
+                                         Vacancies, VacancyInfo,)
 from pkg.vacancy_api.vacancy_pb2_grpc import VacancyServicer
 
 from src.api.dependencies.service import IVacancyService
@@ -57,4 +57,6 @@ class VacancyHandlers(VacancyServicer):
 
     @handle_errors
     async def SetVacancyStatus(self, request: SetVacancyStatusRequest, context: ServicerContext) -> Response:
-        ...
+        await self.vacancy_service.set_vacancy_status(request.vacancy_id, request.status, request.user_info)
+
+        return Response(message='successfully updated vacancy status', status=ResponseStatus.SUCCESS)

@@ -1,11 +1,12 @@
 from pkg.common.common_pb2 import UserInfo, UserRole
-from pkg.vacancy_api.vacancy_pb2 import Vacancies, VacancyInfo, VacancyStatus as PBVacancyStatus
+from pkg.vacancy_api.vacancy_pb2 import Vacancies, VacancyInfo
+from pkg.vacancy_api.vacancy_pb2 import VacancyStatus as PBVacancyStatus
 
 from src.core.exc import AccessError, ArgumentError
+from src.domain.models.vacancy import VacancyStatus
 from src.domain.rules.vacancy import check_vacancy_fields, has_right_to_vacancy, is_vacancy_id_valid
 from src.service.dependencies.repo import IVacancyRepo
 from src.service.dto.vacancy import create_vacancy_dto, find_vacancies_with_tags_dto, vacancy_info_dto
-from src.domain.models.vacancy import VacancyStatus
 
 
 class VacancyService:

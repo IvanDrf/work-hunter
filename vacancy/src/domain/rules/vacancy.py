@@ -32,7 +32,7 @@ def has_right_to_vacancy(vacancy: VacancyORM, user_info: UserInfo) -> bool:
 
 
 def is_vacancy_id_valid(vacancy_id: int) -> bool:
-    return vacancy_id < MIN_VACANCY_ID
+    return vacancy_id >= MIN_VACANCY_ID
 
 
 def _is_salary_valid(vacancy: VacancyInfo) -> bool:
