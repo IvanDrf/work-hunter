@@ -1,6 +1,7 @@
 from grpc import ServicerContext
 from pkg.vacancy_api.vacancy_pb2 import (CreateVacancyRequest, CreateVacancyResponse, FindVacancyByIDRequest,
-                                         FindVacancyByTagsRequest, Vacancies, VacancyInfo,)
+                                         FindVacancyByTagsRequest, Response, SetVacancyStatusRequest, Vacancies,
+                                         VacancyInfo,)
 from pkg.vacancy_api.vacancy_pb2_grpc import VacancyServicer
 
 from src.api.dependencies.service import IVacancyService
@@ -53,3 +54,7 @@ class VacancyHandlers(VacancyServicer):
             )
 
         return vacancies
+
+    @handle_errors
+    async def SetVacancyStatus(self, request: SetVacancyStatusRequest, context: ServicerContext) -> Response:
+        ...
