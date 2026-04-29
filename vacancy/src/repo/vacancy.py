@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from sqlalchemy import select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import SQLAlchemyError
@@ -70,3 +72,12 @@ class VacancyRepo:
                 )
 
             await session.commit()
+
+    @catch_rise_error(SQLAlchemyError, InternalError, 'critical', '''can't find author_id by vacancy_id''')
+    async def find_vacancy_author(self, vacancy_id: int) -> UUID | None:
+        async with self.session_maker() as session:
+            query = select(VacancyORM.author_id)\
+                .where(VacancyORM.vacancy_id == vacancy_id)
+
+            author_id = await session.execute(query)
+            return author_id.scalar_one_or_none()  # type: ignore
