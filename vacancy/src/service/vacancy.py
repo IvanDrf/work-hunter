@@ -80,3 +80,21 @@ class VacancyService:
             )
 
         await self.vacancy_repo.set_vacancy_status(vacancy_id, VacancyStatus(status))
+
+    async def delete_vacancy(self, vacancy_id: int, user_info: UserInfo) -> None:
+        if user_info.role == UserRole.ADMIN:
+            await self.vacancy_repo.delete_vacancy(vacancy_id)
+            return
+
+        author_id = await self.vacancy_repo.find_vacancy_author(vacancy_id)
+        if author_id is None:
+            raise ArgumentError(
+                f'''can't find author for vacancy with {vacancy_id=}'''
+            )
+
+        if author_id != user_info.user_id:
+            raise AccessError(
+                f'''you have no rights to delete vacancy, you haven't created'''
+            )
+
+        await self.vacancy_repo.delete_vacancy(vacancy_id)
