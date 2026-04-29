@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlalchemy import select, update
+from sqlalchemy import delete, select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
@@ -81,3 +81,18 @@ class VacancyRepo:
 
             author_id = await session.execute(query)
             return author_id.scalar_one_or_none()  # type: ignore
+
+    @catch_rise_error(SQLAlchemyError, InternalError, 'critical', '''can't delete vacancy with given vacancy_id''')
+    async def delete_vacancy(self, vacancy_id: int) -> None:
+        async with self.session_maker() as session:
+            query = delete(VacancyORM)\
+                .where(VacancyORM.vacancy_id == vacancy_id)\
+                .returning(VacancyORM.vacancy_id)
+
+            res = await session.execute(query)
+            if res.one_or_none() is None:
+                raise InternalError(
+                    f'''can't delete vacancy with {vacancy_id=}'''
+                )
+
+            await session.commit()
