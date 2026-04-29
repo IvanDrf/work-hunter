@@ -92,7 +92,7 @@ class VacancyService:
                 f'''can't find author for vacancy with {vacancy_id=}'''
             )
 
-        if author_id != user_info.user_id:
+        if str(author_id) != user_info.user_id:
             raise AccessError(
                 f'''you have no rights to delete vacancy, you haven't created'''
             )

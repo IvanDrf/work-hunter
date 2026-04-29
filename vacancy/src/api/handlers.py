@@ -1,7 +1,7 @@
 from grpc import ServicerContext
 from pkg.vacancy_api.vacancy_pb2 import (CreateVacancyRequest, CreateVacancyResponse, FindVacancyByIDRequest,
                                          FindVacancyByTagsRequest, Response, ResponseStatus, SetVacancyStatusRequest,
-                                         Vacancies, VacancyInfo,)
+                                         Vacancies, VacancyInfo, DeleteVacancyRequest)
 from pkg.vacancy_api.vacancy_pb2_grpc import VacancyServicer
 
 from src.api.dependencies.service import IVacancyService
@@ -60,3 +60,9 @@ class VacancyHandlers(VacancyServicer):
         await self.vacancy_service.set_vacancy_status(request.vacancy_id, request.status, request.user_info)
 
         return Response(message='successfully updated vacancy status', status=ResponseStatus.SUCCESS)
+
+    @handle_errors
+    async def DeleteVacancy(self, request: DeleteVacancyRequest, context: ServicerContext) -> Response:
+        await self.vacancy_service.delete_vacancy(request.vacancy_id, request.user_info)
+
+        return Response(message='successfully deleted vacancy', status=ResponseStatus.SUCCESS)
