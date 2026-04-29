@@ -57,7 +57,7 @@ class VacancyHandlers(VacancyServicer):
 
     @handle_errors
     async def SetVacancyStatus(self, request: SetVacancyStatusRequest, context: ServicerContext) -> Response:
-        await self.vacancy_service.set_vacancy_status(request.vacancy_id, request.status, request.user_info)
+        await self.vacancy_service.set_vacancy_status(request.vacancy_id, request.status, request.moderator_comments, request.user_info)
 
         return Response(message='successfully updated vacancy status', status=ResponseStatus.SUCCESS)
 

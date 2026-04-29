@@ -14,7 +14,7 @@ class IVacancyRepo(Protocol):
     async def find_vacancies_with_tags(self, tags: list[str], offset: int, limit: int) -> list[VacancyORM] | None:
         ...
 
-    async def set_vacancy_status(self, vacancy_id: int, status: VacancyStatus) -> None:
+    async def set_vacancy_status(self, vacancy_id: int, status: VacancyStatus, moderator_comments: str) -> None:
         ...
 
     async def find_vacancy_author(self, vacancy_id: int) -> UUID | None:

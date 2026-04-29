@@ -77,14 +77,22 @@ class VacancyORM(Base):
     created_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True), nullable=False
     )
-    updated_at: Mapped[datetime] = mapped_column(TIMESTAMP, nullable=True)
-    published_at: Mapped[datetime] = mapped_column(TIMESTAMP, nullable=True)
-    closed_at: Mapped[datetime] = mapped_column(TIMESTAMP, nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True), nullable=True
+    )
+    published_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True), nullable=True
+    )
+    closed_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True), nullable=True
+    )
 
     status: Mapped[VacancyStatus] = mapped_column(
         Enum(VacancyStatus), nullable=False
     )
-    moderated_at: Mapped[datetime] = mapped_column(TIMESTAMP, nullable=True)
+    moderated_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True), nullable=True
+    )
     moderator_comments: Mapped[str] = mapped_column(Text, nullable=True)
 
     views: Mapped[int] = mapped_column(

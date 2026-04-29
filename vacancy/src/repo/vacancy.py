@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from uuid import UUID
 
 from sqlalchemy import delete, select, update
@@ -58,11 +59,11 @@ class VacancyRepo:
             return vacancies if len(vacancies) > 0 else None
 
     @catch_rise_error(SQLAlchemyError, InternalError, 'critical', '''can't update vacancy status''')
-    async def set_vacancy_status(self, vacancy_id: int, status: VacancyStatus) -> None:
+    async def set_vacancy_status(self, vacancy_id: int, status: VacancyStatus, moderator_comments: str) -> None:
         async with self.session_maker() as session:
             query = update(VacancyORM)\
                 .where(VacancyORM.vacancy_id == vacancy_id)\
-                .values(status=status)\
+                .values(status=status, moderator_comments=moderator_comments, moderated_at=datetime.now(timezone.utc))\
                 .returning(VacancyORM.vacancy_id)
 
             res = await session.execute(query)

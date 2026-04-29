@@ -24,5 +24,5 @@ class IVacancyService(Protocol):
     async def delete_vacancy(self, vacancy_id: int, user_info: UserInfo) -> None:
         ...
 
-    async def set_vacancy_status(self, vacancy_id: int, status: PBVacancyStatus, user_info: UserInfo) -> None:
+    async def set_vacancy_status(self, vacancy_id: int, status: PBVacancyStatus, moderator_comments: str, user_info: UserInfo) -> None:
         ...

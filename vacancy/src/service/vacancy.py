@@ -73,7 +73,7 @@ class VacancyService:
 
         return Vacancies(vacancies=find_vacancies_with_tags_dto(vacancies), limit=limit, offset=offset)
 
-    async def set_vacancy_status(self, vacancy_id: int, status: PBVacancyStatus, user_info: UserInfo) -> None:
+    async def set_vacancy_status(self, vacancy_id: int, status: PBVacancyStatus, moderator_comments: str, user_info: UserInfo) -> None:
         if user_info.role != UserRole.ADMIN:
             raise AccessError(
                 '''you can't change vacancy status, you are not admin'''
@@ -84,7 +84,7 @@ class VacancyService:
                 f'vacancy_id must be non negative number, {vacancy_id=}'
             )
 
-        await self.vacancy_repo.set_vacancy_status(vacancy_id, VacancyStatus(status))
+        await self.vacancy_repo.set_vacancy_status(vacancy_id, VacancyStatus(status), moderator_comments)
 
     async def delete_vacancy(self, vacancy_id: int, user_info: UserInfo) -> None:
         if user_info.role == UserRole.ADMIN:
