@@ -1,13 +1,17 @@
 import datetime
+from collections.abc import Iterable as _Iterable
+from collections.abc import Mapping as _Mapping
+from typing import ClassVar as _ClassVar
+from typing import Optional as _Optional
+from typing import Union as _Union
 
-from google.protobuf import timestamp_pb2 as _timestamp_pb2
-from ..common import common_pb2 as _common_pb2
-from google.protobuf.internal import containers as _containers
-from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from collections.abc import Iterable as _Iterable, Mapping as _Mapping
-from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
+from google.protobuf import timestamp_pb2 as _timestamp_pb2
+from google.protobuf.internal import containers as _containers
+from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
+
+from ..common import common_pb2 as _common_pb2
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
@@ -256,13 +260,17 @@ class Vacancies(_message.Message):
 
 
 class FindVacanciesByAuthorRequest(_message.Message):
-    __slots__ = ("author", "user_info")
+    __slots__ = ("author", "limit", "offset", "user_info")
     AUTHOR_FIELD_NUMBER: _ClassVar[int]
+    LIMIT_FIELD_NUMBER: _ClassVar[int]
+    OFFSET_FIELD_NUMBER: _ClassVar[int]
     USER_INFO_FIELD_NUMBER: _ClassVar[int]
     author: str
+    limit: int
+    offset: int
     user_info: _common_pb2.UserInfo
-    def __init__(self, author: _Optional[str] = ...,
-                 user_info: _Optional[_Union[_common_pb2.UserInfo, _Mapping]] = ...) -> None: ...
+    def __init__(self, author: _Optional[str] = ..., limit: _Optional[int] = ..., offset: _Optional[int]
+                 = ..., user_info: _Optional[_Union[_common_pb2.UserInfo, _Mapping]] = ...) -> None: ...
 
 
 class SetVacancyStatusRequest(_message.Message):

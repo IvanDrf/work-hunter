@@ -1,7 +1,7 @@
 from grpc import ServicerContext
-from pkg.vacancy_api.vacancy_pb2 import (CreateVacancyRequest, CreateVacancyResponse, FindVacancyByIDRequest,
-                                         FindVacancyByTagsRequest, Response, ResponseStatus, SetVacancyStatusRequest,
-                                         Vacancies, VacancyInfo, DeleteVacancyRequest)
+from pkg.vacancy_api.vacancy_pb2 import (CreateVacancyRequest, CreateVacancyResponse, DeleteVacancyRequest,
+                                         FindVacancyByIDRequest, FindVacancyByTagsRequest, Response, ResponseStatus,
+                                         SetVacancyStatusRequest, Vacancies, VacancyInfo,)
 from pkg.vacancy_api.vacancy_pb2_grpc import VacancyServicer
 
 from src.api.dependencies.service import IVacancyService

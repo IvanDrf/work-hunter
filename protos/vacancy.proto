@@ -186,8 +186,10 @@ message Vacancies {
 
 message FindVacanciesByAuthorRequest {
     string author = 1; // author name
+    uint32 limit = 2;
+    uint32 offset = 3;
 
-    common.UserInfo user_info = 2;
+    common.UserInfo user_info = 4;
 }
 
 message SetVacancyStatusRequest {

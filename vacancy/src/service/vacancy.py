@@ -26,6 +26,11 @@ class VacancyService:
                 '''user is not verificated, can't create vacancy '''
             )
 
+        if user_info.role != UserRole.EMPLOYER:
+            raise AccessError(
+                '''only employer can create vacancies'''
+            )
+
         check_vacancy_fields(vacancy)
 
         vacancy_id = await self.vacancy_repo.create_vacancy(create_vacancy_dto(vacancy, user_info))
