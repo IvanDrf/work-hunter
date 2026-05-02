@@ -16,6 +16,7 @@ platformdirs==4.9.6
 protobuf==6.33.6
 python-discovery==1.2.2
 PyYAML==6.0.3
+redis==7.4.0
 setuptools==82.0.1
 SQLAlchemy==2.0.49
 typing_extensions==4.15.0

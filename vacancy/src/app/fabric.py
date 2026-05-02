@@ -1,6 +1,6 @@
 from src.api.handlers import VacancyHandlers
 from src.core.config.config import Config
-from src.database.postgresql import connect
+from src.database.postgresql import connect as connect_postgresql
 from src.infrastructure.repo.vacancy import VacancyRepo
 from src.infrastructure.service.dependencies.repo import IVacancyRepo
 from src.infrastructure.service.vacancy import VacancyService
@@ -17,7 +17,7 @@ class Fabric:
         return VacancyHandlers(vacancy_service)
 
     async def new_vacancy_repo(self) -> VacancyRepo:
-        return VacancyRepo(await connect(self.config.database))
+        return VacancyRepo(await connect_postgresql(self.config.database))
 
     def new_vacancy_service(self, repo: IVacancyRepo) -> VacancyService:
         return VacancyService(repo)
