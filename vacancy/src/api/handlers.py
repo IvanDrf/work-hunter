@@ -9,6 +9,7 @@ from src.api.rules.params import (MAX_LIMIT, MAX_TAGS_AMOUNT, MIN_LIMIT, MIN_OFF
                                   is_offset_valid, is_tags_amount_valid,)
 from src.core.exc import ArgumentError, NotFoundError
 from src.utils.handle_errors import handle_errors
+from src.api.rules.user_info import is_user_id_valid, get_user_info
 
 
 class VacancyHandlers(VacancyServicer):
@@ -18,36 +19,38 @@ class VacancyHandlers(VacancyServicer):
 
     @handle_errors
     async def CreateVacancy(self, request: CreateVacancyRequest, context: ServicerContext) -> CreateVacancyResponse:
+        if not is_user_id_valid(request.user_info):
+            raise ArgumentError(f'invalid user_id in user_info: {request.user_info.user_id=}')
+
         vacancy_id = await self.vacancy_service.create_vacancy(request.vacancy, request.user_info)
         return CreateVacancyResponse(vacancy_id=vacancy_id)
 
     @handle_errors
     async def FindVacancyByID(self, request: FindVacancyByIDRequest, context: ServicerContext) -> VacancyInfo:
-        vacancy = await self.vacancy_service.find_vacancy_by_id(request.vacancy_id, request.user_info)
+        user_info = get_user_info(request)
+
+        vacancy = await self.vacancy_service.find_vacancy_by_id(request.vacancy_id, user_info)
         if vacancy is None:
-            raise NotFoundError(
-                f'''can't find vacancy with given {request.vacancy_id=}'''
-            )
+            raise NotFoundError(f'''can't find vacancy with given {request.vacancy_id=}''')
 
         return vacancy
 
     @handle_errors
     async def FindVacanciesByTags(self, request: FindVacancyByTagsRequest, context: ServicerContext) -> Vacancies:
         if not is_offset_valid(request.offset):
-            raise ArgumentError(
-                f'offset must be greater than {MIN_OFFSET}, but {request.offset=}')
+            raise ArgumentError(f'offset must be greater than {MIN_OFFSET}, but {request.offset=}')
 
         if not is_limit_valid(request.limit):
-            raise ArgumentError(
-                f'limit must be in range ({MIN_LIMIT}, {MAX_LIMIT}), but {request.limit=}'
-            )
+            raise ArgumentError(f'limit must be in range ({MIN_LIMIT}, {MAX_LIMIT}), but {request.limit=}')
 
         if not is_tags_amount_valid(request.tags):
             raise ArgumentError(
                 f'tags amount must be in range ({MIN_TAGS_AMOUNT}, {MAX_TAGS_AMOUNT}), but {len(request.tags)=}'
             )
 
-        vacancies = await self.vacancy_service.find_vacancies_with_tags(list(request.tags), request.offset, request.limit)
+        user_info = get_user_info(request)
+
+        vacancies = await self.vacancy_service.find_vacancies_with_tags(list(request.tags), request.offset, request.limit, user_info)
         if vacancies is None:
             raise NotFoundError(
                 f'''can't find vacancies with given params {list(request.tags)}, {request.offset=}, {request.limit=}'''

@@ -166,7 +166,7 @@ message DeleteVacancyRequest {
 message FindVacancyByIDRequest {
     uint64 vacancy_id = 1;
 
-    common.UserInfo user_info = 2;
+    optional common.UserInfo user_info = 2;
 }
 
 message FindVacancyByTagsRequest {
@@ -174,7 +174,7 @@ message FindVacancyByTagsRequest {
     uint32 limit = 2;
     uint32 offset = 3;
 
-    common.UserInfo user_info = 4;
+    optional common.UserInfo user_info = 4;
 }
 
 message Vacancies {

@@ -1,18 +1,17 @@
-from typing import ClassVar as _ClassVar
-from typing import Optional as _Optional
-from typing import Union as _Union
-
+from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
+from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class UserRole(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
+    UNSPECIFIED: _ClassVar[UserRole]
     ADMIN: _ClassVar[UserRole]
     EMPLOYEE: _ClassVar[UserRole]
     EMPLOYER: _ClassVar[UserRole]
+UNSPECIFIED: UserRole
 ADMIN: UserRole
 EMPLOYEE: UserRole
 EMPLOYER: UserRole

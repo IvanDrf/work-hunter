@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from uuid import UUID
 
-from sqlalchemy import delete, select, update
+from sqlalchemy import and_, delete, select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
@@ -44,7 +44,22 @@ class VacancyRepo:
             return res.scalar_one_or_none()
 
     @catch_rise_error(SQLAlchemyError, InternalError, 'critical', '''can't find vacancies with given tags''')
-    async def find_vacancies_with_tags(self, tags: list[str], offset: int, limit: int) -> list[VacancyORM] | None:
+    async def find_only_published_vacancies_with_tags(self, tags: list[str], offset: int, limit: int) -> list[VacancyORM] | None:
+        async with self.session_maker() as session:
+            query = select(VacancyORM)\
+                .join(VacanciesTagsORM, VacanciesTagsORM.vacancy_id == VacancyORM.vacancy_id)\
+                .join(TagORM, TagORM.tag_id == VacanciesTagsORM.tag_id)\
+                .where(and_(TagORM.tag.in_(tags), VacancyORM.status == VacancyStatus.PUBLISHED))\
+                .offset(offset).limit(limit)\
+                .options(selectinload(VacancyORM.tags))
+
+            res = await session.execute(query)
+            vacancies = list(res.scalars())
+
+            return vacancies if len(vacancies) > 0 else None
+
+    @catch_rise_error(SQLAlchemyError, InternalError, 'critical', '''can't find vacancies with given tags''')
+    async def find_vacancies_for_admin_with_tags(self, tags: list[str], offset: int, limit: int) -> list[VacancyORM] | None:
         async with self.session_maker() as session:
             query = select(VacancyORM)\
                 .join(VacanciesTagsORM, VacanciesTagsORM.vacancy_id == VacancyORM.vacancy_id)\

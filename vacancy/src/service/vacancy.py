@@ -37,7 +37,7 @@ class VacancyService:
         vacancy_id = await self.vacancy_repo.create_vacancy(create_vacancy_dto(vacancy, user_info))
         return vacancy_id
 
-    async def find_vacancy_by_id(self, vacancy_id: int, user_info: UserInfo) -> VacancyInfo | None:
+    async def find_vacancy_by_id(self, vacancy_id: int, user_info: UserInfo | None) -> VacancyInfo | None:
         '''
         Raises:
             ArgumentError: if vacancy_id < 0
@@ -55,20 +55,22 @@ class VacancyService:
             return None
 
         if not has_right_to_vacancy(vacancy, user_info):
-            raise AccessError(
-                '''this vacancy is moderating now, you can't see it now '''
-            )
+            raise AccessError('''this vacancy is moderating now, you can't see it now ''')
 
         return vacancy_info_dto(vacancy)
 
-    async def find_vacancies_with_tags(self, tags: list[str], offset: int, limit: int) -> Vacancies | None:
+    async def find_vacancies_with_tags(self, tags: list[str], offset: int, limit: int, user_info: UserInfo | None) -> Vacancies | None:
         '''
         Raises:
             ArgumentError: if offset < MIN_OFFSET, limit is invalid, amount of tags is invalid
             InternalError: from vacancy_repo
         '''
 
-        vacancies = await self.vacancy_repo.find_vacancies_with_tags(tags, offset, limit)
+        if user_info is not None and is_user_admin(user_info):
+            vacancies = await self.vacancy_repo.find_vacancies_for_admin_with_tags(tags, offset, limit)
+        else:
+            vacancies = await self.vacancy_repo.find_only_published_vacancies_with_tags(tags, offset, limit)
+
         if vacancies is None:
             return None
 
@@ -100,7 +102,7 @@ class VacancyService:
 
         if str(author_id) != user_info.user_id:
             raise AccessError(
-                f'''you have no rights to delete vacancy, you haven't created'''
+                f'''you have no rights to delete vacancy, you didn't created'''
             )
 
         await self.vacancy_repo.delete_vacancy(vacancy_id)

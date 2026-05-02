@@ -76,8 +76,7 @@ class Response(_message.Message):
     STATUS_FIELD_NUMBER: _ClassVar[int]
     message: str
     status: ResponseStatus
-    def __init__(self, message: _Optional[str] = ...,
-                 status: _Optional[_Union[ResponseStatus, str]] = ...) -> None: ...
+    def __init__(self, message: _Optional[str] = ..., status: _Optional[_Union[ResponseStatus, str]] = ...) -> None: ...
 
 
 class VacancyInfo(_message.Message):

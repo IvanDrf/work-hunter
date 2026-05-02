@@ -9,13 +9,13 @@ class IVacancyService(Protocol):
     async def create_vacancy(self, vacancy: VacancyInfo, user_info: UserInfo) -> int:
         ...
 
-    async def find_vacancy_by_id(self, vacancy_id: int, user_info: UserInfo) -> VacancyInfo | None:
+    async def find_vacancy_by_id(self, vacancy_id: int, user_info: UserInfo | None) -> VacancyInfo | None:
         ...
 
     async def find_vacancies_by_author(self, author: str, user_info: UserInfo) -> Vacancies:
         ...
 
-    async def find_vacancies_with_tags(self, tags: list[str], offset: int, limit: int) -> Vacancies | None:
+    async def find_vacancies_with_tags(self, tags: list[str], offset: int, limit: int, user_info: UserInfo | None) -> Vacancies | None:
         ...
 
     async def update_vacancy(self, request: UpdateVacancyRequest) -> None:

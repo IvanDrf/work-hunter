@@ -27,8 +27,16 @@ def check_vacancy_fields(vacancy: VacancyInfo) -> None:
         )
 
 
-def has_right_to_vacancy(vacancy: VacancyORM, user_info: UserInfo) -> bool:
-    return vacancy.status == VacancyStatus.MODERATING and user_info.role != UserRole.ADMIN and vacancy.author_id != user_info.user_id
+def has_right_to_vacancy(vacancy: VacancyORM, user_info: UserInfo | None) -> bool:
+    is_published = vacancy.status == VacancyStatus.PUBLISHED
+
+    if user_info is None and not is_published:
+        return False
+
+    is_admin_or_author = user_info is not None and (
+        user_info.role == UserRole.ADMIN or user_info.user_id == vacancy.author_id)
+
+    return is_published or (vacancy.status == VacancyStatus.MODERATING and is_admin_or_author)
 
 
 def is_vacancy_id_valid(vacancy_id: int) -> bool:

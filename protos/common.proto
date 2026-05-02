@@ -3,9 +3,10 @@ syntax = "proto3";
 package common;
 
 enum UserRole {
-    ADMIN = 0;
-    EMPLOYEE = 1;
-    EMPLOYER = 2;
+    UNSPECIFIED = 0;
+    ADMIN = 1;
+    EMPLOYEE = 2;
+    EMPLOYER = 3;
 }
 
 message UserInfo {
