@@ -1,5 +1,6 @@
 from datetime import datetime
 from enum import Enum as PyEnum
+from uuid import UUID as PyUUID
 
 from sqlalchemy import BIGINT, INT, TIMESTAMP, UUID, VARCHAR, CheckConstraint, Enum, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -40,7 +41,7 @@ class VacancyORM(Base):
     vacancy_id: Mapped[int] = mapped_column(
         BIGINT, primary_key=True, autoincrement=True, index=True
     )
-    author_id: Mapped[UUID] = mapped_column(
+    author_id: Mapped[PyUUID] = mapped_column(
         UUID, index=True, nullable=False
     )
 

@@ -81,7 +81,7 @@ class VacancyRepo:
                 .where(VacancyORM.vacancy_id == vacancy_id)
 
             author_id = await session.execute(query)
-            return author_id.scalar_one_or_none()  # type: ignore
+            return author_id.scalar_one_or_none()
 
     @catch_rise_error(SQLAlchemyError, InternalError, 'critical', '''can't delete vacancy with given vacancy_id''')
     async def delete_vacancy(self, vacancy_id: int) -> None:

@@ -1,9 +1,10 @@
-from pkg.common.common_pb2 import UserInfo, UserRole
+from pkg.common.common_pb2 import UserInfo
 from pkg.vacancy_api.vacancy_pb2 import Vacancies, VacancyInfo
 from pkg.vacancy_api.vacancy_pb2 import VacancyStatus as PBVacancyStatus
 
 from src.core.exc import AccessError, ArgumentError
 from src.domain.models.vacancy import VacancyStatus
+from src.domain.rules.user import is_user_admin, is_user_employer
 from src.domain.rules.vacancy import check_vacancy_fields, has_right_to_vacancy, is_vacancy_id_valid
 from src.service.dependencies.repo import IVacancyRepo
 from src.service.dto.vacancy import create_vacancy_dto, find_vacancies_with_tags_dto, vacancy_info_dto
@@ -26,7 +27,7 @@ class VacancyService:
                 '''user is not verificated, can't create vacancy '''
             )
 
-        if user_info.role != UserRole.EMPLOYER:
+        if not is_user_employer(user_info):
             raise AccessError(
                 '''only employer can create vacancies'''
             )
@@ -74,7 +75,7 @@ class VacancyService:
         return Vacancies(vacancies=find_vacancies_with_tags_dto(vacancies), limit=limit, offset=offset)
 
     async def set_vacancy_status(self, vacancy_id: int, status: PBVacancyStatus, moderator_comments: str, user_info: UserInfo) -> None:
-        if user_info.role != UserRole.ADMIN:
+        if not is_user_admin(user_info):
             raise AccessError(
                 '''you can't change vacancy status, you are not admin'''
             )
@@ -87,7 +88,7 @@ class VacancyService:
         await self.vacancy_repo.set_vacancy_status(vacancy_id, VacancyStatus(status), moderator_comments)
 
     async def delete_vacancy(self, vacancy_id: int, user_info: UserInfo) -> None:
-        if user_info.role == UserRole.ADMIN:
+        if is_user_admin(user_info):
             await self.vacancy_repo.delete_vacancy(vacancy_id)
             return
 
