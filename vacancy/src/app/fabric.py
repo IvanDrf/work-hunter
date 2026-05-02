@@ -1,9 +1,9 @@
 from src.api.handlers import VacancyHandlers
 from src.core.config.config import Config
 from src.database.postgresql import connect
-from src.repo.vacancy import VacancyRepo
-from src.service.dependencies.repo import IVacancyRepo
-from src.service.vacancy import VacancyService
+from src.infrastructure.repo.vacancy import VacancyRepo
+from src.infrastructure.service.dependencies.repo import IVacancyRepo
+from src.infrastructure.service.vacancy import VacancyService
 
 
 class Fabric:

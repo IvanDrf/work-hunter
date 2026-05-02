@@ -7,9 +7,9 @@ from pkg.vacancy_api.vacancy_pb2_grpc import VacancyServicer
 from src.api.dependencies.service import IVacancyService
 from src.api.rules.params import (MAX_LIMIT, MAX_TAGS_AMOUNT, MIN_LIMIT, MIN_OFFSET, MIN_TAGS_AMOUNT, is_limit_valid,
                                   is_offset_valid, is_tags_amount_valid,)
+from src.api.rules.user_info import get_user_info, is_user_id_valid
 from src.core.exc import ArgumentError, NotFoundError
 from src.utils.handle_errors import handle_errors
-from src.api.rules.user_info import is_user_id_valid, get_user_info
 
 
 class VacancyHandlers(VacancyServicer):

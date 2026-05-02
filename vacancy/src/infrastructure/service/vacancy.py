@@ -6,8 +6,8 @@ from src.core.exc import AccessError, ArgumentError
 from src.domain.models.vacancy import VacancyStatus
 from src.domain.rules.user import is_user_admin, is_user_employer
 from src.domain.rules.vacancy import check_vacancy_fields, has_right_to_vacancy, is_vacancy_id_valid
-from src.service.dependencies.repo import IVacancyRepo
-from src.service.dto.vacancy import create_vacancy_dto, find_vacancies_with_tags_dto, vacancy_info_dto
+from src.infrastructure.service.dependencies.repo import IVacancyRepo
+from src.infrastructure.service.dto.vacancy import create_vacancy_dto, find_vacancies_with_tags_dto, vacancy_info_dto
 
 
 class VacancyService:
