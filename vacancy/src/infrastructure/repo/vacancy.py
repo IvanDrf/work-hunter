@@ -18,20 +18,17 @@ class VacancyRepo:
         self.session_maker: async_sessionmaker[AsyncSession] = session_maker
 
     @catch_rise_error(SQLAlchemyError, InternalError, 'critical', '''can't create new vacancy in database''')
-    async def create_vacancy(self, vacancy: VacancyORM) -> int:
+    async def create_vacancy(self, vacancy: VacancyORM) -> None:
         async with self.session_maker() as session:
-            async with session.begin():
-                tags = [{'tag': tag.tag} for tag in vacancy.tags]
-                await session.execute(insert(TagORM).values(tags).on_conflict_do_nothing(index_elements=['tag']))
+            tags = [{'tag': tag.tag} for tag in vacancy.tags]
+            await session.execute(insert(TagORM).values(tags).on_conflict_do_nothing(index_elements=['tag']))
 
-                tags = await session.execute(select(TagORM).where(TagORM.tag.in_([t['tag'] for t in tags])))
+            tags = await session.execute(select(TagORM).where(TagORM.tag.in_([t['tag'] for t in tags])))
 
-                vacancy.tags = list(tags.scalars().all())
+            vacancy.tags = list(tags.scalars().all())
 
-                session.add(vacancy)
-                await session.flush()
-
-                return vacancy.vacancy_id
+            session.add(vacancy)
+            await session.commit()
 
     @catch_rise_error(SQLAlchemyError, InternalError, 'critical', '''can't find vacancy with given vacancy_id''')
     async def find_vacancy_by_id(self, vacancy_id: int) -> VacancyORM | None:

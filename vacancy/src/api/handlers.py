@@ -4,7 +4,7 @@ from pkg.vacancy_api.vacancy_pb2 import (CreateVacancyRequest, CreateVacancyResp
                                          SetVacancyStatusRequest, Vacancies, VacancyInfo,)
 from pkg.vacancy_api.vacancy_pb2_grpc import VacancyServicer
 
-from src.api.dependencies.service import IVacancyService
+from src.api.dependencies import IVacancyService
 from src.api.rules.params import (MAX_LIMIT, MAX_TAGS_AMOUNT, MIN_LIMIT, MIN_OFFSET, MIN_TAGS_AMOUNT, is_limit_valid,
                                   is_offset_valid, is_tags_amount_valid,)
 from src.api.rules.user_info import get_user_info, is_user_id_valid
@@ -22,8 +22,8 @@ class VacancyHandlers(VacancyServicer):
         if not is_user_id_valid(request.user_info):
             raise ArgumentError(f'invalid user_id in user_info: {request.user_info.user_id=}')
 
-        vacancy_id = await self.vacancy_service.create_vacancy(request.vacancy, request.user_info)
-        return CreateVacancyResponse(vacancy_id=vacancy_id)
+        vacancy = await self.vacancy_service.create_vacancy(request.vacancy, request.user_info)
+        return CreateVacancyResponse(vacancy=vacancy)
 
     @handle_errors
     async def FindVacancyByID(self, request: FindVacancyByIDRequest, context: ServicerContext) -> VacancyInfo:

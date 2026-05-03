@@ -6,7 +6,7 @@ from pkg.vacancy_api.vacancy_pb2 import VacancyStatus as PBVacancyStatus
 
 
 class IVacancyService(Protocol):
-    async def create_vacancy(self, vacancy: VacancyInfo, user_info: UserInfo) -> int:
+    async def create_vacancy(self, vacancy: VacancyInfo, user_info: UserInfo) -> VacancyInfo:
         ...
 
     async def find_vacancy_by_id(self, vacancy_id: int, user_info: UserInfo | None) -> VacancyInfo | None:

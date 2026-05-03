@@ -106,6 +106,7 @@ message VacancyInfo {
     optional uint64 applications_count = 23;
 
     repeated string tags = 24; // vacancies tags: golang, javascript, manager
+    string author_name = 25;
 }
 
 message CreateVacancyRequest {
@@ -115,7 +116,7 @@ message CreateVacancyRequest {
 }
 
 message CreateVacancyResponse {
-    uint64 vacancy_id = 1;
+    VacancyInfo vacancy = 1;
 }
 
 message UpdateVacancyRequest {

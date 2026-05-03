@@ -81,7 +81,7 @@ class Response(_message.Message):
 
 class VacancyInfo(_message.Message):
     __slots__ = ("vacancy_id", "title", "description", "requirements", "conditions", "salary_min", "salary_max", "currency", "city", "metro", "remote_type", "time_type", "experience_min",
-                 "experience_max", "created_at", "updated_at", "published_at", "closed_at", "status", "moderated_time", "moderator_comments", "views", "applications_count", "tags")
+                 "experience_max", "created_at", "updated_at", "published_at", "closed_at", "status", "moderated_time", "moderator_comments", "views", "applications_count", "tags", "author_name")
     VACANCY_ID_FIELD_NUMBER: _ClassVar[int]
     TITLE_FIELD_NUMBER: _ClassVar[int]
     DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
@@ -106,6 +106,7 @@ class VacancyInfo(_message.Message):
     VIEWS_FIELD_NUMBER: _ClassVar[int]
     APPLICATIONS_COUNT_FIELD_NUMBER: _ClassVar[int]
     TAGS_FIELD_NUMBER: _ClassVar[int]
+    AUTHOR_NAME_FIELD_NUMBER: _ClassVar[int]
     vacancy_id: int
     title: str
     description: str
@@ -130,8 +131,9 @@ class VacancyInfo(_message.Message):
     views: int
     applications_count: int
     tags: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, vacancy_id: _Optional[int] = ..., title: _Optional[str] = ..., description: _Optional[str] = ..., requirements: _Optional[str] = ..., conditions: _Optional[str] = ..., salary_min: _Optional[int] = ..., salary_max: _Optional[int] = ..., currency: _Optional[_Union[Currency, str]] = ..., city: _Optional[str] = ..., metro: _Optional[str] = ..., remote_type: _Optional[_Union[RemoteType, str]] = ..., time_type: _Optional[_Union[TimeType, str]] = ..., experience_min: _Optional[int] = ..., experience_max: _Optional[int] = ..., created_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp,
-                 _Mapping]] = ..., updated_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., published_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., closed_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., status: _Optional[_Union[VacancyStatus, str]] = ..., moderated_time: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., moderator_comments: _Optional[str] = ..., views: _Optional[int] = ..., applications_count: _Optional[int] = ..., tags: _Optional[_Iterable[str]] = ...) -> None: ...
+    author_name: str
+    def __init__(self, vacancy_id: _Optional[int] = ..., title: _Optional[str] = ..., description: _Optional[str] = ..., requirements: _Optional[str] = ..., conditions: _Optional[str] = ..., salary_min: _Optional[int] = ..., salary_max: _Optional[int] = ..., currency: _Optional[_Union[Currency, str]] = ..., city: _Optional[str] = ..., metro: _Optional[str] = ..., remote_type: _Optional[_Union[RemoteType, str]] = ..., time_type: _Optional[_Union[TimeType, str]] = ..., experience_min: _Optional[int] = ..., experience_max: _Optional[int] = ..., created_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ...,
+                 updated_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., published_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., closed_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., status: _Optional[_Union[VacancyStatus, str]] = ..., moderated_time: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., moderator_comments: _Optional[str] = ..., views: _Optional[int] = ..., applications_count: _Optional[int] = ..., tags: _Optional[_Iterable[str]] = ..., author_name: _Optional[str] = ...) -> None: ...
 
 
 class CreateVacancyRequest(_message.Message):
@@ -145,10 +147,10 @@ class CreateVacancyRequest(_message.Message):
 
 
 class CreateVacancyResponse(_message.Message):
-    __slots__ = ("vacancy_id",)
-    VACANCY_ID_FIELD_NUMBER: _ClassVar[int]
-    vacancy_id: int
-    def __init__(self, vacancy_id: _Optional[int] = ...) -> None: ...
+    __slots__ = ("vacancy",)
+    VACANCY_FIELD_NUMBER: _ClassVar[int]
+    vacancy: VacancyInfo
+    def __init__(self, vacancy: _Optional[_Union[VacancyInfo, _Mapping]] = ...) -> None: ...
 
 
 class UpdateVacancyRequest(_message.Message):

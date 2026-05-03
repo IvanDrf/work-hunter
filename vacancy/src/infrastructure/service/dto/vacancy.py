@@ -10,6 +10,7 @@ from src.domain.models.vacancy import Currency, RemoteType, TimeType, VacancyORM
 def create_vacancy_dto(vacancy: VacancyInfo, user_info: UserInfo) -> VacancyORM:
     return VacancyORM(
         author_id=user_info.user_id,
+        author_name=vacancy.author_name,
 
         title=vacancy.title,
         description=vacancy.description,
@@ -45,8 +46,9 @@ def create_vacancy_dto(vacancy: VacancyInfo, user_info: UserInfo) -> VacancyORM:
     )
 
 
-def vacancy_info_dto(vacancy: VacancyORM) -> VacancyInfo:
+def vacancy_orm_to_info_dto(vacancy: VacancyORM) -> VacancyInfo:
     return VacancyInfo(
+        author_name=vacancy.author_name,
         vacancy_id=vacancy.vacancy_id,
         title=vacancy.title,
         description=vacancy.description,
@@ -83,4 +85,4 @@ def vacancy_info_dto(vacancy: VacancyORM) -> VacancyInfo:
 
 
 def find_vacancies_with_tags_dto(vacancies: list[VacancyORM]) -> list[VacancyInfo]:
-    return [vacancy_info_dto(vacancy) for vacancy in vacancies]
+    return [vacancy_orm_to_info_dto(vacancy) for vacancy in vacancies]

@@ -5,8 +5,7 @@ from uuid import UUID as PyUUID
 from sqlalchemy import BIGINT, INT, TIMESTAMP, UUID, VARCHAR, CheckConstraint, Enum, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.domain.models.association import VacanciesTagsORM
-from src.domain.models.base import Base
+from src.domain.models import Base, VacanciesTagsORM
 
 
 class RemoteType(PyEnum):
@@ -44,6 +43,7 @@ class VacancyORM(Base):
     author_id: Mapped[PyUUID] = mapped_column(
         UUID, index=True, nullable=False
     )
+    author_name: Mapped[str] = mapped_column(VARCHAR(75), nullable=False)
 
     title: Mapped[str] = mapped_column(VARCHAR(150), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
