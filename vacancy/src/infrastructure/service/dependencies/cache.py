@@ -1,5 +1,5 @@
-from typing import Protocol
 from datetime import timedelta
+from typing import Protocol
 
 
 class ICache(Protocol):

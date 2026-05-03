@@ -2,6 +2,7 @@ import logging
 
 from redis.asyncio import Redis
 from redis.exceptions import ConnectionError
+
 from src.core.config.cache import RedisConfig
 
 

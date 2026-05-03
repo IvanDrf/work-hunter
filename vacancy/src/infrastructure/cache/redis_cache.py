@@ -1,5 +1,5 @@
-from datetime import timedelta
 import logging
+from datetime import timedelta
 
 from redis.asyncio import Redis
 from redis.exceptions import RedisError

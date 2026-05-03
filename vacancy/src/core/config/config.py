@@ -4,8 +4,8 @@ from pathlib import Path
 from yaml import safe_load
 
 from src.core.config.app import AppConfig
-from src.core.config.database import PostgreSQLConfig
 from src.core.config.cache import RedisConfig
+from src.core.config.database import PostgreSQLConfig
 
 
 @dataclass(frozen=True, slots=True)
