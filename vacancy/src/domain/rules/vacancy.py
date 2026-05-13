@@ -6,24 +6,21 @@ from pkg.vacancy_api.vacancy_pb2 import VacancyInfo
 from src.core.exc import ArgumentError
 from src.domain.models.vacancy import VacancyORM, VacancyStatus
 
-
 MIN_VACANCY_ID: Final[int] = 0
 
 
-def check_vacancy_fields(vacancy: VacancyInfo) -> None:
-    if vacancy.title == '':
-        raise ArgumentError(
-            f'title must be non empty, but given: {vacancy.title}'
-        )
+def validate_vacancy_fields(vacancy: VacancyInfo) -> None:
+    if vacancy.title == "":
+        raise ArgumentError(f"title must be non empty, but given: {vacancy.title}")
 
     if not _is_salary_valid(vacancy):
         raise ArgumentError(
-            f'salary_min must be less or equal to salary_max, but given: {vacancy.salary_min} and {vacancy.salary_max}'
+            f"salary_min must be less or equal to salary_max, but given: {vacancy.salary_min} and {vacancy.salary_max}"
         )
 
     if not _is_experience_valid(vacancy):
         raise ArgumentError(
-            f'experience_min must be less or equal to experience_max, but given: {vacancy.experience_min} and {vacancy.experience_max}'
+            f"experience_min must be less or equal to experience_max, but given: {vacancy.experience_min} and {vacancy.experience_max}"
         )
 
 
@@ -33,8 +30,7 @@ def has_right_to_vacancy(vacancy: VacancyORM, user_info: UserInfo | None) -> boo
     if user_info is None and not is_published:
         return False
 
-    is_admin_or_author = user_info is not None and (
-        user_info.role == UserRole.ADMIN or user_info.user_id == vacancy.author_id)
+    is_admin_or_author = user_info is not None and (user_info.role == UserRole.ADMIN or user_info.user_id == vacancy.author_id)
 
     return is_published or (vacancy.status == VacancyStatus.MODERATING and is_admin_or_author)
 

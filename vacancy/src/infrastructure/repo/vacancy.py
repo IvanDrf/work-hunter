@@ -17,95 +17,94 @@ class VacancyRepo:
     def __init__(self, session_maker: async_sessionmaker[AsyncSession]) -> None:
         self.session_maker: async_sessionmaker[AsyncSession] = session_maker
 
-    @catch_rise_error(SQLAlchemyError, InternalError, 'critical', '''can't create new vacancy in database''')
+    @catch_rise_error(SQLAlchemyError, InternalError, "critical", "can't create new vacancy in database")
     async def create_vacancy(self, vacancy: VacancyORM) -> None:
         async with self.session_maker() as session:
-            tags = [{'tag': tag.tag} for tag in vacancy.tags]
-            await session.execute(insert(TagORM).values(tags).on_conflict_do_nothing(index_elements=['tag']))
+            tags = [{"tag": tag.tag} for tag in vacancy.tags]
+            await session.execute(insert(TagORM).values(tags).on_conflict_do_nothing(index_elements=["tag"]))
 
-            tags = await session.execute(select(TagORM).where(TagORM.tag.in_([t['tag'] for t in tags])))
+            tags = await session.execute(select(TagORM).where(TagORM.tag.in_([t["tag"] for t in tags])))
 
             vacancy.tags = list(tags.scalars().all())
 
             session.add(vacancy)
             await session.commit()
 
-    @catch_rise_error(SQLAlchemyError, InternalError, 'critical', '''can't find vacancy with given vacancy_id''')
+    @catch_rise_error(SQLAlchemyError, InternalError, "critical", "can't find vacancy with given vacancy_id")
     async def find_vacancy_by_id(self, vacancy_id: int) -> VacancyORM | None:
         async with self.session_maker() as session:
-            query = select(VacancyORM)\
-                .where(VacancyORM.vacancy_id == vacancy_id)\
-                .options(selectinload(VacancyORM.tags))
+            query = select(VacancyORM).where(VacancyORM.vacancy_id == vacancy_id).options(selectinload(VacancyORM.tags))
 
             res = await session.execute(query)
             return res.scalar_one_or_none()
 
-    @catch_rise_error(SQLAlchemyError, InternalError, 'critical', '''can't find vacancies with given tags''')
+    @catch_rise_error(SQLAlchemyError, InternalError, "critical", "can't find vacancies with given tags")
     async def find_only_published_vacancies_with_tags(self, tags: list[str], offset: int, limit: int) -> list[VacancyORM] | None:
         async with self.session_maker() as session:
-            query = select(VacancyORM)\
-                .join(VacanciesTagsORM, VacanciesTagsORM.vacancy_id == VacancyORM.vacancy_id)\
-                .join(TagORM, TagORM.tag_id == VacanciesTagsORM.tag_id)\
-                .where(and_(TagORM.tag.in_(tags), VacancyORM.status == VacancyStatus.PUBLISHED))\
-                .offset(offset).limit(limit)\
+            query = (
+                select(VacancyORM)
+                .join(VacanciesTagsORM, VacanciesTagsORM.vacancy_id == VacancyORM.vacancy_id)
+                .join(TagORM, TagORM.tag_id == VacanciesTagsORM.tag_id)
+                .where(and_(TagORM.tag.in_(tags), VacancyORM.status == VacancyStatus.PUBLISHED))
+                .offset(offset)
+                .limit(limit)
                 .options(selectinload(VacancyORM.tags))
+            )
 
             res = await session.execute(query)
             vacancies = list(res.scalars())
 
             return vacancies if len(vacancies) > 0 else None
 
-    @catch_rise_error(SQLAlchemyError, InternalError, 'critical', '''can't find vacancies with given tags''')
+    @catch_rise_error(SQLAlchemyError, InternalError, "critical", "can't find vacancies with given tags")
     async def find_vacancies_for_admin_with_tags(self, tags: list[str], offset: int, limit: int) -> list[VacancyORM] | None:
         async with self.session_maker() as session:
-            query = select(VacancyORM)\
-                .join(VacanciesTagsORM, VacanciesTagsORM.vacancy_id == VacancyORM.vacancy_id)\
-                .join(TagORM, TagORM.tag_id == VacanciesTagsORM.tag_id)\
-                .where(TagORM.tag.in_(tags))\
-                .offset(offset).limit(limit)\
+            query = (
+                select(VacancyORM)
+                .join(VacanciesTagsORM, VacanciesTagsORM.vacancy_id == VacancyORM.vacancy_id)
+                .join(TagORM, TagORM.tag_id == VacanciesTagsORM.tag_id)
+                .where(TagORM.tag.in_(tags))
+                .offset(offset)
+                .limit(limit)
                 .options(selectinload(VacancyORM.tags))
+            )
 
             res = await session.execute(query)
             vacancies = list(res.scalars())
 
             return vacancies if len(vacancies) > 0 else None
 
-    @catch_rise_error(SQLAlchemyError, InternalError, 'critical', '''can't update vacancy status''')
+    @catch_rise_error(SQLAlchemyError, InternalError, "critical", "can't update vacancy status")
     async def set_vacancy_status(self, vacancy_id: int, status: VacancyStatus, moderator_comments: str) -> None:
         async with self.session_maker() as session:
-            query = update(VacancyORM)\
-                .where(VacancyORM.vacancy_id == vacancy_id)\
-                .values(status=status, moderator_comments=moderator_comments, moderated_at=datetime.now(timezone.utc))\
+            query = (
+                update(VacancyORM)
+                .where(VacancyORM.vacancy_id == vacancy_id)
+                .values(status=status, moderator_comments=moderator_comments, moderated_at=datetime.now(timezone.utc))
                 .returning(VacancyORM.vacancy_id)
+            )
 
             res = await session.execute(query)
             if res.one_or_none() is None:
-                raise InternalError(
-                    f'''can't update vacancy status with given {vacancy_id=}, does this vacancy exists?'''
-                )
+                raise InternalError(f"can't update vacancy status with given {vacancy_id=}, does this vacancy exists?")
 
             await session.commit()
 
-    @catch_rise_error(SQLAlchemyError, InternalError, 'critical', '''can't find author_id by vacancy_id''')
+    @catch_rise_error(SQLAlchemyError, InternalError, "critical", "can't find author_id by vacancy_id")
     async def find_vacancy_author(self, vacancy_id: int) -> UUID | None:
         async with self.session_maker() as session:
-            query = select(VacancyORM.author_id)\
-                .where(VacancyORM.vacancy_id == vacancy_id)
+            query = select(VacancyORM.author_id).where(VacancyORM.vacancy_id == vacancy_id)
 
             author_id = await session.execute(query)
             return author_id.scalar_one_or_none()
 
-    @catch_rise_error(SQLAlchemyError, InternalError, 'critical', '''can't delete vacancy with given vacancy_id''')
+    @catch_rise_error(SQLAlchemyError, InternalError, "critical", "can't delete vacancy with given vacancy_id")
     async def delete_vacancy(self, vacancy_id: int) -> None:
         async with self.session_maker() as session:
-            query = delete(VacancyORM)\
-                .where(VacancyORM.vacancy_id == vacancy_id)\
-                .returning(VacancyORM.vacancy_id)
+            query = delete(VacancyORM).where(VacancyORM.vacancy_id == vacancy_id).returning(VacancyORM.vacancy_id)
 
             res = await session.execute(query)
             if res.one_or_none() is None:
-                raise InternalError(
-                    f'''can't delete vacancy with {vacancy_id=}'''
-                )
+                raise InternalError(f"can't delete vacancy with {vacancy_id=}")
 
             await session.commit()

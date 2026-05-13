@@ -2,20 +2,19 @@ import logging
 from functools import wraps
 from typing import Literal
 
-
 logger_levels = {
-    'debug': logging.debug,
-    'info': logging.info,
-    'warning': logging.warning,
-    'error': logging.error,
-    'critical': logging.critical
+    "debug": logging.debug,
+    "info": logging.info,
+    "warning": logging.warning,
+    "error": logging.error,
+    "critical": logging.critical,
 }
 
 
 def catch_rise_error(
     expect_error: tuple[type[Exception]] | type[Exception],
     raise_error: type[Exception],
-    logger_level: Literal['debug', 'info', 'warning', 'error', 'critical'],
+    logger_level: Literal["debug", "info", "warning", "error", "critical"],
     message: str,
 ):
     def decorator(func):
@@ -25,9 +24,10 @@ def catch_rise_error(
                 res = await func(*args, **kwargs)
                 return res
             except expect_error as e:
-                logger_levels[logger_level](f'{func.__name__}: {e}')
+                logger_levels[logger_level](f"{func.__name__}: {e}")
 
                 raise raise_error(message)
+
         return wrapper
 
     return decorator
