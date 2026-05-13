@@ -1,37 +1,15 @@
 from datetime import datetime
-from enum import Enum as PyEnum
+from typing import TypeAlias
 from uuid import UUID as PyUUID
 
 from sqlalchemy import BIGINT, INT, TIMESTAMP, UUID, VARCHAR, CheckConstraint, Enum, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.domain.models.base import Base
+from src.domain.types.enums import Currency, RemoteType, TimeType, VacancyStatus
 
-
-class RemoteType(PyEnum):
-    OFFICE = 0
-    REMOTE = 1
-    HYBRID = 2
-    ANY = 3
-
-
-class TimeType(PyEnum):
-    FULL = 0
-    PART = 1
-
-
-class Currency(PyEnum):
-    RUB = 0
-    USD = 1
-    EUR = 2
-
-
-class VacancyStatus(PyEnum):
-    MODERATING = 0
-    PUBLISHED = 1
-    UPDATED = 2
-    CLOSED = 3
-    DELETED = 4
+Year: TypeAlias = int
+Money: TypeAlias = int
 
 
 class VacancyORM(Base):
@@ -47,42 +25,46 @@ class VacancyORM(Base):
     requirements: Mapped[str] = mapped_column(Text, nullable=False)
     conditions: Mapped[str] = mapped_column(Text, nullable=False)
 
-    salary_min: Mapped[int] = mapped_column(
-        INT,
-        CheckConstraint("salary_min >= 0", name="check_positive_salary_min"),
-        nullable=False,
+    salary_min: Mapped[Money | None] = mapped_column(
+        INT, CheckConstraint("salary_min >= 0", name="check_positive_salary_min"), nullable=True, default=0
     )
-    salary_max: Mapped[int] = mapped_column(
-        INT,
-        CheckConstraint("salary_max >= 0", name="check_positive_salary_max"),
-        nullable=False,
+    salary_max: Mapped[Money | None] = mapped_column(
+        INT, CheckConstraint("salary_max >= 0", name="check_positive_salary_max"), nullable=True, default=0
     )
 
     currency: Mapped[Currency] = mapped_column(Enum(Currency), nullable=False)
 
-    city: Mapped[str] = mapped_column(VARCHAR(150), nullable=True)
-    metro: Mapped[str] = mapped_column(VARCHAR(100), nullable=True)
+    city: Mapped[str | None] = mapped_column(VARCHAR(150), nullable=True)
+    metro: Mapped[str | None] = mapped_column(VARCHAR(100), nullable=True)
 
     remote_type: Mapped[RemoteType] = mapped_column(Enum(RemoteType), nullable=False)
     time_type: Mapped[TimeType] = mapped_column(Enum(TimeType), nullable=False)
 
-    experience_min: Mapped[int] = mapped_column(
-        INT, CheckConstraint("experience_min >= 0", name="check_non_negative_min_exp"), nullable=True
+    experience_min: Mapped[Year | None] = mapped_column(
+        INT,
+        CheckConstraint("experience_min >= 0", name="check_non_negative_min_exp"),
+        nullable=True,
+        default=None,
     )
-    experience_max: Mapped[int] = mapped_column(
-        INT, CheckConstraint("experience_max >= 0", name="check_non_negative_max_exp"), nullable=True
+    experience_max: Mapped[Year | None] = mapped_column(
+        INT,
+        CheckConstraint("experience_max >= 0", name="check_non_negative_max_exp"),
+        nullable=True,
+        default=None,
     )
 
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), nullable=False)
-    updated_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), nullable=True)
-    published_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), nullable=True)
-    closed_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), nullable=True)
+    updated_at: Mapped[datetime | None] = mapped_column(TIMESTAMP(timezone=True), nullable=True)
+    published_at: Mapped[datetime | None] = mapped_column(TIMESTAMP(timezone=True), nullable=True)
+    closed_at: Mapped[datetime | None] = mapped_column(TIMESTAMP(timezone=True), nullable=True)
 
     status: Mapped[VacancyStatus] = mapped_column(Enum(VacancyStatus), nullable=False)
-    moderated_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), nullable=True)
-    moderator_comments: Mapped[str] = mapped_column(Text, nullable=True)
+    moderated_at: Mapped[datetime | None] = mapped_column(TIMESTAMP(timezone=True), nullable=True)
+    moderator_comments: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    views: Mapped[int] = mapped_column(BIGINT, CheckConstraint("views >= 0", name="check_non_negative_views"), nullable=True)
+    views: Mapped[int] = mapped_column(
+        BIGINT, CheckConstraint("views >= 0", name="check_non_negative_views"), nullable=False, default=0
+    )
 
     applications_count: Mapped[int] = mapped_column(
         BIGINT, CheckConstraint("applications_count >= 0", name="check_non_negative_applications"), nullable=False, default=0
