@@ -2,9 +2,9 @@ from datetime import datetime
 from typing import Final
 from uuid import UUID
 
-from pydantic import BaseModel, Field, ValidationInfo, field_validator
+from pydantic import BaseModel, Field
 
-from src.core.exc import ArgumentError
+from src.domain.schemas.mixins import ExperienceValidatorMixin, SalaryValidatorMixin
 from src.domain.types.enums import Currency, RemoteType, TimeType, VacancyStatus
 from src.domain.types.types import UNSET_VALUE, Money, UnsetValue, Year
 
@@ -16,7 +16,7 @@ MAX_REQUIREMENTS_LENGTH: Final[int] = 20_000
 MAX_CONDITIONS_LENGTH: Final[int] = 20_000
 
 
-class VacancySchema(BaseModel):
+class VacancySchema(BaseModel, SalaryValidatorMixin, ExperienceValidatorMixin):
     title: str = Field(min_length=MIN_TITLE_LENGTH, max_length=MAX_TITLE_LENGTH)
     description: str = Field(default="No description", max_length=MAX_DESCRIPTION_LENGTH)
 
@@ -39,45 +39,13 @@ class VacancySchema(BaseModel):
 
     tags: list[str] | None = None
 
-    @field_validator("salary_min")
-    def validate_salary_min(cls, value: Money, info: ValidationInfo) -> Money:
-        salary_max = info.data.get("salary_max")
-        if salary_max is not None and value > salary_max:
-            raise ArgumentError(f"maximum salary - {salary_max} must be greater than minimum salary - {value}")
 
-        return value
-
-    @field_validator("salary_max")
-    def validate_salary_max(cls, value: Money, info: ValidationInfo) -> Money:
-        salary_min = info.data.get("salary_min")
-        if salary_min is not None and value < salary_min:
-            raise ArgumentError(f"maximum salary - {value} must be greater than minimum salary - {salary_min}")
-
-        return value
-
-    @field_validator("experience_min")
-    def validate_experience_min(cls, value: Year, info: ValidationInfo) -> Year:
-        experience_max = info.data.get("experience_max")
-        if experience_max is not None and value > experience_max:
-            raise ArgumentError(f"maximum experience - {experience_max} must be greater than minimum experience - {value}")
-
-        return value
-
-    @field_validator("experience_max")
-    def validate_experience_max(cls, value: Year, info: ValidationInfo) -> Year:
-        experience_min = info.data.get("experience_min")
-        if experience_min is not None and value < experience_min:
-            raise ArgumentError(f"maximum experience - {value} must be greater than minimum experience - {experience_min}")
-
-        return value
-
-
-class VacancyCreateSchema(VacancySchema):
+class VacancyCreateSchema(VacancySchema, SalaryValidatorMixin, ExperienceValidatorMixin):
     author_id: UUID
     author_name: str
 
 
-class VacancyUpdateSchema(BaseModel):
+class VacancyUpdateSchema(BaseModel, SalaryValidatorMixin, ExperienceValidatorMixin):
     vacancy_id: int = Field(ge=0)
     title: str | UnsetValue = UNSET_VALUE
     description: str | UnsetValue = UNSET_VALUE
@@ -101,40 +69,8 @@ class VacancyUpdateSchema(BaseModel):
 
     tags: list[str] | None | UnsetValue = UNSET_VALUE
 
-    @field_validator("salary_min")
-    def validate_salary_min(cls, value: Money, info: ValidationInfo) -> Money:
-        salary_max = info.data.get("salary_max")
-        if salary_max is not None and value > salary_max:
-            raise ArgumentError(f"maximum salary - {salary_max} must be greater than minimum salary - {value}")
 
-        return value
-
-    @field_validator("salary_max")
-    def validate_salary_max(cls, value: Money, info: ValidationInfo) -> Money:
-        salary_min = info.data.get("salary_min")
-        if salary_min is not None and value < salary_min:
-            raise ArgumentError(f"maximum salary - {value} must be greater than minimum salary - {salary_min}")
-
-        return value
-
-    @field_validator("experience_min")
-    def validate_experience_min(cls, value: Year, info: ValidationInfo) -> Year:
-        experience_max = info.data.get("experience_max")
-        if experience_max is not None and value > experience_max:
-            raise ArgumentError(f"maximum experience - {experience_max} must be greater than minimum experience - {value}")
-
-        return value
-
-    @field_validator("experience_max")
-    def validate_experience_max(cls, value: Year, info: ValidationInfo) -> Year:
-        experience_min = info.data.get("experience_min")
-        if experience_min is not None and value < experience_min:
-            raise ArgumentError(f"maximum experience - {value} must be greater than minimum experience - {experience_min}")
-
-        return value
-
-
-class VacancyResponseSchema(VacancySchema):
+class VacancyResponseSchema(VacancySchema, SalaryValidatorMixin, ExperienceValidatorMixin):
     vacancy_id: int
     author_name: str
 

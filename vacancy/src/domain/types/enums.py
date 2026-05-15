@@ -1,6 +1,13 @@
 from enum import Enum
 
 
+class UserRole(Enum):
+    UNSPECIFIED = 0
+    ADMIN = 1
+    EMPLOYEE = 2
+    EMPLOYER = 3
+
+
 class RemoteType(Enum):
     OFFICE = 0
     REMOTE = 1
