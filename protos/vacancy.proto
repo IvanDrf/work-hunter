@@ -80,8 +80,8 @@ message VacancyInfo {
     string requirements = 4;
     string conditions = 5;
 
-    uint64 salary_min =  6;
-    uint64 salary_max = 7; 
+    optional uint64 salary_min =  6;
+    optional uint64 salary_max = 7; 
     Currency currency = 8;
 
     optional string city = 9;
@@ -112,7 +112,7 @@ message VacancyInfo {
 message CreateVacancyRequest {
     VacancyInfo vacancy = 1;
     
-    common.UserInfo user_info = 2;
+    common.FullUserInfo user_info = 2;
 }
 
 message CreateVacancyResponse {

@@ -25,3 +25,15 @@ class UserInfo(_message.Message):
     user_id: str
     verificated: bool
     def __init__(self, role: _Optional[_Union[UserRole, str]] = ..., user_id: _Optional[str] = ..., verificated: bool = ...) -> None: ...
+
+class FullUserInfo(_message.Message):
+    __slots__ = ("role", "user_id", "username", "verificated")
+    ROLE_FIELD_NUMBER: _ClassVar[int]
+    USER_ID_FIELD_NUMBER: _ClassVar[int]
+    USERNAME_FIELD_NUMBER: _ClassVar[int]
+    VERIFICATED_FIELD_NUMBER: _ClassVar[int]
+    role: UserRole
+    user_id: str
+    username: str
+    verificated: bool
+    def __init__(self, role: _Optional[_Union[UserRole, str]] = ..., user_id: _Optional[str] = ..., username: _Optional[str] = ..., verificated: bool = ...) -> None: ...

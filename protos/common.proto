@@ -14,3 +14,10 @@ message UserInfo {
     string user_id = 2; // uuid
     bool verificated = 3;
 }
+
+message FullUserInfo {
+    UserRole role = 1;
+    string user_id = 2;
+    string username = 3;
+    bool verificated = 4;
+}
