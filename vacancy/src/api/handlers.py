@@ -14,6 +14,9 @@ from pkg.vacancy_api.vacancy_pb2 import (
 from pkg.vacancy_api.vacancy_pb2_grpc import VacancyServicer
 
 from src.api.dependencies import IVacancyService
+from src.api.dto.status import vacancy_status_dto
+from src.api.dto.user_info import user_info_dto, user_info_none_dto
+from src.api.dto.vacancy import vacancy_create_dto, vacancy_response_dto
 from src.api.rules.params import (
     MAX_LIMIT,
     MAX_TAGS_AMOUNT,
@@ -39,18 +42,22 @@ class VacancyHandlers(VacancyServicer):
         if not is_user_id_valid(request.user_info):
             raise ArgumentError(f"invalid user_id in user_info: {request.user_info.user_id=}")
 
-        vacancy = await self.vacancy_service.create_vacancy(request.vacancy, request.user_info)
-        return CreateVacancyResponse(vacancy=vacancy)
+        vacancy_schema = vacancy_create_dto(request.vacancy, request.user_info)
+        user_info_schema = user_info_dto(request.user_info)
+
+        vacancy = await self.vacancy_service.create_vacancy(vacancy_schema, user_info_schema)
+
+        return CreateVacancyResponse(vacancy=vacancy_response_dto(vacancy))
 
     @handle_errors
     async def FindVacancyByID(self, request: FindVacancyByIDRequest, context: ServicerContext) -> VacancyInfo:
         user_info = get_user_info(request)
 
-        vacancy = await self.vacancy_service.find_vacancy_by_id(request.vacancy_id, user_info)
+        vacancy = await self.vacancy_service.find_vacancy_by_id(request.vacancy_id, user_info_none_dto(user_info))
         if vacancy is None:
             raise NotFoundError(f"can't find vacancy with given {request.vacancy_id=}")
 
-        return vacancy
+        return vacancy_response_dto(vacancy)
 
     @handle_errors
     async def FindVacanciesByTags(self, request: FindVacancyByTagsRequest, context: ServicerContext) -> Vacancies:
@@ -66,7 +73,7 @@ class VacancyHandlers(VacancyServicer):
         user_info = get_user_info(request)
 
         vacancies = await self.vacancy_service.find_vacancies_with_tags(
-            list(request.tags), request.offset, request.limit, user_info
+            list(request.tags), request.offset, request.limit, user_info_none_dto(user_info)
         )
 
         if vacancies is None:
@@ -74,18 +81,25 @@ class VacancyHandlers(VacancyServicer):
                 f"can't find vacancies with given params {list(request.tags)}, {request.offset=}, {request.limit=}"
             )
 
-        return vacancies
+        return Vacancies(
+            vacancies=[vacancy_response_dto(vacancy) for vacancy in vacancies],
+            limit=request.limit,
+            offset=request.offset,
+        )
 
     @handle_errors
     async def SetVacancyStatus(self, request: SetVacancyStatusRequest, context: ServicerContext) -> Response:
         await self.vacancy_service.set_vacancy_status(
-            request.vacancy_id, request.status, request.moderator_comments, request.user_info
+            request.vacancy_id,
+            vacancy_status_dto(request.status),
+            request.moderator_comments,
+            user_info_dto(request.user_info),
         )
 
         return Response(message="successfully updated vacancy status", status=ResponseStatus.SUCCESS)
 
     @handle_errors
     async def DeleteVacancy(self, request: DeleteVacancyRequest, context: ServicerContext) -> Response:
-        await self.vacancy_service.delete_vacancy(request.vacancy_id, request.user_info)
+        await self.vacancy_service.delete_vacancy(request.vacancy_id, user_info_dto(request.user_info))
 
         return Response(message="successfully deleted vacancy", status=ResponseStatus.SUCCESS)
