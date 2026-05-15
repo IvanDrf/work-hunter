@@ -7,7 +7,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from sqlalchemy.orm import selectinload
 
-from src.core.exc.internal import InternalError
+from src.core.exc import InternalError
 from src.domain.models import TagORM, VacanciesTagsORM, VacancyORM
 from src.domain.models.vacancy import VacancyStatus
 from src.utils.catch_error import catch_rise_error
