@@ -1,35 +1,75 @@
-from typing import TypeAlias
+from uuid import UUID
 
 from pytest import fixture
 
-from src.domain.types.types import UNSET_VALUE, Money, UnsetValue
-
-Salaries: TypeAlias = list[tuple[Money | UnsetValue | None, Money | UnsetValue | None]]
-
-
-@fixture(scope="module")
-def valid_salaries() -> Salaries:
-    return [
-        (5, 67),
-        (0, 0),
-        (20, 20),
-        (None, None),
-        (20, None),
-        (None, 30),
-        (UNSET_VALUE, 30),
-        (30, UNSET_VALUE),
-        (UNSET_VALUE, UNSET_VALUE),
-    ]
+from src.domain.schemas.user import UserInfo
+from src.domain.types.enums import UserRole
 
 
-@fixture(scope="module")
-def invalid_salaries() -> Salaries:
-    return [
-        (20, 10),
-        (-5, 10),
-        (-5, -5),
-        (None, -5),
-        (-5, None),
-        (UNSET_VALUE, -5),
-        (-5, UNSET_VALUE),
-    ]
+@fixture(scope="package")
+def user_id() -> UUID:
+    return UUID("3e0baeb1-a57d-42b2-bb05-a10cc3e5be57")
+
+
+@fixture(scope="function")
+def admin_user_info(user_id) -> tuple[UserInfo, ...]:
+    return (
+        UserInfo(
+            user_role=UserRole.ADMIN,
+            user_id=user_id,
+            verificated=True,
+        ),
+        UserInfo(
+            user_role=UserRole.ADMIN,
+            user_id=user_id,
+            verificated=False,
+        ),
+    )
+
+
+@fixture(scope="function")
+def employee_user_info(user_id) -> tuple[UserInfo, ...]:
+    return (
+        UserInfo(
+            user_role=UserRole.EMPLOYEE,
+            user_id=user_id,
+            verificated=True,
+        ),
+        UserInfo(
+            user_role=UserRole.EMPLOYEE,
+            user_id=user_id,
+            verificated=False,
+        ),
+    )
+
+
+@fixture(scope="function")
+def employer_user_info(user_id) -> tuple[UserInfo, ...]:
+    return (
+        UserInfo(
+            user_role=UserRole.EMPLOYER,
+            user_id=user_id,
+            verificated=True,
+        ),
+        UserInfo(
+            user_role=UserRole.EMPLOYER,
+            user_id=user_id,
+            verificated=False,
+        ),
+    )
+
+
+@fixture(scope="function")
+def unspecified_user_info(user_id) -> tuple[UserInfo, ...]:
+    return (
+        UserInfo(
+            user_role=UserRole.UNSPECIFIED,
+            user_id=user_id,
+            verificated=True,
+        ),
+        UserInfo(
+            user_role=UserRole.UNSPECIFIED,
+            user_id=user_id,
+            verificated=False,
+        ),
+    )
