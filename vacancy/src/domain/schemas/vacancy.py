@@ -37,7 +37,7 @@ class VacancySchema(BaseModel, SalaryValidatorMixin, ExperienceValidatorMixin):
     experience_min: Year | None = None
     experience_max: Year | None = None
 
-    tags: list[str] | None = None
+    tags: list[str] = []
 
 
 class VacancyCreateSchema(VacancySchema, SalaryValidatorMixin, ExperienceValidatorMixin):
@@ -67,7 +67,7 @@ class VacancyUpdateSchema(BaseModel, SalaryValidatorMixin, ExperienceValidatorMi
     experience_min: Year | None | UnsetValue = UNSET_VALUE
     experience_max: Year | None | UnsetValue = UNSET_VALUE
 
-    tags: list[str] | None | UnsetValue = UNSET_VALUE
+    tags: list[str] | UnsetValue = UNSET_VALUE
 
 
 class VacancyResponseSchema(VacancySchema, SalaryValidatorMixin, ExperienceValidatorMixin):
@@ -77,10 +77,12 @@ class VacancyResponseSchema(VacancySchema, SalaryValidatorMixin, ExperienceValid
     status: VacancyStatus = VacancyStatus.MODERATING
 
     views: int = Field(default=0, ge=0)
-    applications: int = Field(default=0, ge=0)
+    applications_count: int = Field(default=0, ge=0)
 
     created_at: datetime
     updated_at: datetime | None = None
     published_at: datetime | None = None
     closed_at: datetime | None = None
+
     moderator_comments: str | None = None
+    moderated_at: datetime | None = None
