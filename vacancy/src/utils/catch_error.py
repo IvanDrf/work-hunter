@@ -11,7 +11,7 @@ logger_levels = {
 }
 
 
-def catch_rise_error(
+def catch_raise_error(
     expect_error: tuple[type[Exception]] | type[Exception],
     raise_error: type[Exception],
     logger_level: Literal["debug", "info", "warning", "error", "critical"],

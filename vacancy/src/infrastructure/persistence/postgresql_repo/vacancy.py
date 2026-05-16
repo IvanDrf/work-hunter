@@ -10,14 +10,14 @@ from sqlalchemy.orm import selectinload
 from src.core.exc import InternalError
 from src.domain.models import TagORM, VacanciesTagsORM, VacancyORM
 from src.domain.models.vacancy import VacancyStatus
-from src.utils.catch_error import catch_rise_error
+from src.utils.catch_error import catch_raise_error
 
 
 class VacancyRepo:
     def __init__(self, session_maker: async_sessionmaker[AsyncSession]) -> None:
         self.session_maker: async_sessionmaker[AsyncSession] = session_maker
 
-    @catch_rise_error(SQLAlchemyError, InternalError, "critical", "can't create new vacancy in database")
+    @catch_raise_error(SQLAlchemyError, InternalError, "critical", "can't create new vacancy in database")
     async def create_vacancy(self, vacancy: VacancyORM) -> None:
         async with self.session_maker() as session:
             tags = [{"tag": tag.tag} for tag in vacancy.tags]
@@ -30,7 +30,7 @@ class VacancyRepo:
             session.add(vacancy)
             await session.commit()
 
-    @catch_rise_error(SQLAlchemyError, InternalError, "critical", "can't find vacancy with given vacancy_id")
+    @catch_raise_error(SQLAlchemyError, InternalError, "critical", "can't find vacancy with given vacancy_id")
     async def find_vacancy_by_id(self, vacancy_id: int) -> VacancyORM | None:
         async with self.session_maker() as session:
             query = select(VacancyORM).where(VacancyORM.vacancy_id == vacancy_id).options(selectinload(VacancyORM.tags))
@@ -38,7 +38,7 @@ class VacancyRepo:
             res = await session.execute(query)
             return res.scalar_one_or_none()
 
-    @catch_rise_error(SQLAlchemyError, InternalError, "critical", "can't find vacancies with given tags")
+    @catch_raise_error(SQLAlchemyError, InternalError, "critical", "can't find vacancies with given tags")
     async def find_only_published_vacancies_with_tags(self, tags: list[str], offset: int, limit: int) -> list[VacancyORM] | None:
         async with self.session_maker() as session:
             query = (
@@ -56,7 +56,7 @@ class VacancyRepo:
 
             return vacancies if len(vacancies) > 0 else None
 
-    @catch_rise_error(SQLAlchemyError, InternalError, "critical", "can't find vacancies with given tags")
+    @catch_raise_error(SQLAlchemyError, InternalError, "critical", "can't find vacancies with given tags")
     async def find_vacancies_for_admin_with_tags(self, tags: list[str], offset: int, limit: int) -> list[VacancyORM] | None:
         async with self.session_maker() as session:
             query = (
@@ -74,7 +74,7 @@ class VacancyRepo:
 
             return vacancies if len(vacancies) > 0 else None
 
-    @catch_rise_error(SQLAlchemyError, InternalError, "critical", "can't update vacancy status")
+    @catch_raise_error(SQLAlchemyError, InternalError, "critical", "can't update vacancy status")
     async def set_vacancy_status(self, vacancy_id: int, status: VacancyStatus, moderator_comments: str) -> None:
         async with self.session_maker() as session:
             query = (
@@ -90,7 +90,7 @@ class VacancyRepo:
 
             await session.commit()
 
-    @catch_rise_error(SQLAlchemyError, InternalError, "critical", "can't find author_id by vacancy_id")
+    @catch_raise_error(SQLAlchemyError, InternalError, "critical", "can't find author_id by vacancy_id")
     async def find_vacancy_author(self, vacancy_id: int) -> UUID | None:
         async with self.session_maker() as session:
             query = select(VacancyORM.author_id).where(VacancyORM.vacancy_id == vacancy_id)
@@ -98,7 +98,7 @@ class VacancyRepo:
             author_id = await session.execute(query)
             return author_id.scalar_one_or_none()
 
-    @catch_rise_error(SQLAlchemyError, InternalError, "critical", "can't delete vacancy with given vacancy_id")
+    @catch_raise_error(SQLAlchemyError, InternalError, "critical", "can't delete vacancy with given vacancy_id")
     async def delete_vacancy(self, vacancy_id: int) -> None:
         async with self.session_maker() as session:
             query = delete(VacancyORM).where(VacancyORM.vacancy_id == vacancy_id).returning(VacancyORM.vacancy_id)
