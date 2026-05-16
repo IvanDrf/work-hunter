@@ -13,10 +13,10 @@ class RedisCache:
         try:
             await self.client.set(key, content, ex=ttl)
         except RedisError as e:
-            logging.error(f'''can't save in cache by {key=}, details={e} ''')
+            logging.error(f"can't save in cache by {key=}, details={e} ")
 
     async def get(self, key: str) -> str | None:
         try:
             return await self.client.get(key)
         except RedisError as e:
-            logging.error(f'''can't get content from cache by {key=}, details={e} ''')
+            logging.error(f"can't get content from cache by {key=}, details={e} ")
