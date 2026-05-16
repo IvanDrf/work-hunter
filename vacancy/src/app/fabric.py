@@ -1,7 +1,7 @@
 from src.api.handlers import VacancyHandlers
 from src.core.config.config import Config
-from src.database.postgresql import connect as connect_postgresql
-from src.infrastructure.repo.vacancy import VacancyRepo
+from src.infrastructure.persistence.postgresql_repo import VacancyRepo
+from src.infrastructure.persistence.postgresql_repo import connect as connect_postgresql
 from src.infrastructure.service.dependencies.repo import IVacancyRepo
 from src.infrastructure.service.vacancy import VacancyService
 
