@@ -9,7 +9,13 @@ from src.core.exc import AccessError, ArgumentError, InternalError, NotFoundErro
 def handle_errors(func):
     @wraps(func)
     async def wrapper(*args, **kwargs):
-        context: ServicerContext = args[2] or kwargs["context"]
+        if "context" in kwargs:
+            context: ServicerContext = kwargs["context"]
+        elif len(args) > 3:
+            context: ServicerContext = args[2]
+        else:
+            raise ValueError("invalid function signature, must has 'context'")
+
         try:
             res = await func(*args, **kwargs)
             return res
