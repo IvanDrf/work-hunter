@@ -1,10 +1,11 @@
 from datetime import datetime, timezone
 
-from src.core.exc import AccessError, ArgumentError
+from src.core.exc import AccessError, ArgumentError, NotFoundError
 from src.domain.models.vacancy import VacancyStatus
-from src.domain.rules.user import is_user_admin, is_user_employer
+from src.domain.rules.user import is_user_admin, is_user_employer, is_user_vacancy_author
 from src.domain.rules.vacancy import has_right_to_vacancy, is_vacancy_id_valid
-from src.domain.schemas import UserInfo, VacancyCreateSchema, VacancyResponseSchema
+from src.domain.schemas import UserInfo, VacancyCreateSchema, VacancyResponseSchema, VacancyUpdateSchema
+from src.domain.types.types import UNSET_VALUE
 from src.infrastructure.service.dependencies import IVacancyRepo
 from src.infrastructure.service.dto.vacancy import (
     create_vacancy_dto,
@@ -60,15 +61,18 @@ class VacancyService:
     async def set_vacancy_status(
         self, vacancy_id: int, status: VacancyStatus, moderator_comments: str, user_info: UserInfo
     ) -> None:
-        if not is_user_admin(user_info):
-            raise AccessError("you can't change vacancy status, you are not admin")
-
         if not is_vacancy_id_valid(vacancy_id):
             raise ArgumentError(f"vacancy_id must be non negative number, {vacancy_id=}")
+
+        if not is_user_admin(user_info):
+            raise AccessError("you can't change vacancy status, you are not admin")
 
         await self.vacancy_repo.set_vacancy_status(vacancy_id, VacancyStatus(status), moderator_comments)
 
     async def delete_vacancy(self, vacancy_id: int, user_info: UserInfo) -> None:
+        if not is_vacancy_id_valid(vacancy_id):
+            raise ArgumentError(f"vacancy_id must be non negative number, {vacancy_id=}")
+
         if is_user_admin(user_info):
             await self.vacancy_repo.delete_vacancy(vacancy_id)
             return
@@ -77,7 +81,31 @@ class VacancyService:
         if author_id is None:
             raise ArgumentError(f"can't find author for vacancy with {vacancy_id=}")
 
-        if str(author_id) != user_info.user_id:
+        if not is_user_vacancy_author(author_id, user_info.user_id):
             raise AccessError("you have no rights to delete vacancy, you didn't created")
 
         await self.vacancy_repo.delete_vacancy(vacancy_id)
+
+    async def update_vacancy(self, vacancy_update_schema: VacancyUpdateSchema, user_info: UserInfo) -> VacancyResponseSchema:
+        if not is_vacancy_id_valid(vacancy_update_schema.vacancy_id):
+            raise ArgumentError(f"vacancy_id must be non negative number, {vacancy_update_schema.vacancy_id=}")
+
+        vacancy = await self.vacancy_repo.find_vacancy_by_id(vacancy_update_schema.vacancy_id)
+        if vacancy is None:
+            raise NotFoundError(f"can't find vacancy with given vacancy_id={vacancy_update_schema.vacancy_id}")
+
+        if not is_user_admin(user_info) and not is_user_vacancy_author(vacancy.author_id, user_info.user_id):
+            raise AccessError("only author or admin can change vacancy")
+
+        fields = {}
+        for field_name, value in vacancy_update_schema.model_dump().items():
+            if value is not UNSET_VALUE and field_name != "vacancy_id":
+                fields[field_name] = value
+
+        if not fields:
+            raise ArgumentError("no fields were given to update")
+
+        fields["updated_at"] = datetime.now(timezone.utc)
+
+        vacancy = await self.vacancy_repo.update_vacancy(vacancy_update_schema.vacancy_id, fields)
+        return vacancy_orm_to_response_dto(vacancy)
