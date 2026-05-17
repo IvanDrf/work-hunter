@@ -1,10 +1,11 @@
 from uuid import UUID
 
 from pkg.common.common_pb2 import FullUserInfo
-from pkg.vacancy_api.vacancy_pb2 import VacancyInfo
+from pkg.vacancy_api.vacancy_pb2 import UpdateVacancyRequest, VacancyInfo
 
-from src.domain.schemas import VacancyCreateSchema, VacancyResponseSchema
+from src.domain.schemas import VacancyCreateSchema, VacancyResponseSchema, VacancyUpdateSchema
 from src.domain.types.enums import Currency, RemoteType, TimeType
+from src.domain.types.types import UNSET_VALUE, Money, Year
 
 
 def vacancy_create_dto(vacancy: VacancyInfo, user_info: FullUserInfo) -> VacancyCreateSchema:
@@ -67,4 +68,24 @@ def vacancy_response_dto(vacancy: VacancyResponseSchema) -> VacancyInfo:
         updated_at=vacancy.updated_at,
         published_at=vacancy.published_at,
         closed_at=vacancy.closed_at,
+    )
+
+
+def vacancy_update_dto(vacancy: UpdateVacancyRequest) -> VacancyUpdateSchema:
+    return VacancyUpdateSchema(
+        vacancy_id=vacancy.vacancy_id,
+        title=vacancy.title if vacancy.title else UNSET_VALUE,
+        description=vacancy.description if vacancy.description else UNSET_VALUE,
+        requirements=vacancy.requirements if vacancy.requirements else UNSET_VALUE,
+        conditions=vacancy.conditions if vacancy.conditions else UNSET_VALUE,
+        salary_min=Money(vacancy.salary_min) if vacancy.salary_min else UNSET_VALUE,
+        salary_max=Money(vacancy.salary_max) if vacancy.salary_max else UNSET_VALUE,
+        currency=Currency(vacancy.currency) if vacancy.currency else UNSET_VALUE,
+        city=vacancy.city if vacancy.city else UNSET_VALUE,
+        metro=vacancy.metro if vacancy.metro else UNSET_VALUE,
+        remote_type=RemoteType(vacancy.remote_type) if vacancy.remote_type else UNSET_VALUE,
+        time_type=TimeType(vacancy.time_type) if vacancy.time_type else UNSET_VALUE,
+        experience_min=Year(vacancy.experience_min) if vacancy.experience_min else UNSET_VALUE,
+        experience_max=Year(vacancy.experience_max) if vacancy.experience_max else UNSET_VALUE,
+        tags=list(vacancy.tags) if vacancy.tags else UNSET_VALUE,
     )

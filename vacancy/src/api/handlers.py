@@ -8,6 +8,7 @@ from pkg.vacancy_api.vacancy_pb2 import (
     Response,
     ResponseStatus,
     SetVacancyStatusRequest,
+    UpdateVacancyRequest,
     Vacancies,
     VacancyInfo,
 )
@@ -16,7 +17,7 @@ from pkg.vacancy_api.vacancy_pb2_grpc import VacancyServicer
 from src.api.dependencies import IVacancyService
 from src.api.dto.status import vacancy_status_dto
 from src.api.dto.user_info import user_info_dto, user_info_none_dto
-from src.api.dto.vacancy import vacancy_create_dto, vacancy_response_dto
+from src.api.dto.vacancy import vacancy_create_dto, vacancy_response_dto, vacancy_update_dto
 from src.api.rules.params import (
     MAX_LIMIT,
     MAX_TAGS_AMOUNT,
@@ -103,3 +104,11 @@ class VacancyHandlers(VacancyServicer):
         await self.vacancy_service.delete_vacancy(request.vacancy_id, user_info_dto(request.user_info))
 
         return Response(message="successfully deleted vacancy", status=ResponseStatus.SUCCESS)
+
+    @handle_errors
+    async def UpdateVacancy(self, request: UpdateVacancyRequest, context: ServicerContext) -> Response:
+        user_info = user_info_dto(request.user_info)
+        vacancy_schema = vacancy_update_dto(request)
+
+        await self.vacancy_service.update_vacancy(vacancy_schema, user_info)
+        return Response(message="successfully updated vacancy", status=ResponseStatus.SUCCESS)
