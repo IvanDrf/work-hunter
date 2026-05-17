@@ -8,7 +8,7 @@ import "common.proto";
 // Vacancy service
 service Vacancy {
     // Create vacancy, returns vacancy_id if success
-    rpc CreateVacancy(CreateVacancyRequest) returns (CreateVacancyResponse);
+    rpc CreateVacancy(CreateVacancyRequest) returns (VacancyInfo);
 
     // Find vacancy by it's id
     // If vacancy has status - MODERATING only moderator or user who created this vacancy can see it
@@ -23,7 +23,7 @@ service Vacancy {
     rpc FindVacanciesByAuthor(FindVacanciesByAuthorRequest) returns (Vacancies);
 
     // Update vacancy information
-    rpc UpdateVacancy(UpdateVacancyRequest) returns (Response);
+    rpc UpdateVacancy(UpdateVacancyRequest) returns (VacancyInfo);
 
     // Delete vacancy by user who created it or by moderator
     rpc DeleteVacancy(DeleteVacancyRequest) returns (Response);
@@ -115,9 +115,6 @@ message CreateVacancyRequest {
     common.FullUserInfo user_info = 2;
 }
 
-message CreateVacancyResponse {
-    VacancyInfo vacancy = 1;
-}
 
 message UpdateVacancyRequest {
     uint64 vacancy_id = 1;

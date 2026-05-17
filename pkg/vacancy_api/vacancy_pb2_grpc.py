@@ -41,7 +41,7 @@ class VacancyStub(object):
         self.CreateVacancy = channel.unary_unary(
             "/vacancy.Vacancy/CreateVacancy",
             request_serializer=vacancy__pb2.CreateVacancyRequest.SerializeToString,
-            response_deserializer=vacancy__pb2.CreateVacancyResponse.FromString,
+            response_deserializer=vacancy__pb2.VacancyInfo.FromString,
             _registered_method=True,
         )
         self.FindVacancyByID = channel.unary_unary(
@@ -65,7 +65,7 @@ class VacancyStub(object):
         self.UpdateVacancy = channel.unary_unary(
             "/vacancy.Vacancy/UpdateVacancy",
             request_serializer=vacancy__pb2.UpdateVacancyRequest.SerializeToString,
-            response_deserializer=vacancy__pb2.Response.FromString,
+            response_deserializer=vacancy__pb2.VacancyInfo.FromString,
             _registered_method=True,
         )
         self.DeleteVacancy = channel.unary_unary(
@@ -141,7 +141,7 @@ def add_VacancyServicer_to_server(servicer, server):
         "CreateVacancy": grpc.unary_unary_rpc_method_handler(
             servicer.CreateVacancy,
             request_deserializer=vacancy__pb2.CreateVacancyRequest.FromString,
-            response_serializer=vacancy__pb2.CreateVacancyResponse.SerializeToString,
+            response_serializer=vacancy__pb2.VacancyInfo.SerializeToString,
         ),
         "FindVacancyByID": grpc.unary_unary_rpc_method_handler(
             servicer.FindVacancyByID,
@@ -161,7 +161,7 @@ def add_VacancyServicer_to_server(servicer, server):
         "UpdateVacancy": grpc.unary_unary_rpc_method_handler(
             servicer.UpdateVacancy,
             request_deserializer=vacancy__pb2.UpdateVacancyRequest.FromString,
-            response_serializer=vacancy__pb2.Response.SerializeToString,
+            response_serializer=vacancy__pb2.VacancyInfo.SerializeToString,
         ),
         "DeleteVacancy": grpc.unary_unary_rpc_method_handler(
             servicer.DeleteVacancy,
@@ -203,7 +203,7 @@ class Vacancy(object):
             target,
             "/vacancy.Vacancy/CreateVacancy",
             vacancy__pb2.CreateVacancyRequest.SerializeToString,
-            vacancy__pb2.CreateVacancyResponse.FromString,
+            vacancy__pb2.VacancyInfo.FromString,
             options,
             channel_credentials,
             insecure,
@@ -323,7 +323,7 @@ class Vacancy(object):
             target,
             "/vacancy.Vacancy/UpdateVacancy",
             vacancy__pb2.UpdateVacancyRequest.SerializeToString,
-            vacancy__pb2.Response.FromString,
+            vacancy__pb2.VacancyInfo.FromString,
             options,
             channel_credentials,
             insecure,

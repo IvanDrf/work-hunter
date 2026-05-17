@@ -204,14 +204,6 @@ class CreateVacancyRequest(_message.Message):
         user_info: _Optional[_Union[_common_pb2.FullUserInfo, _Mapping]] = ...,
     ) -> None: ...
 
-class CreateVacancyResponse(_message.Message):
-    __slots__ = ("vacancy",)
-    VACANCY_FIELD_NUMBER: _ClassVar[int]
-    vacancy: VacancyInfo
-    def __init__(
-        self, vacancy: _Optional[_Union[VacancyInfo, _Mapping]] = ...
-    ) -> None: ...
-
 class UpdateVacancyRequest(_message.Message):
     __slots__ = (
         "vacancy_id",

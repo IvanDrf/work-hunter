@@ -1,7 +1,6 @@
 from grpc import ServicerContext
 from pkg.vacancy_api.vacancy_pb2 import (
     CreateVacancyRequest,
-    CreateVacancyResponse,
     DeleteVacancyRequest,
     FindVacancyByIDRequest,
     FindVacancyByTagsRequest,
@@ -39,7 +38,7 @@ class VacancyHandlers(VacancyServicer):
         super().__init__()
 
     @handle_errors
-    async def CreateVacancy(self, request: CreateVacancyRequest, context: ServicerContext) -> CreateVacancyResponse:
+    async def CreateVacancy(self, request: CreateVacancyRequest, context: ServicerContext) -> VacancyInfo:
         if not is_user_id_valid(request.user_info):
             raise ArgumentError(f"invalid user_id in user_info: {request.user_info.user_id=}")
 
@@ -48,7 +47,7 @@ class VacancyHandlers(VacancyServicer):
 
         vacancy = await self.vacancy_service.create_vacancy(vacancy_schema, user_info_schema)
 
-        return CreateVacancyResponse(vacancy=vacancy_response_dto(vacancy))
+        return vacancy_response_dto(vacancy)
 
     @handle_errors
     async def FindVacancyByID(self, request: FindVacancyByIDRequest, context: ServicerContext) -> VacancyInfo:
@@ -106,9 +105,9 @@ class VacancyHandlers(VacancyServicer):
         return Response(message="successfully deleted vacancy", status=ResponseStatus.SUCCESS)
 
     @handle_errors
-    async def UpdateVacancy(self, request: UpdateVacancyRequest, context: ServicerContext) -> Response:
+    async def UpdateVacancy(self, request: UpdateVacancyRequest, context: ServicerContext) -> VacancyInfo:
         user_info = user_info_dto(request.user_info)
         vacancy_schema = vacancy_update_dto(request)
 
-        await self.vacancy_service.update_vacancy(vacancy_schema, user_info)
-        return Response(message="successfully updated vacancy", status=ResponseStatus.SUCCESS)
+        vacancy = await self.vacancy_service.update_vacancy(vacancy_schema, user_info)
+        return vacancy_response_dto(vacancy)
