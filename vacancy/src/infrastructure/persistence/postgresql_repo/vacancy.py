@@ -108,3 +108,16 @@ class VacancyRepo:
                 raise InternalError(f"can't delete vacancy with {vacancy_id=}")
 
             await session.commit()
+
+    @catch_raise_error(SQLAlchemyError, InternalError, "critical", "can't update vacancy with given vacancy_id")
+    async def update_vacancy(self, vacancy_id: int, fields: dict) -> VacancyORM:
+        async with self.session_maker() as session:
+            query = update(VacancyORM).where(VacancyORM.vacancy_id == vacancy_id).values(fields).returning(VacancyORM)
+
+            res = await session.execute(query)
+            vacancy = res.scalar_one_or_none()
+
+            if vacancy is None:
+                raise InternalError(f"can't update vacancy with {vacancy_id=}")
+
+            return vacancy
