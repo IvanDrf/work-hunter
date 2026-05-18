@@ -33,7 +33,6 @@ class VacancyStatus(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
     MODERATING: _ClassVar[VacancyStatus]
     PUBLISHED: _ClassVar[VacancyStatus]
-    UPDATED: _ClassVar[VacancyStatus]
     CLOSED: _ClassVar[VacancyStatus]
     DELETED: _ClassVar[VacancyStatus]
 
@@ -55,7 +54,6 @@ USD: Currency
 EUR: Currency
 MODERATING: VacancyStatus
 PUBLISHED: VacancyStatus
-UPDATED: VacancyStatus
 CLOSED: VacancyStatus
 DELETED: VacancyStatus
 SUCCESS: ResponseStatus
