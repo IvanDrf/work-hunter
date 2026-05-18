@@ -1,4 +1,3 @@
-from datetime import datetime
 from uuid import UUID
 
 from sqlalchemy import and_, delete, select, update
@@ -62,21 +61,6 @@ class VacancyRepo:
         vacancies = list(res.scalars())
 
         return vacancies if len(vacancies) > 0 else None
-
-    @catch_raise_error(SQLAlchemyError, InternalError, "critical", "can't update vacancy status")
-    async def set_vacancy_status(
-        self, uof: UnitOfWork, vacancy_id: int, status: VacancyStatus, moderator_comments: str, moderated_at: datetime
-    ) -> None:
-        query = (
-            update(VacancyORM)
-            .where(VacancyORM.vacancy_id == vacancy_id)
-            .values(status=status, moderator_comments=moderator_comments, moderated_at=moderated_at)
-            .returning(VacancyORM.vacancy_id)
-        )
-
-        res = await uof.session.execute(query)
-        if res.one_or_none() is None:
-            raise InternalError(f"can't update vacancy status with given {vacancy_id=}, does this vacancy exists?")
 
     @catch_raise_error(SQLAlchemyError, InternalError, "critical", "can't find author_id by vacancy_id")
     async def find_vacancy_author(self, uof: UnitOfWork, vacancy_id: int) -> UUID | None:

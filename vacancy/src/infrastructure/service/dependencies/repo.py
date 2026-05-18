@@ -1,9 +1,8 @@
-from datetime import datetime
 from typing import Protocol
 from uuid import UUID
 
 from src.domain.models import TagORM
-from src.domain.models.vacancy import VacancyORM, VacancyStatus
+from src.domain.models.vacancy import VacancyORM
 from src.infrastructure.service.dependencies.unit_of_work import IUnitOfWork
 
 
@@ -19,14 +18,6 @@ class IVacancyRepo(Protocol):
     ) -> list[VacancyORM] | None: ...
     async def find_vacancy_author(self, uof: IUnitOfWork, vacancy_id: int) -> UUID | None: ...
 
-    async def set_vacancy_status(
-        self,
-        uof: IUnitOfWork,
-        vacancy_id: int,
-        status: VacancyStatus,
-        moderator_comments: str,
-        moderated_at: datetime,
-    ) -> None: ...
     async def update_vacancy(self, uof: IUnitOfWork, vacancy_id: int, fields: dict) -> VacancyORM: ...
 
     async def delete_vacancy(self, uof: IUnitOfWork, vacancy_id: int) -> None: ...

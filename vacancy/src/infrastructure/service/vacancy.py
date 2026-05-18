@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from typing import Any
 
 from src.core.exc import AccessError, ArgumentError, NotFoundError
 from src.domain.models.vacancy import VacancyStatus
@@ -46,7 +47,7 @@ class VacancyService:
                 return None
 
         if not has_right_to_vacancy(vacancy, user_info):
-            raise AccessError("this vacancy is moderating now, you can't see it now")
+            raise AccessError("this vacancy is moderating now or deleted, you can't see it now")
 
         return vacancy_orm_to_response_dto(vacancy)
 
@@ -74,16 +75,15 @@ class VacancyService:
             raise AccessError("you can't change vacancy status, you are not admin")
 
         async with self.uof_factory as uof:
-            moderated_at = datetime.now(timezone.utc)
-            await self.vacancy_repo.set_vacancy_status(uof, vacancy_id, VacancyStatus(status), moderator_comments, moderated_at)
+            fields = create_fields_for_status_update(status, moderator_comments)
+            await self.vacancy_repo.update_vacancy(uof, vacancy_id, fields)
 
     async def delete_vacancy(self, vacancy_id: int, user_info: UserInfo) -> None:
         if not is_vacancy_id_valid(vacancy_id):
             raise ArgumentError(f"vacancy_id must be non negative number, {vacancy_id=}")
 
         if is_user_admin(user_info):
-            async with self.uof_factory as uof:
-                await self.vacancy_repo.delete_vacancy(uof, vacancy_id)
+            await self.__delete_vacancy_by_admin(vacancy_id)
             return
 
         async with self.uof_factory as uof:
@@ -102,7 +102,7 @@ class VacancyService:
         if not is_vacancy_id_valid(vacancy_update_schema.vacancy_id):
             raise ArgumentError(f"vacancy_id must be non negative number, {vacancy_update_schema.vacancy_id=}")
 
-        fields = parse_updated_fields(vacancy_update_schema)
+        fields = create_fields_for_update(vacancy_update_schema)
 
         async with self.uof_factory as uof:
             vacancy = await self.vacancy_repo.find_vacancy_by_id(uof, vacancy_update_schema.vacancy_id)
@@ -128,8 +128,16 @@ class VacancyService:
             vacancy = await self.vacancy_repo.update_vacancy(uof, vacancy.vacancy_id, fields)
         return vacancy_orm_to_response_dto(vacancy)
 
+    async def __delete_vacancy_by_admin(self, vacancy_id: int) -> None:
+        async with self.uof_factory as uof:
+            vacancy = await self.vacancy_repo.find_vacancy_by_id(uof, vacancy_id)
+            if vacancy is None:
+                raise NotFoundError(f"can't find vacancy with {vacancy_id=}")
 
-def parse_updated_fields(vacancy_update_schema: VacancyUpdateSchema) -> dict:
+            await self.vacancy_repo.delete_vacancy(uof, vacancy_id)
+
+
+def create_fields_for_update(vacancy_update_schema: VacancyUpdateSchema) -> dict:
     fields = {}
     for field_name, value in vacancy_update_schema.model_dump().items():
         if value is not UNSET_VALUE and field_name not in ("vacancy_id", "tags"):
@@ -139,4 +147,24 @@ def parse_updated_fields(vacancy_update_schema: VacancyUpdateSchema) -> dict:
         raise ArgumentError("no fields were given to update")
 
     fields["updated_at"] = datetime.now(timezone.utc)
+    return fields
+
+
+def create_fields_for_status_update(status: VacancyStatus, moderator_comments: str) -> dict:
+    fields: dict[str, Any] = {"status": status}
+    updated_time = datetime.now(timezone.utc)
+
+    match status:
+        case VacancyStatus.PUBLISHED:
+            fields["moderated_at"] = updated_time
+            fields["moderator_comments"] = moderator_comments
+
+        case VacancyStatus.CLOSED:
+            fields["closed_at"] = updated_time
+            fields["moderator_comments"] = moderator_comments if moderator_comments else None
+
+        case VacancyStatus.DELETED:
+            fields["deleted_at"] = updated_time
+            fields["moderator_comments"] = moderator_comments
+
     return fields

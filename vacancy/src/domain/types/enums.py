@@ -30,3 +30,4 @@ class VacancyStatus(Enum):
     MODERATING = 0
     PUBLISHED = 1
     CLOSED = 2
+    DELETED = 3

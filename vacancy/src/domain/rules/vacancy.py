@@ -4,7 +4,7 @@ from src.domain.types.enums import UserRole, VacancyStatus
 
 
 def has_right_to_vacancy(vacancy: VacancyORM, user_info: UserInfo | None) -> bool:
-    if vacancy.status == VacancyStatus.PUBLISHED:
+    if vacancy.status == VacancyStatus.PUBLISHED or vacancy.status == VacancyStatus.CLOSED:
         return True
 
     if user_info is None:

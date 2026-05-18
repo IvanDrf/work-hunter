@@ -50,7 +50,7 @@ def upgrade() -> None:
         sa.Column("updated_at", sa.TIMESTAMP(), nullable=True),
         sa.Column("published_at", sa.TIMESTAMP(), nullable=True),
         sa.Column("closed_at", sa.TIMESTAMP(), nullable=True),
-        sa.Column("status", sa.Enum("MODERATING", "PUBLISHED", "CLOSED", name="vacancystatus"), nullable=False),
+        sa.Column("status", sa.Enum("MODERATING", "PUBLISHED", "CLOSED", "DELETED", name="vacancystatus"), nullable=False),
         sa.Column("moderated_at", sa.TIMESTAMP(), nullable=True),
         sa.Column("moderator_comments", sa.Text(), nullable=True),
         sa.Column("views", sa.BIGINT(), nullable=True),

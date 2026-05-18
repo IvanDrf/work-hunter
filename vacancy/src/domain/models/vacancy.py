@@ -57,6 +57,7 @@ class VacancyORM(Base):
     updated_at: Mapped[datetime | None] = mapped_column(TIMESTAMP(timezone=True), nullable=True)
     published_at: Mapped[datetime | None] = mapped_column(TIMESTAMP(timezone=True), nullable=True)
     closed_at: Mapped[datetime | None] = mapped_column(TIMESTAMP(timezone=True), nullable=True)
+    deleted_at: Mapped[datetime | None] = mapped_column(TIMESTAMP(timezone=True), nullable=True)
 
     status: Mapped[VacancyStatus] = mapped_column(Enum(VacancyStatus), nullable=False)
     moderated_at: Mapped[datetime | None] = mapped_column(TIMESTAMP(timezone=True), nullable=True)
