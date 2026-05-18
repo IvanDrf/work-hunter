@@ -11,7 +11,7 @@ def handle_errors(func):
     async def wrapper(*args, **kwargs):
         if "context" in kwargs:
             context: ServicerContext = kwargs["context"]
-        elif len(args) > 3:
+        elif len(args) >= 3:
             context: ServicerContext = args[2]
         else:
             raise ValueError("invalid function signature, must has 'context'")

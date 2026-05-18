@@ -138,17 +138,7 @@ message UpdateVacancyRequest {
     optional uint32 experience_min = 13;
     optional uint32 experience_max = 14;
 
-    optional google.protobuf.Timestamp created_at = 15;
-    optional google.protobuf.Timestamp updated_at = 16;
-    optional google.protobuf.Timestamp published_at = 17;
     optional google.protobuf.Timestamp closed_at = 18;
-
-    optional VacancyStatus status = 19;
-    optional google.protobuf.Timestamp moderated_time = 20;
-    optional string moderator_comments = 21;
-    
-    optional uint64 views = 22;
-    optional uint64 applications_count = 23;
 
     repeated string tags = 24; // vacancies tags: golang, javascript, manager
 

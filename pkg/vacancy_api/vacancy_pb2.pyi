@@ -220,15 +220,7 @@ class UpdateVacancyRequest(_message.Message):
         "time_type",
         "experience_min",
         "experience_max",
-        "created_at",
-        "updated_at",
-        "published_at",
         "closed_at",
-        "status",
-        "moderated_time",
-        "moderator_comments",
-        "views",
-        "applications_count",
         "tags",
         "user_info",
     )
@@ -246,15 +238,7 @@ class UpdateVacancyRequest(_message.Message):
     TIME_TYPE_FIELD_NUMBER: _ClassVar[int]
     EXPERIENCE_MIN_FIELD_NUMBER: _ClassVar[int]
     EXPERIENCE_MAX_FIELD_NUMBER: _ClassVar[int]
-    CREATED_AT_FIELD_NUMBER: _ClassVar[int]
-    UPDATED_AT_FIELD_NUMBER: _ClassVar[int]
-    PUBLISHED_AT_FIELD_NUMBER: _ClassVar[int]
     CLOSED_AT_FIELD_NUMBER: _ClassVar[int]
-    STATUS_FIELD_NUMBER: _ClassVar[int]
-    MODERATED_TIME_FIELD_NUMBER: _ClassVar[int]
-    MODERATOR_COMMENTS_FIELD_NUMBER: _ClassVar[int]
-    VIEWS_FIELD_NUMBER: _ClassVar[int]
-    APPLICATIONS_COUNT_FIELD_NUMBER: _ClassVar[int]
     TAGS_FIELD_NUMBER: _ClassVar[int]
     USER_INFO_FIELD_NUMBER: _ClassVar[int]
     vacancy_id: int
@@ -271,15 +255,7 @@ class UpdateVacancyRequest(_message.Message):
     time_type: TimeType
     experience_min: int
     experience_max: int
-    created_at: _timestamp_pb2.Timestamp
-    updated_at: _timestamp_pb2.Timestamp
-    published_at: _timestamp_pb2.Timestamp
     closed_at: _timestamp_pb2.Timestamp
-    status: VacancyStatus
-    moderated_time: _timestamp_pb2.Timestamp
-    moderator_comments: str
-    views: int
-    applications_count: int
     tags: _containers.RepeatedScalarFieldContainer[str]
     user_info: _common_pb2.UserInfo
     def __init__(
@@ -298,25 +274,9 @@ class UpdateVacancyRequest(_message.Message):
         time_type: _Optional[_Union[TimeType, str]] = ...,
         experience_min: _Optional[int] = ...,
         experience_max: _Optional[int] = ...,
-        created_at: _Optional[
-            _Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]
-        ] = ...,
-        updated_at: _Optional[
-            _Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]
-        ] = ...,
-        published_at: _Optional[
-            _Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]
-        ] = ...,
         closed_at: _Optional[
             _Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]
         ] = ...,
-        status: _Optional[_Union[VacancyStatus, str]] = ...,
-        moderated_time: _Optional[
-            _Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]
-        ] = ...,
-        moderator_comments: _Optional[str] = ...,
-        views: _Optional[int] = ...,
-        applications_count: _Optional[int] = ...,
         tags: _Optional[_Iterable[str]] = ...,
         user_info: _Optional[_Union[_common_pb2.UserInfo, _Mapping]] = ...,
     ) -> None: ...
