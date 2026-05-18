@@ -29,6 +29,4 @@ class Currency(Enum):
 class VacancyStatus(Enum):
     MODERATING = 0
     PUBLISHED = 1
-    UPDATED = 2
-    CLOSED = 3
-    DELETED = 4
+    CLOSED = 2
