@@ -69,8 +69,33 @@ class VacancyService:
 
         return [vacancy_orm_to_response_dto(vacancy) for vacancy in vacancies]
 
+    async def find_vacancies_by_author(
+        self,
+        author: str,
+        offset: int,
+        limit: int,
+        user_info: UserInfo | None,
+    ) -> list[VacancyResponseSchema] | None:
+        if author == "":
+            raise ArgumentError("invalid author name in request, author name is empty")
+
+        async with self.uof_factory as uof:
+            if user_info is not None and is_user_admin(user_info):
+                vacancies = await self.vacancy_repo.find_vacancies_for_admin_by_author(uof, author, offset, limit)
+            else:
+                vacancies = await self.vacancy_repo.find_only_published_vacancies_by_author(uof, author, offset, limit)
+
+            if vacancies is None:
+                return None
+
+        return [vacancy_orm_to_response_dto(vacancy) for vacancy in vacancies]
+
     async def set_vacancy_status(
-        self, vacancy_id: int, status: VacancyStatus, moderator_comments: str, user_info: UserInfo
+        self,
+        vacancy_id: int,
+        status: VacancyStatus,
+        moderator_comments: str,
+        user_info: UserInfo,
     ) -> None:
         if not is_vacancy_id_valid(vacancy_id):
             raise ArgumentError(f"vacancy_id must be non negative number, {vacancy_id=}")

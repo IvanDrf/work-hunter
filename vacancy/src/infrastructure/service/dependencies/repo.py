@@ -11,10 +11,32 @@ class IVacancyRepo(Protocol):
 
     async def find_vacancy_by_id(self, uof: IUnitOfWork, vacancy_id: int) -> VacancyORM | None: ...
     async def find_only_published_vacancies_with_tags(
-        self, uof: IUnitOfWork, tags: list[str], offset: int, limit: int
+        self,
+        uof: IUnitOfWork,
+        tags: list[str],
+        offset: int,
+        limit: int,
     ) -> list[VacancyORM] | None: ...
     async def find_vacancies_for_admin_with_tags(
-        self, uof: IUnitOfWork, tags: list[str], offset: int, limit: int
+        self,
+        uof: IUnitOfWork,
+        tags: list[str],
+        offset: int,
+        limit: int,
+    ) -> list[VacancyORM] | None: ...
+    async def find_only_published_vacancies_by_author(
+        self,
+        uof: IUnitOfWork,
+        author: str,
+        offset: int,
+        limit: int,
+    ) -> list[VacancyORM] | None: ...
+    async def find_vacancies_for_admin_by_author(
+        self,
+        uof: IUnitOfWork,
+        author: str,
+        offset: int,
+        limit: int,
     ) -> list[VacancyORM] | None: ...
     async def find_vacancy_author(self, uof: IUnitOfWork, vacancy_id: int) -> UUID | None: ...
 
