@@ -26,7 +26,11 @@ class VacancyRepo:
 
     @catch_raise_error(SQLAlchemyError, InternalError, "critical", "can't find vacancies with given tags")
     async def find_only_published_vacancies_with_tags(
-        self, uof: UnitOfWork, tags: list[str], offset: int, limit: int
+        self,
+        uof: UnitOfWork,
+        tags: list[str],
+        offset: int,
+        limit: int,
     ) -> list[VacancyORM] | None:
         query = (
             select(VacancyORM)
@@ -45,7 +49,11 @@ class VacancyRepo:
 
     @catch_raise_error(SQLAlchemyError, InternalError, "critical", "can't find vacancies with given tags")
     async def find_vacancies_for_admin_with_tags(
-        self, uof: UnitOfWork, tags: list[str], offset: int, limit: int
+        self,
+        uof: UnitOfWork,
+        tags: list[str],
+        offset: int,
+        limit: int,
     ) -> list[VacancyORM] | None:
         query = (
             select(VacancyORM)
@@ -59,6 +67,48 @@ class VacancyRepo:
 
         res = await uof.session.execute(query)
         vacancies = list(res.scalars())
+
+        return vacancies if len(vacancies) > 0 else None
+
+    @catch_raise_error(SQLAlchemyError, InternalError, "critical", "can't find vacancies by author")
+    async def find_only_published_vacancies_by_author(
+        self,
+        uof: UnitOfWork,
+        author: str,
+        offset: int,
+        limit: int,
+    ) -> list[VacancyORM] | None:
+        query = (
+            select(VacancyORM)
+            .where(and_(VacancyORM.status == VacancyStatus.PUBLISHED, VacancyORM.author_id.like(author)))
+            .offset(offset)
+            .limit(limit)
+            .options(selectinload(VacancyORM.tags))
+        )
+
+        res = await uof.session.execute(query)
+        vacancies = list(res.scalars().all())
+
+        return vacancies if len(vacancies) > 0 else None
+
+    @catch_raise_error(SQLAlchemyError, InternalError, "critical", "can't find vacancies by author for admin")
+    async def find_vacancies_for_admin_by_author(
+        self,
+        uof: UnitOfWork,
+        author: str,
+        offset: int,
+        limit: int,
+    ) -> list[VacancyORM] | None:
+        query = (
+            select(VacancyORM)
+            .where(VacancyORM.author_id.like(author))
+            .offset(offset)
+            .limit(limit)
+            .options(selectinload(VacancyORM.tags))
+        )
+
+        res = await uof.session.execute(query)
+        vacancies = list(res.scalars().all())
 
         return vacancies if len(vacancies) > 0 else None
 
