@@ -19,7 +19,7 @@ from src.api.dto.status import vacancy_status_dto
 from src.api.dto.user_info import user_info_dto, user_info_none_dto
 from src.api.dto.vacancy import vacancy_create_dto, vacancy_response_dto, vacancy_update_dto
 from src.api.rules.params import MAX_TAGS_AMOUNT, MIN_TAGS_AMOUNT, is_tags_amount_valid, validate_limit_offset
-from src.api.rules.user_info import get_user_info, is_user_id_valid
+from src.api.rules.user_info import get_user_info
 from src.core.exc import ArgumentError, NotFoundError
 from src.utils.handle_errors import handle_errors
 
@@ -31,9 +31,6 @@ class VacancyHandlers(VacancyServicer):
 
     @handle_errors
     async def CreateVacancy(self, request: CreateVacancyRequest, context: ServicerContext) -> VacancyInfo:
-        if not is_user_id_valid(request.user_info):
-            raise ArgumentError(f"invalid user_id in user_info: {request.user_info.user_id=}")
-
         vacancy_schema = vacancy_create_dto(request.vacancy, request.user_info)
         user_info_schema = user_info_dto(request.user_info)
 
@@ -61,7 +58,10 @@ class VacancyHandlers(VacancyServicer):
         user_info = get_user_info(request)
 
         vacancies = await self.vacancy_service.find_vacancies_with_tags(
-            list(request.tags), request.offset, request.limit, user_info_none_dto(user_info)
+            list(request.tags),
+            request.offset,
+            request.limit,
+            user_info_none_dto(user_info),
         )
 
         if vacancies is None:
@@ -109,6 +109,9 @@ class VacancyHandlers(VacancyServicer):
             user_info = user_info_dto(user_info)
 
         vacancies = await self.vacancy_service.find_vacancies_by_author(request.author, request.offset, request.limit, user_info)
+        if vacancies is None:
+            raise NotFoundError(f"can't find vacancies with given params {request.author=}, {request.offset=}, {request.limit=}")
+
         return Vacancies(
             vacancies=[vacancy_response_dto(vacancy) for vacancy in vacancies],
             limit=request.limit,

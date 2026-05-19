@@ -1,14 +1,4 @@
-from uuid import UUID
-
-from pkg.common.common_pb2 import FullUserInfo, UserInfo
-
-
-def is_user_id_valid(user_info: UserInfo | FullUserInfo) -> bool:
-    try:
-        UUID(user_info.user_id)
-        return True
-    except ValueError:
-        return False
+from pkg.common.common_pb2 import UserInfo
 
 
 def get_user_info(request) -> UserInfo | None:

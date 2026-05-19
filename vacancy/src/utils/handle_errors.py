@@ -40,4 +40,9 @@ def handle_errors(func):
 
             await context.abort(StatusCode.NOT_FOUND, e.__str__())
 
+        except OSError as e:
+            logging.critical(f"{func.__name__}: critical os error {e.__str__()}")
+
+            await context.abort(StatusCode.INTERNAL, "internal error, service in not available now")
+
     return wrapper

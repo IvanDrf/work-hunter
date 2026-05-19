@@ -80,7 +80,7 @@ class VacancyRepo:
     ) -> list[VacancyORM] | None:
         query = (
             select(VacancyORM)
-            .where(and_(VacancyORM.status == VacancyStatus.PUBLISHED, VacancyORM.author_id.like(author)))
+            .where(and_(VacancyORM.status == VacancyStatus.PUBLISHED, VacancyORM.author_name.like(author)))
             .offset(offset)
             .limit(limit)
             .options(selectinload(VacancyORM.tags))
@@ -101,7 +101,7 @@ class VacancyRepo:
     ) -> list[VacancyORM] | None:
         query = (
             select(VacancyORM)
-            .where(VacancyORM.author_id.like(author))
+            .where(VacancyORM.author_name.like(author))
             .offset(offset)
             .limit(limit)
             .options(selectinload(VacancyORM.tags))
