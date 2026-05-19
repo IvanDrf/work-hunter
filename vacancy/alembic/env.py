@@ -1,10 +1,11 @@
 import asyncio
 from logging.config import fileConfig
 
-from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
+
+from alembic import context
 from src.core.config.config import Config
 from src.domain.models.association import VacanciesTagsORM
 from src.domain.models.base import Base
@@ -31,10 +32,18 @@ target_metadata = Base.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
-config.set_main_option(
-    'sqlalchemy.url',
-    Config.load_from_yaml('config/config.yaml').database.dsn
-)
+
+def get_config_path() -> str:
+    args = context.get_x_argument(True)
+
+    if "config-path" in args:
+        return args["config-path"]
+
+    return "config/config.yaml"
+
+
+config_path = get_config_path()
+config.set_main_option("sqlalchemy.url", Config.load_from_yaml(config_path).database.dsn)
 
 
 def run_migrations_offline() -> None:
