@@ -8,7 +8,7 @@ from pkg.vacancy_api.vacancy_pb2_grpc import add_VacancyServicer_to_server
 
 from src.api.handlers import VacancyHandlers
 from src.core.config.app import AppConfig
-from src.core.exc.internal import InternalError
+from src.core.exc import InternalError
 
 
 class Server:
@@ -23,14 +23,14 @@ class Server:
         self.server = server(ThreadPoolExecutor(max_workers=self.WORKERS))
         add_VacancyServicer_to_server(handlers, self.server)
 
-        self.server.add_insecure_port(f'{self.host}:{self.port}')
+        self.server.add_insecure_port(f"{self.host}:{self.port}")
         enable_server_reflection(SERVICE_NAME, self.server)
 
     async def run(self) -> None:
         if self.server is None:
-            raise InternalError('server is not registred')
+            raise InternalError("server is not registred")
 
-        logging.info(f'Starting server {self.host}:{self.port}')
+        logging.info(f"Starting server {self.host}:{self.port}")
 
         await self.server.start()
         await self.server.wait_for_termination()

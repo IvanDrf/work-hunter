@@ -8,7 +8,7 @@ import "common.proto";
 // Vacancy service
 service Vacancy {
     // Create vacancy, returns vacancy_id if success
-    rpc CreateVacancy(CreateVacancyRequest) returns (CreateVacancyResponse);
+    rpc CreateVacancy(CreateVacancyRequest) returns (VacancyInfo);
 
     // Find vacancy by it's id
     // If vacancy has status - MODERATING only moderator or user who created this vacancy can see it
@@ -23,7 +23,7 @@ service Vacancy {
     rpc FindVacanciesByAuthor(FindVacanciesByAuthorRequest) returns (Vacancies);
 
     // Update vacancy information
-    rpc UpdateVacancy(UpdateVacancyRequest) returns (Response);
+    rpc UpdateVacancy(UpdateVacancyRequest) returns (VacancyInfo);
 
     // Delete vacancy by user who created it or by moderator
     rpc DeleteVacancy(DeleteVacancyRequest) returns (Response);
@@ -54,9 +54,8 @@ enum Currency {
 enum VacancyStatus {
     MODERATING = 0;
     PUBLISHED = 1;
-    UPDATED = 2;
-    CLOSED = 3;
-    DELETED = 4;
+    CLOSED = 2;
+    DELETED = 3;
 }
 
 enum ResponseStatus {
@@ -80,8 +79,8 @@ message VacancyInfo {
     string requirements = 4;
     string conditions = 5;
 
-    uint64 salary_min =  6;
-    uint64 salary_max = 7; 
+    optional uint64 salary_min =  6;
+    optional uint64 salary_max = 7; 
     Currency currency = 8;
 
     optional string city = 9;
@@ -106,17 +105,15 @@ message VacancyInfo {
     optional uint64 applications_count = 23;
 
     repeated string tags = 24; // vacancies tags: golang, javascript, manager
+    string author_name = 25;
 }
 
 message CreateVacancyRequest {
     VacancyInfo vacancy = 1;
     
-    common.UserInfo user_info = 2;
+    common.FullUserInfo user_info = 2;
 }
 
-message CreateVacancyResponse {
-    uint64 vacancy_id = 1;
-}
 
 message UpdateVacancyRequest {
     uint64 vacancy_id = 1;
@@ -140,18 +137,6 @@ message UpdateVacancyRequest {
     optional uint32 experience_min = 13;
     optional uint32 experience_max = 14;
 
-    optional google.protobuf.Timestamp created_at = 15;
-    optional google.protobuf.Timestamp updated_at = 16;
-    optional google.protobuf.Timestamp published_at = 17;
-    optional google.protobuf.Timestamp closed_at = 18;
-
-    optional VacancyStatus status = 19;
-    optional google.protobuf.Timestamp moderated_time = 20;
-    optional string moderator_comments = 21;
-    
-    optional uint64 views = 22;
-    optional uint64 applications_count = 23;
-
     repeated string tags = 24; // vacancies tags: golang, javascript, manager
 
     common.UserInfo user_info = 25;
@@ -166,7 +151,7 @@ message DeleteVacancyRequest {
 message FindVacancyByIDRequest {
     uint64 vacancy_id = 1;
 
-    common.UserInfo user_info = 2;
+    optional common.UserInfo user_info = 2;
 }
 
 message FindVacancyByTagsRequest {
@@ -174,7 +159,7 @@ message FindVacancyByTagsRequest {
     uint32 limit = 2;
     uint32 offset = 3;
 
-    common.UserInfo user_info = 4;
+    optional common.UserInfo user_info = 4;
 }
 
 message Vacancies {
@@ -186,13 +171,16 @@ message Vacancies {
 
 message FindVacanciesByAuthorRequest {
     string author = 1; // author name
+    uint32 limit = 2;
+    uint32 offset = 3;
 
-    common.UserInfo user_info = 2;
+    common.UserInfo user_info = 4;
 }
 
 message SetVacancyStatusRequest {
     uint64 vacancy_id = 1;
     VacancyStatus status = 2;
+    string moderator_comments = 3;
 
-    common.UserInfo user_info = 3;
+    common.UserInfo user_info = 4;
 }

@@ -11,3 +11,8 @@ database:
   password: password
 
   db_name: vacancy
+
+cache:
+  host: localhost
+  port: 6379
+  db: 0

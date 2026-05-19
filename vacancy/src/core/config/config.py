@@ -4,6 +4,7 @@ from pathlib import Path
 from yaml import safe_load
 
 from src.core.config.app import AppConfig
+from src.core.config.cache import RedisConfig
 from src.core.config.database import PostgreSQLConfig
 
 
@@ -11,6 +12,7 @@ from src.core.config.database import PostgreSQLConfig
 class Config:
     app: AppConfig
     database: PostgreSQLConfig
+    cache: RedisConfig
 
     @classmethod
     def load_from_yaml(cls, path: str) -> 'Config':
@@ -26,5 +28,6 @@ class Config:
 
             return cls(
                 app=AppConfig(**content['app']),
-                database=PostgreSQLConfig(**content['database'])
+                database=PostgreSQLConfig(**content['database']),
+                cache=RedisConfig(**content['cache'])
             )
