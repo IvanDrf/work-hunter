@@ -10,7 +10,7 @@ database:
     username: test_user
     password: test_password
 
-    db_name: vacancy
+    db_name: vacancy_test
 
 cache:
     host: localhost
