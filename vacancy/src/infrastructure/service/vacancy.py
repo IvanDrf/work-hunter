@@ -52,7 +52,11 @@ class VacancyService:
         return vacancy_orm_to_response_dto(vacancy)
 
     async def find_vacancies_with_tags(
-        self, tags: list[str], offset: int, limit: int, user_info: UserInfo | None
+        self,
+        tags: list[str],
+        offset: int,
+        limit: int,
+        user_info: UserInfo | None,
     ) -> list[VacancyResponseSchema] | None:
         async with self.uof_factory as uof:
             if user_info is not None and is_user_admin(user_info):
