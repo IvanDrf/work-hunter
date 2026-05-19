@@ -1,0 +1,18 @@
+app:
+    host: localhost
+    port: 50052
+    logger_level: info
+
+database:
+    host: localhost
+    port: 5434
+
+    username: test_user
+    password: test_password
+
+    db_name: vacancy
+
+cache:
+    host: localhost
+    port: 6379
+    db: 0
