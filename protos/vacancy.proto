@@ -137,8 +137,6 @@ message UpdateVacancyRequest {
     optional uint32 experience_min = 13;
     optional uint32 experience_max = 14;
 
-    optional google.protobuf.Timestamp closed_at = 18;
-
     repeated string tags = 24; // vacancies tags: golang, javascript, manager
 
     common.UserInfo user_info = 25;
