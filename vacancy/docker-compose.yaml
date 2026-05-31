@@ -24,6 +24,26 @@ services:
       timeout: 5s
       retries: 5
 
+  cache:
+    image: redis:8.6
+    container_name: vacancy_cache
+    restart: always
+
+    ports:
+      - "${REDIS_PORT}:6379"
+
+    volumes:
+      - redis_data:/data
+    networks:
+      - vacancy_network
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
   app:
     build:
       context: ..
@@ -35,12 +55,16 @@ services:
     depends_on:
       database:
         condition: service_healthy
+      cache:
+        condition: service_healthy
+      
     networks:
       - vacancy_network
     restart: on-failure
 
 volumes:
   pgdata:
+  redis_data:
 
 networks:
   vacancy_network:
