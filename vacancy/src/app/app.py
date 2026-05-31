@@ -6,7 +6,7 @@ from src.core.config.config import Config
 class App:
     def __init__(self, config: Config) -> None:
         self.config: Config = config
-        self.server: Server = Server(config.app)
+        self.server: Server = Server(config)
 
         self.fabric: Fabric = Fabric(config)
 

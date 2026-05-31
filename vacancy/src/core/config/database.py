@@ -1,20 +1,23 @@
-from dataclasses import dataclass
+from pydantic import Field
+
+from src.core.config.base import BaseConfig
 
 
-@dataclass(frozen=True, slots=True, kw_only=True)
-class PostgreSQLConfig:
-    host: str
-    port: str
+class PostgreSQLConfig(BaseConfig):
+    postgres_host: str = Field(default="localhost", validation_alias="POSTGRES_HOST")
+    postgres_port: int = Field(default=5432, validation_alias="POSTGRES_PORT")
 
-    username: str
-    password: str
+    postgres_user: str = Field(default="user", validation_alias="POSTGRES_USER")
+    postgres_password: str = Field(default="password", validation_alias="POSTGRES_PASSWORD")
 
-    db_name: str
-
-    @property
-    def address(self) -> str:
-        return f'{self.host}:{self.port}'
+    postgres_db_name: str = Field(default="vacancy", validation_alias="POSTGRES_DB")
 
     @property
-    def dsn(self) -> str:
-        return f'postgresql+asyncpg://{self.username}:{self.password}@{self.address}/{self.db_name}'
+    def postgres_address(self) -> str:
+        return f"{self.postgres_host}:{self.postgres_port}"
+
+    @property
+    def postgres_dsn(self) -> str:
+        return (
+            f"postgresql+asyncpg://{self.postgres_user}:{self.postgres_password}@{self.postgres_address}/{self.postgres_db_name}"
+        )

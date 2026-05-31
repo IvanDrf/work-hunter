@@ -13,7 +13,7 @@ class Fabric:
         self.config: Config = config
 
     async def new_handlers(self) -> VacancyHandlers:
-        session_maker = await connect_postgresql(self.config.database)
+        session_maker = await connect_postgresql(self.config)
 
         vacancy_repo: IVacancyRepo = self.new_vacancy_repo()
         tag_repo: ITagRepo = self.new_tag_repo()

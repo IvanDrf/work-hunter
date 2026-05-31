@@ -15,8 +15,8 @@ class Server:
     WORKERS: Final[int] = 4
 
     def __init__(self, config: AppConfig) -> None:
-        self.host: str = config.host
-        self.port: int = config.port
+        self.host: str = config.app_host
+        self.port: int = config.app_port
         self.server = None
 
     def register(self, handlers: VacancyHandlers) -> None:
