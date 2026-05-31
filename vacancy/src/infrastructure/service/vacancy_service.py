@@ -1,26 +1,45 @@
-from datetime import datetime, timezone
-from typing import Any
+import logging
+from asyncio import create_task, wait_for
+from datetime import datetime, timedelta, timezone
+from typing import Final
 
-from src.core.exc import AccessError, ArgumentError, NotFoundError
+from pydantic import ValidationError
+
+from src.core.exc import AccessError, ArgumentError, InternalError, NotFoundError
 from src.domain.models.vacancy import VacancyStatus
 from src.domain.rules.user import is_user_admin, is_user_employer, is_user_vacancy_author
 from src.domain.rules.vacancy import has_right_to_vacancy, is_vacancy_id_valid
 from src.domain.schemas import UserInfo, VacancyCreateSchema, VacancyResponseSchema, VacancyUpdateSchema
 from src.domain.types.types import UNSET_VALUE, UnsetValue
-from src.infrastructure.service.dependencies import ITagRepo, IUnitOfWork, IVacancyRepo
-from src.infrastructure.service.dto.vacancy import (
+from src.infrastructure.service.dependencies import ICache, ITagRepo, IUnitOfWork, IVacancyRepo
+from src.infrastructure.service.dto.vacancy_dto import (
     create_vacancy_dto,
     vacancy_orm_to_response_dto,
 )
 
 
 class VacancyService:
-    def __init__(self, vacancy_repo: IVacancyRepo, tag_repo: ITagRepo, unit_of_work: IUnitOfWork) -> None:
+    def __init__(
+        self,
+        vacancy_repo: IVacancyRepo,
+        tag_repo: ITagRepo,
+        cache: ICache,
+        vacancy_ttl: float,
+        unit_of_work: IUnitOfWork,
+    ) -> None:
         self.vacancy_repo: IVacancyRepo = vacancy_repo
         self.tag_repo: ITagRepo = tag_repo
+
+        self.cache: ICache = cache
+        self.vacancy_ttl: timedelta = timedelta(minutes=vacancy_ttl)
+
         self.uof_factory: IUnitOfWork = unit_of_work
+        self.CACHE_TIMEOUT: Final[float] = 0.3
 
     async def create_vacancy(self, vacancy: VacancyCreateSchema, user_info: UserInfo) -> VacancyResponseSchema:
+        if not vacancy.author_name:
+            raise ArgumentError("author name can't be empty")
+
         if not user_info.verificated:
             raise AccessError("user is not verificated, can't create vacancy")
 
@@ -35,11 +54,21 @@ class VacancyService:
             tags = await self.tag_repo.add_tags(uof, vacancy.tags)
             await self.vacancy_repo.create_vacancy(uof, vacancyORM, tags)
 
-        return vacancy_orm_to_response_dto(vacancyORM)
+        vacancySchema = vacancy_orm_to_response_dto(vacancyORM)
+        create_task(self._save_vacancy_in_cache_by_id(vacancySchema))
+
+        return vacancySchema
 
     async def find_vacancy_by_id(self, vacancy_id: int, user_info: UserInfo | None) -> VacancyResponseSchema | None:
         if not is_vacancy_id_valid(vacancy_id):
             raise ArgumentError(f"vacancy_id must be non negative number, {vacancy_id=}")
+
+        vacancy = await self._get_vacancy_from_cache(vacancy_id)
+        if vacancy is not None:
+            if not has_right_to_vacancy(vacancy, user_info):
+                raise AccessError("this vacancy is moderating now or deleted, you can't see it now")
+
+            return vacancy
 
         async with self.uof_factory as uof:
             vacancy = await self.vacancy_repo.find_vacancy_by_id(uof, vacancy_id)
@@ -49,7 +78,10 @@ class VacancyService:
         if not has_right_to_vacancy(vacancy, user_info):
             raise AccessError("this vacancy is moderating now or deleted, you can't see it now")
 
-        return vacancy_orm_to_response_dto(vacancy)
+        vacancySchema = vacancy_orm_to_response_dto(vacancy)
+        create_task(self._save_vacancy_in_cache_by_id(vacancySchema))
+
+        return vacancySchema
 
     async def find_vacancies_with_tags(
         self,
@@ -165,6 +197,28 @@ class VacancyService:
 
             await self.vacancy_repo.delete_vacancy(uof, vacancy_id)
 
+    async def _save_vacancy_in_cache_by_id(self, vacancy: VacancyResponseSchema) -> None:
+        vacancy_json = vacancy.model_dump_json()
+
+        try:
+            await self.cache.save(str(vacancy.vacancy_id), vacancy_json, self.vacancy_ttl)
+        except InternalError as e:
+            logging.warning(f"Can't save vacancy with vacancy_id={vacancy.vacancy_id} in cache, error={e}")
+
+    async def _get_vacancy_from_cache(self, vacancy_id: int) -> VacancyResponseSchema | None:
+        try:
+            vacancy_json = await wait_for(self.cache.get(str(vacancy_id)), timeout=self.CACHE_TIMEOUT)
+            return VacancyResponseSchema.model_validate_json(vacancy_json) if vacancy_json is not None else None
+
+        except InternalError as e:
+            logging.warning(f"Can't get vacancy with {vacancy_id=} from cache, error={e}")
+
+        except ValidationError as e:
+            logging.error(f"Invalid vacancy json in cache, can't parse it, error={e}")
+
+        except TimeoutError:
+            logging.error(f"Can't get vacancy with {vacancy_id=} form cache, timeout error")
+
 
 def create_fields_for_update(vacancy_update_schema: VacancyUpdateSchema) -> dict:
     fields = {}
@@ -180,7 +234,7 @@ def create_fields_for_update(vacancy_update_schema: VacancyUpdateSchema) -> dict
 
 
 def create_fields_for_status_update(status: VacancyStatus, moderator_comments: str) -> dict:
-    fields: dict[str, Any] = {"status": status}
+    fields: dict = {"status": status}
     updated_time = datetime.now(timezone.utc)
 
     match status:

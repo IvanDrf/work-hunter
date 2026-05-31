@@ -6,13 +6,13 @@ from redis.exceptions import ConnectionError
 from src.core.config.cache import RedisConfig
 
 
-async def connect(config: RedisConfig) -> Redis | None:
-    client = Redis(host=config.host, port=config.port, db=config.db)
+async def connect(config: RedisConfig) -> Redis:
+    client = Redis(host=config.redis_host, port=config.redis_port, db=config.redis_db)
 
     try:
         await client.ping()  # type: ignore
     except ConnectionError as e:
-        logging.error(f"can't connect to redis, details={e}")
-        return None
+        logging.error(f"can't connect to redis, error={e}")
+        raise
 
     return client
