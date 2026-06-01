@@ -55,6 +55,9 @@ class VacancySearchService(BaseVacancyService):
         limit: int,
         user_info: UserInfo | None,
     ) -> list[VacancyResponseSchema] | None:
+        if not tags:
+            raise ArgumentError("invalid vacancy tags, tags can't be empty")
+
         async with self.uof_factory as uof:
             if user_info is not None and is_user_admin(user_info):
                 vacancies = await self.vacancy_repo.find_vacancies_for_admin_with_tags(uof, tags, offset, limit)
@@ -73,8 +76,8 @@ class VacancySearchService(BaseVacancyService):
         limit: int,
         user_info: UserInfo | None,
     ) -> list[VacancyResponseSchema] | None:
-        if author == "":
-            raise ArgumentError("invalid author name in request, author name is empty")
+        if not author:
+            raise ArgumentError("invalid author name, author name is empty")
 
         async with self.uof_factory as uof:
             if user_info is not None and is_user_admin(user_info):
@@ -94,8 +97,8 @@ class VacancySearchService(BaseVacancyService):
         limit: int,
         user_info: UserInfo | None,
     ) -> list[VacancyResponseSchema] | None:
-        if title == "":
-            raise ArgumentError("vacancy title can't be empty")
+        if not title:
+            raise ArgumentError("invalid vacancy title, title can't be empty")
 
         async with self.uof_factory as uof:
             if user_info is not None and is_user_admin(user_info):
