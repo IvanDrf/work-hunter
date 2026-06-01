@@ -3,6 +3,7 @@ from pkg.vacancy_api.vacancy_pb2 import (
     CreateVacancyRequest,
     DeleteVacancyRequest,
     FindVacanciesByAuthorRequest,
+    FindVacanciesByTitleRequest,
     FindVacancyByIDRequest,
     FindVacancyByTagsRequest,
     Response,
@@ -111,6 +112,28 @@ class VacancyHandlers(VacancyServicer):
         vacancies = await self.vacancy_service.find_vacancies_by_author(request.author, request.offset, request.limit, user_info)
         if vacancies is None:
             raise NotFoundError(f"can't find vacancies with given params {request.author=}, {request.offset=}, {request.limit=}")
+
+        return Vacancies(
+            vacancies=[vacancy_response_dto(vacancy) for vacancy in vacancies],
+            limit=request.limit,
+            offset=request.offset,
+        )
+
+    @handle_errors
+    async def FindVacanciesByTitle(self, request: FindVacanciesByTitleRequest, context: ServicerContext) -> Vacancies:
+        validate_limit_offset(request.limit, request.offset)
+
+        user_info = get_user_info(request)
+
+        vacancies = await self.vacancy_service.find_vacancies_by_title(
+            request.title,
+            request.offset,
+            request.limit,
+            user_info_none_dto(user_info),
+        )
+
+        if vacancies is None:
+            raise NotFoundError(f"can't find vacancies with given params {request.title=}, {request.offset=}, {request.limit=}")
 
         return Vacancies(
             vacancies=[vacancy_response_dto(vacancy) for vacancy in vacancies],

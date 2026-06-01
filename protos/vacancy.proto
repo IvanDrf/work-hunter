@@ -22,6 +22,10 @@ service Vacancy {
     // If vacancy has status - MODERATING only moderator or user who created this vacancy can see it  
     rpc FindVacanciesByAuthor(FindVacanciesByAuthorRequest) returns (Vacancies);
 
+    // Find vacancies by title
+    // If vacancy has status - MODERATING only moderator can see this
+    rpc FindVacanciesByTitle(FindVacanciesByTitleRequest) returns (Vacancies);
+
     // Update vacancy information
     rpc UpdateVacancy(UpdateVacancyRequest) returns (VacancyInfo);
 
@@ -171,6 +175,14 @@ message Vacancies {
 
 message FindVacanciesByAuthorRequest {
     string author = 1; // author name
+    uint32 limit = 2;
+    uint32 offset = 3;
+
+    common.UserInfo user_info = 4;
+}
+
+message FindVacanciesByTitleRequest {
+    string title = 1;
     uint32 limit = 2;
     uint32 offset = 3;
 

@@ -86,3 +86,24 @@ class VacancySearchService(BaseVacancyService):
                 return None
 
         return [vacancy_orm_to_response_dto(vacancy) for vacancy in vacancies]
+
+    async def find_vacancies_by_title(
+        self,
+        title: str,
+        offset: int,
+        limit: int,
+        user_info: UserInfo | None,
+    ) -> list[VacancyResponseSchema] | None:
+        if title == "":
+            raise ArgumentError("vacancy title can't be empty")
+
+        async with self.uof_factory as uof:
+            if user_info is not None and is_user_admin(user_info):
+                vacancies = await self.vacancy_repo.find_vacancies_for_admin_by_title(uof, title, offset, limit)
+            else:
+                vacancies = await self.vacancy_repo.find_only_published_vacancies_by_title(uof, title, offset, limit)
+
+        if vacancies is None:
+            return None
+
+        return [vacancy_orm_to_response_dto(vacancy) for vacancy in vacancies]
