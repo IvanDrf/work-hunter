@@ -1,9 +1,8 @@
 from datetime import timedelta
 
-from vacancy.src.infrastructure.service.dependencies.cache import ICache
-from vacancy.src.infrastructure.service.dependencies.repo import ITagRepo, IVacancyRepo
-from vacancy.src.infrastructure.service.dependencies.unit_of_work import IUnitOfWork
-
+from src.infrastructure.service.dependencies.cache import ICache
+from src.infrastructure.service.dependencies.repo import ITagRepo, IVacancyRepo
+from src.infrastructure.service.dependencies.unit_of_work import IUnitOfWork
 from src.infrastructure.service.vacancy_dml import VacancyDMLService
 from src.infrastructure.service.vacancy_search import VacancySearchService
 

@@ -6,8 +6,8 @@ from src.infrastructure.persistence.postgresql_repo import TagRepo, UnitOfWork, 
 from src.infrastructure.persistence.postgresql_repo import connect as connect_postgresql
 from src.infrastructure.persistence.redis_cache import RedisCache
 from src.infrastructure.persistence.redis_cache import connect as connect_redis
-from src.infrastructure.service.vacancy_service import VacancyService
 from src.infrastructure.service.dependencies import ICache, ITagRepo, IUnitOfWork, IVacancyRepo
+from src.infrastructure.service.vacancy_service import VacancyService
 
 
 class Fabric:
@@ -47,4 +47,11 @@ class Fabric:
         cache: ICache,
         uof: IUnitOfWork,
     ) -> VacancyService:
-        return VacancyService(vacancy_repo, tag_repo, uof, cache, self.config.redis_ttl, self.config.redis_timeout)
+        return VacancyService(
+            vacancy_repo,
+            tag_repo,
+            uof,
+            cache,
+            self.config.redis_ttl,
+            self.config.redis_timeout,
+        )

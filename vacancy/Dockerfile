@@ -1,16 +1,19 @@
-FROM python:3.12-slim
+FROM python:3.12-slim-trixie
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 ENV PYTHONDONTWRITEBYTECOD=1
 ENV PYTHONUNBEFFERED=1
+ENV UV_NO_DEV=1
 
 WORKDIR /app
 
-COPY vacancy/requirements.txt . 
-RUN pip install --no-cache-dir -r requirements.txt
+COPY vacancy/.python-version .
+COPY vacancy/pyproject.toml .
+COPY vacancy/uv.lock .
+RUN uv sync --locked
 
 COPY pkg/vacancy_api pkg/vacancy_api
 COPY pkg/common pkg/common
-
 
 COPY vacancy/ .
 RUN chmod +x entry.sh
