@@ -1,7 +1,7 @@
 from asyncio import run
 
 from src.app.app import App
-from src.core.config.config import Config
+from src.core.config import Config
 from src.core.logger.setup import setup_logger
 
 

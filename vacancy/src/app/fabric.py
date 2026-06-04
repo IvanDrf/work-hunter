@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from src.api.handlers import VacancyHandlers
-from src.core.config.config import Config
+from src.core.config import Config
 from src.infrastructure.persistence.postgresql_repo import TagRepo, UnitOfWork, VacancyRepo
 from src.infrastructure.persistence.postgresql_repo import connect as connect_postgresql
 from src.infrastructure.persistence.redis_cache import RedisCache

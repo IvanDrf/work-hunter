@@ -1,6 +1,6 @@
 from src.app.fabric import Fabric
 from src.app.server import Server
-from src.core.config.config import Config
+from src.core.config import Config
 
 
 class App:
