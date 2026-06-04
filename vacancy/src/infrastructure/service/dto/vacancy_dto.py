@@ -6,7 +6,10 @@ from src.domain.schemas import UserInfo, VacancyCreateSchema, VacancyResponseSch
 
 
 def create_vacancy_dto(
-    vacancy: VacancyCreateSchema, user_info: UserInfo, created_at: datetime, status: VacancyStatus
+    vacancy: VacancyCreateSchema,
+    user_info: UserInfo,
+    created_at: datetime,
+    status: VacancyStatus,
 ) -> VacancyORM:
     return VacancyORM(
         author_id=user_info.user_id,
@@ -39,8 +42,9 @@ def create_vacancy_dto(
 
 def vacancy_orm_to_response_dto(vacancy: VacancyORM) -> VacancyResponseSchema:
     return VacancyResponseSchema(
-        author_name=vacancy.author_name,
         vacancy_id=vacancy.vacancy_id,
+        author_name=vacancy.author_name,
+        author_id=vacancy.author_id,
         title=vacancy.title,
         description=vacancy.description,
         requirements=vacancy.requirements,

@@ -7,7 +7,7 @@ from grpc_reflection.v1alpha.reflection import SERVICE_NAME, enable_server_refle
 from pkg.vacancy_api.vacancy_pb2_grpc import add_VacancyServicer_to_server
 
 from src.api.handlers import VacancyHandlers
-from src.core.config.app import AppConfig
+from src.core.config import AppConfig
 from src.core.exc import InternalError
 
 
@@ -15,8 +15,8 @@ class Server:
     WORKERS: Final[int] = 4
 
     def __init__(self, config: AppConfig) -> None:
-        self.host: str = config.host
-        self.port: int = config.port
+        self.host: str = config.app_host
+        self.port: int = config.app_port
         self.server = None
 
     def register(self, handlers: VacancyHandlers) -> None:

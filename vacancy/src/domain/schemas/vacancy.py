@@ -73,6 +73,7 @@ class VacancyUpdateSchema(BaseModel, SalaryValidatorMixin, ExperienceValidatorMi
 class VacancyResponseSchema(VacancySchema, SalaryValidatorMixin, ExperienceValidatorMixin):
     vacancy_id: int
     author_name: str
+    author_id: UUID
 
     status: VacancyStatus = VacancyStatus.MODERATING
 
