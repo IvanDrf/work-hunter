@@ -32,7 +32,7 @@ class VacancyHandlers(VacancyServicer):
 
     @handle_errors
     async def CreateVacancy(self, request: CreateVacancyRequest, context: ServicerContext) -> VacancyInfo:
-        vacancy_schema = vacancy_create_dto(request.vacancy, request.user_info)
+        vacancy_schema = vacancy_create_dto(request)
         user_info_schema = user_info_dto(request.user_info)
 
         vacancy = await self.vacancy_service.create_vacancy(vacancy_schema, user_info_schema)
@@ -109,9 +109,13 @@ class VacancyHandlers(VacancyServicer):
         if user_info is not None:
             user_info = user_info_dto(user_info)
 
-        vacancies = await self.vacancy_service.find_vacancies_by_author(request.author, request.offset, request.limit, user_info)
+        vacancies = await self.vacancy_service.find_vacancies_by_author(
+            request.author_name, request.offset, request.limit, user_info
+        )
         if vacancies is None:
-            raise NotFoundError(f"can't find vacancies with given params {request.author=}, {request.offset=}, {request.limit=}")
+            raise NotFoundError(
+                f"can't find vacancies with given params {request.author_name=}, {request.offset=}, {request.limit=}"
+            )
 
         return Vacancies(
             vacancies=[vacancy_response_dto(vacancy) for vacancy in vacancies],
