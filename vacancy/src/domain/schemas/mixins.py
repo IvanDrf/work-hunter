@@ -3,7 +3,7 @@ from typing import Final
 from pydantic import ValidationInfo, field_validator
 
 from src.core.exc import ArgumentError
-from src.domain.types.types import UNSET_VALUE, Money, Year
+from src.domain.types.types import UNSET_VALUE, Money, UnsetValue, Year
 
 MIN_MONEY: Final[Money] = 0
 MAX_MONEY: Final[Money] = 1_000_000_000
@@ -16,7 +16,10 @@ class SalaryValidatorMixin:
     model_config = {"validate_assignment": True}
 
     @field_validator("salary_min")
-    def validate_salary_min(cls, value: Money, info: ValidationInfo) -> Money:
+    def validate_salary_min(cls, value: Money | UnsetValue | None, info: ValidationInfo) -> Money | UnsetValue | None:
+        if value is None or isinstance(value, UnsetValue):
+            return value
+
         if not (MIN_MONEY <= value <= MAX_MONEY):
             raise ArgumentError(f"salary value must be in range ({MIN_MONEY}, {MAX_MONEY}), but given={value}")
 
@@ -27,7 +30,10 @@ class SalaryValidatorMixin:
         return value
 
     @field_validator("salary_max")
-    def validate_salary_max(cls, value: Money, info: ValidationInfo) -> Money:
+    def validate_salary_max(cls, value: Money | UnsetValue | None, info: ValidationInfo) -> Money | UnsetValue | None:
+        if value is None or isinstance(value, UnsetValue):
+            return value
+
         if not (MIN_MONEY <= value <= MAX_MONEY):
             raise ArgumentError(f"salary value must be in range ({MIN_MONEY}, {MAX_MONEY}), but given={value}")
 
