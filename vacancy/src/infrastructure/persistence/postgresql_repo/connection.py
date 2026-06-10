@@ -5,7 +5,7 @@ from src.core.config.database import PostgreSQLConfig
 
 
 async def connect(config: PostgreSQLConfig) -> async_sessionmaker[AsyncSession]:
-    engine = create_async_engine(config.dsn, pool_pre_ping=True)
+    engine = create_async_engine(config.postgres_dsn, pool_pre_ping=True)
 
     async with engine.begin() as conn:
         await conn.execute(text("SELECT 1"))

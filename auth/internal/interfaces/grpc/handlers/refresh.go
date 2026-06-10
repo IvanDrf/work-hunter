@@ -11,9 +11,9 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *Handler) RefreshTokens(ctx context.Context, tokens *auth_api.RefreshToken) (*auth_api.JwtTokens, error) {
+func (h *Handler) RefreshTokens(ctx context.Context, token *auth_api.RefreshToken) (*auth_api.JwtTokens, error) {
 	slog.Info("RefreshTokens got request")
-	access, refresh, err := h.authService.RefreshTokens(ctx, tokens.Refresh)
+	access, refresh, err := h.authService.RefreshTokens(ctx, token.Refresh)
 
 	var e models.Error
 	if errors.As(err, &e) {

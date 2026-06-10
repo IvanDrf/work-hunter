@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *Handler) DeleteUser(ctx context.Context, req *auth_api.DeleteUserRequest) (*auth_api.DeleteUserStatus, error) {
+func (h *Handler) DeleteUser(ctx context.Context, req *auth_api.DeleteUserRequest) (*auth_api.Empty, error) {
 	slog.Info("DeleteUser got request")
 
 	err := h.authService.DeleteUser(ctx, req.Access, req.Password)
@@ -33,7 +33,5 @@ func (h *Handler) DeleteUser(ctx context.Context, req *auth_api.DeleteUserReques
 	}
 
 	slog.Info("DeleteUser successfull response")
-	return &auth_api.DeleteUserStatus{
-		Deleted: true,
-	}, nil
+	return &auth_api.Empty{}, nil
 }

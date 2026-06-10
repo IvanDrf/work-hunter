@@ -14,7 +14,7 @@ class IVacancyService(Protocol):
         offset: int,
         limit: int,
         user_info: UserInfo | None,
-    ) -> list[VacancyResponseSchema]: ...
+    ) -> list[VacancyResponseSchema] | None: ...
 
     async def find_vacancies_with_tags(
         self,
@@ -23,8 +23,15 @@ class IVacancyService(Protocol):
         limit: int,
         user_info: UserInfo | None,
     ) -> list[VacancyResponseSchema] | None: ...
+    async def find_vacancies_by_title(
+        self,
+        title: str,
+        offset: int,
+        limit: int,
+        user_info: UserInfo | None,
+    ) -> list[VacancyResponseSchema] | None: ...
 
-    async def update_vacancy(self, vacancy_update: VacancyUpdateSchema, user_info: UserInfo) -> VacancyResponseSchema: ...
+    async def update_vacancy(self, vacancy_update_schema: VacancyUpdateSchema, user_info: UserInfo) -> VacancyResponseSchema: ...
     async def delete_vacancy(self, vacancy_id: int, user_info: UserInfo) -> None: ...
 
     async def set_vacancy_status(

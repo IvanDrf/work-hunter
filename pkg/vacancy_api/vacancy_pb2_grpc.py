@@ -62,6 +62,12 @@ class VacancyStub(object):
             response_deserializer=vacancy__pb2.Vacancies.FromString,
             _registered_method=True,
         )
+        self.FindVacanciesByTitle = channel.unary_unary(
+            "/vacancy.Vacancy/FindVacanciesByTitle",
+            request_serializer=vacancy__pb2.FindVacanciesByTitleRequest.SerializeToString,
+            response_deserializer=vacancy__pb2.Vacancies.FromString,
+            _registered_method=True,
+        )
         self.UpdateVacancy = channel.unary_unary(
             "/vacancy.Vacancy/UpdateVacancy",
             request_serializer=vacancy__pb2.UpdateVacancyRequest.SerializeToString,
@@ -115,6 +121,14 @@ class VacancyServicer(object):
         context.set_details("Method not implemented!")
         raise NotImplementedError("Method not implemented!")
 
+    def FindVacanciesByTitle(self, request, context):
+        """Find vacancies by title
+        If vacancy has status - MODERATING only moderator can see this
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
+
     def UpdateVacancy(self, request, context):
         """Update vacancy information"""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -156,6 +170,11 @@ def add_VacancyServicer_to_server(servicer, server):
         "FindVacanciesByAuthor": grpc.unary_unary_rpc_method_handler(
             servicer.FindVacanciesByAuthor,
             request_deserializer=vacancy__pb2.FindVacanciesByAuthorRequest.FromString,
+            response_serializer=vacancy__pb2.Vacancies.SerializeToString,
+        ),
+        "FindVacanciesByTitle": grpc.unary_unary_rpc_method_handler(
+            servicer.FindVacanciesByTitle,
+            request_deserializer=vacancy__pb2.FindVacanciesByTitleRequest.FromString,
             response_serializer=vacancy__pb2.Vacancies.SerializeToString,
         ),
         "UpdateVacancy": grpc.unary_unary_rpc_method_handler(
@@ -293,6 +312,36 @@ class Vacancy(object):
             target,
             "/vacancy.Vacancy/FindVacanciesByAuthor",
             vacancy__pb2.FindVacanciesByAuthorRequest.SerializeToString,
+            vacancy__pb2.Vacancies.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True,
+        )
+
+    @staticmethod
+    def FindVacanciesByTitle(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            "/vacancy.Vacancy/FindVacanciesByTitle",
+            vacancy__pb2.FindVacanciesByTitleRequest.SerializeToString,
             vacancy__pb2.Vacancies.FromString,
             options,
             channel_credentials,

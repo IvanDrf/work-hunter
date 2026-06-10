@@ -1,42 +1,41 @@
 from uuid import UUID
 
-from pkg.common.common_pb2 import FullUserInfo
-from pkg.vacancy_api.vacancy_pb2 import UpdateVacancyRequest, VacancyInfo
+from pkg.vacancy_api.vacancy_pb2 import CreateVacancyRequest, UpdateVacancyRequest, VacancyInfo
 
 from src.domain.schemas import VacancyCreateSchema, VacancyResponseSchema, VacancyUpdateSchema
 from src.domain.types.enums import Currency, RemoteType, TimeType
 from src.domain.types.types import UNSET_VALUE, Money, Year
 
 
-def vacancy_create_dto(vacancy: VacancyInfo, user_info: FullUserInfo) -> VacancyCreateSchema:
+def vacancy_create_dto(request: CreateVacancyRequest) -> VacancyCreateSchema:
     schema = VacancyCreateSchema(
-        title=vacancy.title,
-        requirements=vacancy.requirements,
-        conditions=vacancy.requirements,
-        author_id=UUID(user_info.user_id),
-        author_name=user_info.username,
-        salary_min=vacancy.salary_min,
-        salary_max=vacancy.salary_max,
-        currency=Currency(vacancy.currency),
-        remote_type=RemoteType(vacancy.remote_type),
-        time_type=TimeType(vacancy.time_type),
-        tags=list(vacancy.tags),
+        title=request.title,
+        requirements=request.requirements,
+        conditions=request.conditions,
+        author_id=UUID(request.user_info.user_id),
+        author_name=request.user_info.username,
+        salary_min=request.salary_min,
+        salary_max=request.salary_max,
+        currency=Currency(request.currency),
+        remote_type=RemoteType(request.remote_type),
+        time_type=TimeType(request.time_type),
+        tags=list(request.tags),
     )
 
-    if vacancy.description:
-        schema.description = vacancy.description
+    if request.HasField("description"):
+        schema.description = request.description
 
-    if vacancy.city:
-        schema.city = vacancy.city
+    if request.HasField("city"):
+        schema.city = request.city
 
-    if vacancy.metro:
-        schema.metro = vacancy.metro
+    if request.HasField("metro"):
+        schema.metro = request.metro
 
-    if vacancy.experience_min:
-        schema.experience_min = vacancy.experience_min
+    if request.HasField("experience_min"):
+        schema.experience_min = request.experience_min
 
-    if vacancy.experience_max:
-        schema.experience_max = vacancy.experience_max
+    if request.HasField("experience_max"):
+        schema.experience_max = request.experience_max
 
     return schema
 

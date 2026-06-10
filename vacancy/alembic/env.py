@@ -32,18 +32,7 @@ target_metadata = Base.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
-
-def get_config_path() -> str:
-    args = context.get_x_argument(True)
-
-    if "config-path" in args:
-        return args["config-path"]
-
-    return "config/config.yaml"
-
-
-config_path = get_config_path()
-config.set_main_option("sqlalchemy.url", Config.load_from_yaml(config_path).database.dsn)
+config.set_main_option("sqlalchemy.url", Config().postgres_dsn)
 
 
 def run_migrations_offline() -> None:

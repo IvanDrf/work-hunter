@@ -1,8 +1,14 @@
-from dataclasses import dataclass
+from datetime import timedelta
+
+from pydantic import Field
+
+from src.core.config.base import BaseConfig
 
 
-@dataclass(slots=True, frozen=True, kw_only=True)
-class RedisConfig:
-    host: str
-    port: int
-    db: int
+class RedisConfig(BaseConfig):
+    redis_host: str = Field(default="localhost", validation_alias="REDIS_HOST")
+    redis_port: int = Field(default=6379, validation_alias="REDIS_PORT")
+    redis_db: int = Field(default=0, validation_alias="REDIS_DB")
+
+    redis_ttl: timedelta = Field(default=timedelta(minutes=5), validation_alias="REDIS_CACHE_TTL")
+    redis_timeout: float = Field(default=0.3, validation_alias="REDIS_TIMEOUT")

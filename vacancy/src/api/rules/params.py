@@ -8,7 +8,7 @@ MIN_LIMIT: Final[int] = 5
 MAX_LIMIT: Final[int] = 30
 
 MIN_TAGS_AMOUNT: Final[int] = 1
-MAX_TAGS_AMOUNT: Final[int] = 2
+MAX_TAGS_AMOUNT: Final[int] = 20
 
 
 def validate_limit_offset(limit: int, offset: int) -> None:

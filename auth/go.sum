@@ -4,8 +4,8 @@ github.com/BurntSushi/toml v1.2.1 h1:9F2/+DoOYIOksmaJFPw1tGFy1eDnIJXg+UHjuD8lTak
 github.com/BurntSushi/toml v1.2.1/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=
 github.com/DATA-DOG/go-sqlmock v1.5.2 h1:OcvFkGmslmlZibjAjaHm3L//6LiuBgolP7OputlJIzU=
 github.com/DATA-DOG/go-sqlmock v1.5.2/go.mod h1:88MAG/4G7SMwSE3CeA0ZKzrT5CiOU3OJ+JlNzwDqpNU=
-github.com/IvanDrf/work-hunter/pkg/auth-api v0.0.0-20260411210851-96034d0736a0 h1:HU1UMipS6vmW0nBk/ev27lT+Y+GVyzHSAt74Tsi4cME=
-github.com/IvanDrf/work-hunter/pkg/auth-api v0.0.0-20260411210851-96034d0736a0/go.mod h1:7MFO9fbUEPhWluguZqRzBpZav9eAIUesXODMj7s/AVI=
+github.com/IvanDrf/work-hunter/pkg/auth-api v0.0.0-20260416202508-c777a235a248 h1:N4vtOqz7cHXD6AXMeUqqereY30LPlmWqA+whDetw9c8=
+github.com/IvanDrf/work-hunter/pkg/auth-api v0.0.0-20260416202508-c777a235a248/go.mod h1:7MFO9fbUEPhWluguZqRzBpZav9eAIUesXODMj7s/AVI=
 github.com/Microsoft/go-winio v0.6.2 h1:F2VQgta7ecxGYO8k3ZZz3RS8fVIXVxONVUPlNERoyfY=
 github.com/Microsoft/go-winio v0.6.2/go.mod h1:yd8OoFMLzJbo9gZq8j5qaps8bJ9aShtEA8Ipt1oGCvU=
 github.com/bsm/ginkgo/v2 v2.12.0 h1:Ny8MWAHyOepLGlLKYmXG4IEkioBysk6GpaRTLC8zwWs=

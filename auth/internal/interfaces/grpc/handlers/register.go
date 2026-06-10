@@ -13,17 +13,17 @@ import (
 
 func (h *Handler) Register(ctx context.Context, user *auth_api.User) (*auth_api.JwtTokens, error) {
 	slog.Info("Register got request")
-	access, refresh, err := h.authService.RegisterUser(ctx, user.Email, user.Password, user.Role)
+	access, refresh, err := h.authService.RegisterUser(ctx, user.Email, user.Password, user.Role.String())
 
 	var e models.Error
-	if errors.As(err, &e) {
+	if err != nil && errors.As(err, &e) {
 		slog.Error("Register error", slog.String("error", err.Error()))
 
 		switch e.Code {
 		case models.ErrCodeUserAlreadyExists:
 			return nil, status.Error(codes.AlreadyExists, e.Message)
 
-		case models.ErrCodeInvalidUserRole, models.ErrCodeInvalidPassword:
+		case models.ErrCodeInvalidUserRole, models.ErrCodeInvalidPassword, models.ErrCodeInvalidEmail:
 			return nil, status.Error(codes.InvalidArgument, e.Message)
 
 		case models.ErrCodeInternal:

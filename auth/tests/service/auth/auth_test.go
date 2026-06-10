@@ -4,7 +4,7 @@ import (
 	"log/slog"
 
 	"github.com/IvanDrf/work-hunter/auth/internal/infrastructure/service"
-	"github.com/IvanDrf/work-hunter/auth/tests/service/mocks"
+	"github.com/IvanDrf/work-hunter/auth/tests/mocks"
 )
 
 func init() {

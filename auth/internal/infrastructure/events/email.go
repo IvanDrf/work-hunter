@@ -21,7 +21,7 @@ func NewEmailWorker(consumer service.EmailConsumer, emailService service.EmailSe
 }
 
 func (w *EmailWorker) Start(ctx context.Context) {
-	slog.Info("Starting WORKER")
+	slog.Info("worker: starting")
 
 	w.consumer.ProcessEmailsFromQueue(ctx, func(msg *models.EmailMessage) error {
 		slog.Info("worker: got message from queue")
@@ -33,11 +33,18 @@ func (w *EmailWorker) Start(ctx context.Context) {
 			}
 		}
 
-		return w.emailService.SendVerificationEmail(msg.Email, msg.Token)
+		err := w.emailService.SendVerificationEmail(msg.Email, msg.Token)
+		if err != nil {
+			slog.Error("worker: can't send email", slog.String("error", err.Error()))
+			return err
+		}
+
+		slog.Info("worker: sent email")
+		return err
 	})
 }
 
 func (w *EmailWorker) Stop() {
-	slog.Info("Stopping WORKER")
+	slog.Info("worker: stopping")
 	w.consumer.Close()
 }
