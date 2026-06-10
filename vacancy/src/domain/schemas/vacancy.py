@@ -40,7 +40,7 @@ class VacancySchema(BaseModel, SalaryValidatorMixin, ExperienceValidatorMixin):
     tags: list[str] = []
 
 
-class VacancyCreateSchema(VacancySchema, SalaryValidatorMixin, ExperienceValidatorMixin):
+class VacancyCreateSchema(VacancySchema):
     author_id: UUID
     author_name: str
 
@@ -70,8 +70,8 @@ class VacancyUpdateSchema(BaseModel, SalaryValidatorMixin, ExperienceValidatorMi
     tags: list[str] | UnsetValue = UNSET_VALUE
 
 
-class VacancyResponseSchema(VacancySchema, SalaryValidatorMixin, ExperienceValidatorMixin):
-    vacancy_id: int
+class VacancyResponseSchema(VacancySchema):
+    vacancy_id: int = Field(ge=0)
     author_name: str
     author_id: UUID
 
