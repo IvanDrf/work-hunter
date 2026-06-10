@@ -48,7 +48,10 @@ class ExperienceValidatorMixin:
     model_config = {"validate_assignment": True}
 
     @field_validator("experience_min")
-    def validate_experience_min(cls, value: Year, info: ValidationInfo) -> Year:
+    def validate_experience_min(cls, value: Year | UnsetValue | None, info: ValidationInfo) -> Year | UnsetValue | None:
+        if value is None or isinstance(value, UnsetValue):
+            return value
+
         if not (MIN_YEAR <= value <= MAX_YEAR):
             raise ArgumentError(f"experience value must be in range ({MIN_YEAR}, {MAX_YEAR}), but given={value}")
 
@@ -59,7 +62,10 @@ class ExperienceValidatorMixin:
         return value
 
     @field_validator("experience_max")
-    def validate_experience_max(cls, value: Year, info: ValidationInfo) -> Year:
+    def validate_experience_max(cls, value: Year | UnsetValue | None, info: ValidationInfo) -> Year | UnsetValue | None:
+        if value is None or isinstance(value, UnsetValue):
+            return value
+
         if not (MIN_YEAR <= value <= MAX_YEAR):
             raise ArgumentError(f"experience value must be in range ({MIN_YEAR}, {MAX_YEAR}), but given={value}")
 
