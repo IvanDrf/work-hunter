@@ -17,15 +17,19 @@ class SalaryTestClass(BaseModel, SalaryValidatorMixin):
 
 
 @given(
-    negative_salaries=st.lists(st.integers(-MAX_MONEY, MIN_MONEY - 1), min_size=10, max_size=100),
-    valid_salaries=st.lists(st.integers(MIN_MONEY, MAX_MONEY), min_size=10, max_size=100),
+    negative_salaries=st.lists(st.integers(-MAX_MONEY, MIN_MONEY - 1), min_size=10, max_size=30),
+    valid_salaries=st.lists(st.integers(MIN_MONEY, MAX_MONEY), min_size=10, max_size=30),
+    invalid_big_salaries=st.lists(st.integers(MAX_MONEY + 1, MAX_MONEY * 2), min_size=10, max_size=30),
 )
-def test_SalaryValidatorMixin(negative_salaries: list[int], valid_salaries: list[int]) -> None:
+def test_SalaryValidatorMixin(negative_salaries: list[int], valid_salaries: list[int], invalid_big_salaries: list[int]) -> None:
     for negative_salary in negative_salaries:
-        _test_negative_salary(negative_salary)
+        _test_unbound_salary(negative_salary)
 
     for valid_salary in valid_salaries:
         _test_valid_salary(valid_salary)
+
+    for invalid_big_salary in invalid_big_salaries:
+        _test_unbound_salary(invalid_big_salary)
 
     INVALID_SALARY_VALUES = Template("maximum salary - $salary_max must be greater than minimum salary - $salary_min")
     valid_salaries.sort()
@@ -42,19 +46,27 @@ def test_SalaryValidatorMixin(negative_salaries: list[int], valid_salaries: list
                 SalaryTestClass(salary_min=salary_max, salary_max=salary_min)
 
 
-def _test_negative_salary(negative_salary: int) -> None:
+def _test_unbound_salary(salary: int) -> None:
     INVALID_SALARY_RANGE = Template(f"salary value must be in range ({MIN_MONEY}, {MAX_MONEY}), but given=$salary")
 
     # valid values for other salary: max or min
     # example: salary_min = -200, salary_max = None
     for valid_salary in (None, UNSET_VALUE, 0):
-        error_message = escape(INVALID_SALARY_RANGE.substitute(salary=negative_salary))
+        error_message = escape(INVALID_SALARY_RANGE.substitute(salary=salary))
 
         with raises(ArgumentError, match=error_message):
-            SalaryTestClass(salary_min=negative_salary, salary_max=valid_salary)
+            SalaryTestClass(salary_min=salary, salary_max=valid_salary)
+
+        s = SalaryTestClass(salary_min=None, salary_max=None)
+        with raises(ArgumentError, match=error_message):
+            s.salary_min = salary
 
         with raises(ArgumentError, match=error_message):
-            SalaryTestClass(salary_min=valid_salary, salary_max=negative_salary)
+            SalaryTestClass(salary_min=valid_salary, salary_max=salary)
+
+        s = SalaryTestClass(salary_min=None, salary_max=None)
+        with raises(ArgumentError, match=error_message):
+            s.salary_max = salary
 
 
 def _test_valid_salary(valid_salary: int) -> None:
