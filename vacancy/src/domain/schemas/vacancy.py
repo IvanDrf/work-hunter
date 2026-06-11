@@ -15,6 +15,12 @@ MAX_DESCRIPTION_LENGTH: Final[int] = 20_000
 MAX_REQUIREMENTS_LENGTH: Final[int] = 20_000
 MAX_CONDITIONS_LENGTH: Final[int] = 20_000
 
+MAX_CITY_LENGTH: Final[int] = 40
+MAX_METRO_LENGTH: Final[int] = 50
+
+MIN_TAGS_AMOUNT: Final[int] = 0
+MAX_TAGS_AMOUNT: Final[int] = 20
+
 
 class VacancySchema(BaseModel, SalaryValidatorMixin, ExperienceValidatorMixin):
     title: str = Field(min_length=MIN_TITLE_LENGTH, max_length=MAX_TITLE_LENGTH)
@@ -28,16 +34,16 @@ class VacancySchema(BaseModel, SalaryValidatorMixin, ExperienceValidatorMixin):
 
     currency: Currency = Currency.RUB
 
-    city: str | None = None
-    metro: str | None = None
+    city: str | None = Field(default=None, max_length=MAX_CITY_LENGTH)
+    metro: str | None = Field(default=None, max_length=MAX_METRO_LENGTH)
 
-    remote_type: RemoteType = Field(default=RemoteType.ANY)
-    time_type: TimeType = Field(default=TimeType.FULL)
+    remote_type: RemoteType = RemoteType.ANY
+    time_type: TimeType = TimeType.FULL
 
     experience_min: Year | None = None
     experience_max: Year | None = None
 
-    tags: list[str] = []
+    tags: list[str] = Field(default_factory=list, min_length=MIN_TAGS_AMOUNT, max_length=MAX_TAGS_AMOUNT)
 
 
 class VacancyCreateSchema(VacancySchema):
