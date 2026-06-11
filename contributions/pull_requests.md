@@ -5,6 +5,12 @@ Pull request name must have following structure
 ```bash
 [direction:type]: message
 ```
+
+Example
+```bash
+[back:auth:feat]: add password hashing
+```
+
 directions:
 - front (frontend)
 - back (backend)

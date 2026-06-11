@@ -1,0 +1,30 @@
+name: Run [AUTH] tests
+
+on:
+  push:
+    branches: ["**"]
+
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup GO
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+
+      - name: Run GO tests for [AUTH]
+        working-directory: ./auth/tests
+        run: |
+          go mod download
+          go test ./...

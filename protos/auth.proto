@@ -6,14 +6,23 @@ option  go_package = "pkg/auth-api";
 
 // auth servuce by jwt
 service Auth {
+    // check service health
+    rpc Health(Empty) returns (ServiceStatus);
+
     // register user by username, password
     rpc Register(User) returns (JwtTokens); 
 
     // login user by username, password
     rpc Login(User) returns (JwtTokens);
 
+    // delete user with given access token and password
+    rpc DeleteUser(DeleteUserRequest) returns (Empty);
+    
+    // change user's password from old to new
+    rpc ChangePassword(ChangePasswordRequest) returns (Empty);
+
     // Send verification email if user didn't get it after registration
-    rpc SendVerificationEmail(Email) returns (AcceptStatus);
+    rpc SendVerificationEmail(AccessToken) returns (Empty);
     
     // Verify user email by token
     rpc VerifyEmail(VerifToken) returns (JwtTokens);
@@ -25,9 +34,17 @@ service Auth {
     rpc RefreshTokens(RefreshToken) returns (JwtTokens);
 }
 
+enum Role {
+    ADMIN = 0;
+    EMPLOYEE = 1;
+    EMPLOYER = 2;
+}
+
+
 message User {
     string email = 1;
     string password = 2;
+    Role role = 3; // ADMIN, EMPLOYEE, EMPLOYER
 }
 
 
@@ -47,17 +64,28 @@ message JwtTokens {
 message TokenPayload {
     string id = 1;
     bool verificated = 2;
+    Role role = 3;
 }
 
-
-message Email {
-    string email = 1;
-}
 
 message VerifToken {
     string token = 1;
 }
 
-message AcceptStatus {
-    bool accepted = 1;
+message DeleteUserRequest {
+    string access = 1; // access jwt token
+    string password = 2; // user password
+}
+
+message ChangePasswordRequest {
+    string access = 1; // access jwt token
+    string old = 2; // old password
+    string new = 3; // new password
+}
+
+message Empty {
+}
+
+message ServiceStatus {
+    int32 code = 1;
 }

@@ -11,17 +11,20 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *Handler) SendVerificationEmail(ctx context.Context, email *auth_api.Email) (*auth_api.AcceptStatus, error) {
+func (h *Handler) SendVerificationEmail(ctx context.Context, token *auth_api.AccessToken) (*auth_api.Empty, error) {
 	slog.Info("SendVerificationEmail got request")
-	err := h.verificationService.SendVerificationEmail(ctx, email.Email)
+	err := h.verificationService.ResendVerificationEmail(ctx, token.Access)
 
 	var e models.Error
 	if errors.As(err, &e) {
 		slog.Error("SendVerificationEmail error", slog.String("error", err.Error()))
 
 		switch e.Code {
-		case models.ErrCodeUserNotFound:
+		case models.ErrCodeInvalidJWT:
 			return nil, status.Error(codes.InvalidArgument, e.Message)
+
+		case models.ErrCodeUserNotFound:
+			return nil, status.Error(codes.NotFound, e.Message)
 
 		case models.ErrCodeUserAlreadyVerificated:
 			return nil, status.Error(codes.AlreadyExists, e.Message)
@@ -32,7 +35,5 @@ func (h *Handler) SendVerificationEmail(ctx context.Context, email *auth_api.Ema
 	}
 
 	slog.Info("SendVerificationEmail successfull response")
-	return &auth_api.AcceptStatus{
-		Accepted: true,
-	}, nil
+	return &auth_api.Empty{}, nil
 }

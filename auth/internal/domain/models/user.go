@@ -10,11 +10,12 @@ type User struct {
 
 	Email          string `json:"email"`
 	HashedPassword string `json:"password"`
+	Role           Role   `json:"role"`
 
 	Verificated bool `json:"verificated"`
 }
 
-func NewUser(email string, password string) (*User, error) {
+func NewUser(email string, password string, role Role) (*User, error) {
 	if !rules.IsPasswordCorrect(password) {
 		return nil, Error{
 			Message: "password is to long or short",
@@ -41,6 +42,7 @@ func NewUser(email string, password string) (*User, error) {
 		ID:             uuid.New(),
 		Email:          email,
 		HashedPassword: hashedPassword,
+		Role:           role,
 		Verificated:    false,
 	}, nil
 }

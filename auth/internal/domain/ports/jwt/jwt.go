@@ -1,10 +1,10 @@
 package jwt
 
-import "github.com/google/uuid"
+import (
+	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
+)
 
 type Jwter interface {
-	CreateTokens(userID uuid.UUID, verificated bool) (string, string, error)
-	GetPayload(token string) (uuid.UUID, bool, error)
-
-	RefreshTokens(refresh string) (string, string, error)
+	CreateTokens(payload *models.JwtPayload) (string, string, error)
+	GetPayload(token string) (*models.JwtPayload, error)
 }

@@ -7,6 +7,7 @@ type ErrorCode string
 const (
 	ErrCodeInternal ErrorCode = "INTERNAL_ERROR"
 
+	ErrCodeInvalidUserRole        ErrorCode = "INVALID_USER_ROLE"
 	ErrCodeUserNotFound           ErrorCode = "USER_NOT_FOUND"
 	ErrCodeUserAlreadyExists      ErrorCode = "USER_ALREADY_EXISTS"
 	ErrCodeUserAlreadyVerificated ErrorCode = "USER_ALREADY_VERIFICATED"

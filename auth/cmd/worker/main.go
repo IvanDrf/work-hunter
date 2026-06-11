@@ -1,5 +1,7 @@
 package main
 
+// Email worker is used to send verification messages on email
+
 import (
 	"context"
 	"os"
@@ -8,10 +10,12 @@ import (
 
 	"github.com/IvanDrf/work-hunter/auth/internal/app/factory"
 	"github.com/IvanDrf/work-hunter/auth/internal/config"
+	"github.com/IvanDrf/work-hunter/auth/internal/infrastructure/adapters"
 )
 
 func main() {
 	cfg := config.LoadFromYAML()
+	adapters.InitLogger(&cfg.App)
 
 	worker := factory.NewFactory(cfg).NewEmailWorker()
 

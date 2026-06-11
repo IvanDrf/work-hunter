@@ -4,7 +4,7 @@ import (
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/ports/jwt"
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/ports/repo"
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/ports/service"
-	"github.com/IvanDrf/work-hunter/auth/pkg"
+	j "github.com/IvanDrf/work-hunter/auth/internal/infrastructure/jwt"
 
 	s "github.com/IvanDrf/work-hunter/auth/internal/infrastructure/service"
 )
@@ -28,5 +28,5 @@ func (f *Factory) newVerificationService(producer service.EmailProducer, userRep
 }
 
 func (f *Factory) newJwter() jwt.Jwter {
-	return pkg.NewJwt(f.cfg.Jwt.Secret, f.cfg.Jwt.AccessTime, f.cfg.Jwt.RefreshTime)
+	return j.NewJwt(f.cfg.Jwt.Secret, f.cfg.Jwt.AccessTime, f.cfg.Jwt.RefreshTime)
 }

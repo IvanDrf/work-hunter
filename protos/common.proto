@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package common;
+
+enum UserRole {
+    UNSPECIFIED = 0;
+    ADMIN = 1;
+    EMPLOYEE = 2;
+    EMPLOYER = 3;
+}
+
+message UserInfo {
+    UserRole role = 1;
+    string user_id = 2; // uuid
+    bool verificated = 3;
+}
+
+message FullUserInfo {
+    UserRole role = 1;
+    string user_id = 2;
+    string username = 3;
+    bool verificated = 4;
+}

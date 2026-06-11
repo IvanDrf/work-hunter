@@ -27,7 +27,8 @@ func (h *Handler) IsTokenValid(ctx context.Context, access *auth_api.AccessToken
 
 	slog.Info("IsTokenValid successfull response")
 	return &auth_api.TokenPayload{
-		Id:          payload.ID.String(),
+		Id:          payload.UserID,
 		Verificated: payload.Verificated,
+		Role:        auth_api.Role(auth_api.Role_value[string(payload.Role)]),
 	}, nil
 }
