@@ -16,7 +16,7 @@ service User {
     rpc GetProfile(GetProfileRequest) returns (UserProfile);
 
     // Get user profile by username
-    rpc GetProfileByUsername(GetProfileByUsernameRequest) returns (UserProfile);
+    rpc GetProfileByEmail(GetProfileByEmailRequest) returns (UserProfile);
 
     // Update user profile
     rpc UpdateProfile(UpdateProfileRequest) returns (UserProfile);
@@ -40,38 +40,34 @@ enum UserStatus {
 
 enum UserRole {
     USER_ROLE_UNSPECIFIED = 0;
-    USER_ROLE_USER = 1;
-    USER_ROLE_MODERATOR = 2;
+    USER_ROLE_EMPLOYEE = 1;
+    USER_ROLE_EMPLOYER = 2;
     USER_ROLE_ADMIN = 3;
 }
 
 message UserProfile {
     string id = 1; // UUID
-    string username = 2; // Username (same as in auth service)
-    string email = 3;
-    string first_name = 4; 
-    string last_name = 5; 
-    string phone_number = 6;
-    string avatar_URL = 7;
+    string email = 2;
+    optional string first_name = 3; 
+    optional string last_name = 4;
+    optional string company_name = 5;
 
-    UserStatus status = 8; // Account status
-    UserRole role = 9; // User role
+    UserStatus status = 6; // Account status
+    UserRole role = 7; // User role
 
-    google.protobuf.Timestamp created_at = 10;
-    google.protobuf.Timestamp updated_at = 11;
-    google.protobuf.Timestamp last_login_at = 12;
+    google.protobuf.Timestamp created_at = 8;
+    google.protobuf.Timestamp updated_at = 9;
 
-    bool email_verified = 13;
-    map<string, string> metadata = 14;
+    bool verificated = 13;
 }
 
 message CreateProfileRequest {
     string user_id = 1; // User ID from auth service
-    string username = 2; // Username from auth service
-    string email = 3;
-    string first_name = 4;
-    string last_name = 5;
-    string phone_number = 6;
+    string email = 2;
+    optional string first_name = 3;
+    optional string last_name = 4;
+    optional string company_name = 5;
+    bool verificated = 6;
 }
 
 message GetProfileRequest {
@@ -79,24 +75,23 @@ message GetProfileRequest {
 }
 
 message UpdateProfileRequest {
-    string user_id = 1; // JWT access token for authorization
-    optional string first_name = 2;       // New first name
-    optional string last_name = 3;        // New last name
-    optional string phone_number = 4;     // New phone number
-    optional string avatar_url = 5;       // New avatar URL
-    map<string, string> metadata = 6;
+    string user_id = 1;
+    optional string first_name = 2;
+    optional string last_name = 3;
+    optional string company_name = 4;
+    optional bool verificated = 5;
 }
 
 message DeleteProfileRequest {
     string user_id = 1;
 }
 
-message GetProfileByUsernameRequest {
-    string username = 1;
+message GetProfileByEmailRequest {
+    string email = 1;
 }
 
 message UpdateUserStatusRequest {
-    string user_id = 1; // Admin JWT token for authorization
+    string user_id = 1;
     UserStatus status = 2; // New profile status
 }
 

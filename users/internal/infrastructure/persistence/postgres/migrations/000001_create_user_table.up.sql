@@ -1,39 +1,31 @@
 CREATE TYPE user_status AS ENUM ('active', 'inactive', 'blocked', 'deleted');
-CREATE TYPE user_role AS ENUM ('user', 'moderator', 'admin');
+CREATE TYPE user_role AS ENUM ('employee', 'employer', 'admin');
 
 CREATE TABLE IF NOT EXISTS users (
     -- main fields
     id UUID PRIMARY KEY,
-    username VARCHAR(255) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
 
     -- personal info
-    first_name VARCHAR(255) NOT NULL DEFAULT '',
-    last_name VARCHAR(255) NOT NULL DEFAULT '',
-    phone_number VARCHAR(50) NOT NULL DEFAULT '',
-    avatar_url TEXT NOT NULL DEFAULT '',
+    first_name VARCHAR(255),
+    last_name VARCHAR(255),
+    company_name VARCHAR(255),
 
     -- status and role
     status user_status NOT NULL DEFAULT 'active',
-    role user_role NOT NULL DEFAULT 'user',
+    role user_role NOT NULL DEFAULT 'employee',
 
-    metadata JSONB NOT NULL DEFAULT '{}',
+    BOOLEAN verificated NOT NULL DEFAULT false,
 
     -- time points 
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+
+    CONSTRAINT not_null_personal_info CHECK (first_name IS NOT NULL AND last_name IS NOT NULL OR company_name IS NOT NULL)
 );
 
 -- indexes for fast search
-CREATE INDEX IF NOT EXISTS idx_users_username ON users(username) WHERE status != 'deleted';
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email) WHERE status != 'deleted';
-CREATE INDEX IF NOT EXISTS idx_users_status ON users(status) WHERE status != 'deleted';
-CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
-CREATE INDEX IF NOT EXISTS idx_users_created_at ON users(created_at) WHERE status != 'deleted';
-
--- index for fill-text search
-CREATE INDEX IF NOT EXISTS idx_users_search ON users
-USING GIN(to_tsvector('russian', username || ' ' || email || ' ' || first_name || ' ' || last_name));
 
 -- trigger for auto update 'updated_at'
 CREATE OR REPLACE FUNCTION update_updated_at_column() RETURNS TRIGGER AS $$
@@ -44,6 +36,19 @@ END;
 $$ language 'plpgsql';
 
 CREATE TRIGGER IF NOT EXISTS update_users_updated_at
-    BEFORE UPDATE ON users
+    AFTER UPDATE ON users
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
+
+
+CREATE OR REPLACE FUNCTION set_created_at_column() RETURNS TRIGGER AS $$
+BEGIN
+    NEW.created_at = NOW();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER IF NOT EXISTS set_users_created_at
+    AFTER INSERT ON users
+    FOR EACH ROW
+    EXECUTE FUNCTION set_created_at_column();
