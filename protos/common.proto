@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package common;
 
+option go_package = "pkg/common";
+
 enum UserRole {
     UNSPECIFIED = 0;
     ADMIN = 1;
