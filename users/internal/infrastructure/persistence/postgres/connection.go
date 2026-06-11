@@ -42,8 +42,8 @@ func (c *PostgresConnection) GetDB() *sqlx.DB {
 	return c.db
 }
 
-func (c *PostgresConnection) Close() error {
-	return c.db.Close()
+func (c *PostgresConnection) Close() {
+	c.db.Close()
 }
 
 // execute function in transaction
