@@ -21,6 +21,8 @@ MAX_METRO_LENGTH: Final[int] = 50
 MIN_TAGS_AMOUNT: Final[int] = 0
 MAX_TAGS_AMOUNT: Final[int] = 20
 
+MAX_AUTHOR_NAME_LENGTH: Final[int] = 30
+
 
 class VacancySchema(BaseModel, SalaryValidatorMixin, ExperienceValidatorMixin):
     title: str = Field(min_length=MIN_TITLE_LENGTH, max_length=MAX_TITLE_LENGTH)
@@ -48,7 +50,7 @@ class VacancySchema(BaseModel, SalaryValidatorMixin, ExperienceValidatorMixin):
 
 class VacancyCreateSchema(VacancySchema):
     author_id: UUID
-    author_name: str
+    author_name: str = Field(max_length=MAX_AUTHOR_NAME_LENGTH)
 
 
 class VacancyUpdateSchema(BaseModel, SalaryValidatorMixin, ExperienceValidatorMixin):
