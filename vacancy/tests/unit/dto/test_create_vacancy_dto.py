@@ -145,7 +145,7 @@ def vacancy_info(draw) -> VacancyInfo:
 
 
 @given(requests=st.lists(vacancy_info(), min_size=5, max_size=10))
-def test_vacancy_create_dto(requests: list[VacancyInfo]):
+def test_vacancy_create_dto(requests: list[VacancyInfo]) -> None:
     for req in requests:
         r = _create_request(req)
 
@@ -155,6 +155,30 @@ def test_vacancy_create_dto(requests: list[VacancyInfo]):
         assert_additional(r, schema)
         assert_exp(r, schema)
         assert_author(r, schema)
+
+
+@given(requests=st.lists(vacancy_info(), min_size=5, max_size=10))
+def test_vacancy_create_dto_no_optional_fields(requests: list[VacancyInfo]) -> None:
+    for req in requests:
+        r = _create_request_no_optional_fields(req)
+
+        schema = vacancy_create_dto(r)
+        assert schema.title == r.title
+        assert schema.description == "No description"
+        assert schema.requirements == r.requirements
+        assert schema.conditions == r.conditions
+
+        assert schema.salary_min is None
+        assert schema.salary_max is None
+        assert schema.currency == Currency.RUB
+
+        assert schema.city is None
+        assert schema.metro is None
+        assert_remote_and_time(r, schema)
+
+        assert schema.experience_min is None
+        assert schema.experience_max is None
+        assert schema.tags == list(r.tags)
 
 
 def assert_main(vacancy: CreateVacancyRequest, schema: VacancyCreateSchema) -> None:
@@ -181,6 +205,10 @@ def assert_additional(vacancy: CreateVacancyRequest, schema: VacancyCreateSchema
     assert vacancy.city == schema.city
     assert vacancy.metro == schema.metro
 
+    assert_remote_and_time(vacancy, schema)
+
+
+def assert_remote_and_time(vacancy: CreateVacancyRequest, schema: VacancyCreateSchema) -> None:
     remotes = {
         PKGRemoteType.ANY: RemoteType.ANY,
         PKGRemoteType.HYBRID: RemoteType.HYBRID,
@@ -223,6 +251,24 @@ def _create_request(req: VacancyInfo) -> CreateVacancyRequest:
         time_type=req.additional.time_type,
         experience_min=req.exp.experience_min,
         experience_max=req.exp.experience_min,
+        tags=req.main.tags,
+        user_info=PKGFullUserInfo(
+            role=req.author.role,
+            user_id=str(req.author.author_id),
+            verificated=req.author.verificated,
+            username=req.author.author_name,
+        ),
+    )
+
+
+def _create_request_no_optional_fields(req: VacancyInfo) -> CreateVacancyRequest:
+    return CreateVacancyRequest(
+        title=req.main.title,
+        requirements=req.main.requirements,
+        conditions=req.main.conditions,
+        remote_type=req.additional.remote_type,
+        time_type=req.additional.time_type,
+        tags=req.main.tags,
         user_info=PKGFullUserInfo(
             role=req.author.role,
             user_id=str(req.author.author_id),

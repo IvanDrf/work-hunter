@@ -4,7 +4,7 @@ from pkg.vacancy_api.vacancy_pb2 import CreateVacancyRequest, UpdateVacancyReque
 
 from src.domain.schemas import VacancyCreateSchema, VacancyResponseSchema, VacancyUpdateSchema
 from src.domain.types.enums import Currency, RemoteType, TimeType
-from src.domain.types.types import UNSET_VALUE, Money, Year
+from src.domain.types.types import Money, Year
 
 
 def vacancy_create_dto(request: CreateVacancyRequest) -> VacancyCreateSchema:
@@ -14,8 +14,6 @@ def vacancy_create_dto(request: CreateVacancyRequest) -> VacancyCreateSchema:
         conditions=request.conditions,
         author_id=UUID(request.user_info.user_id),
         author_name=request.user_info.username,
-        salary_min=request.salary_min,
-        salary_max=request.salary_max,
         currency=Currency(request.currency),
         remote_type=RemoteType(request.remote_type),
         time_type=TimeType(request.time_type),
@@ -36,6 +34,12 @@ def vacancy_create_dto(request: CreateVacancyRequest) -> VacancyCreateSchema:
 
     if request.HasField("experience_max"):
         schema.experience_max = request.experience_max
+
+    if request.HasField("salary_min"):
+        schema.salary_min = Money(request.salary_min)
+
+    if request.HasField("salary_max"):
+        schema.salary_max = Money(request.salary_max)
 
     return schema
 
@@ -70,21 +74,49 @@ def vacancy_response_dto(vacancy: VacancyResponseSchema) -> VacancyInfo:
     )
 
 
-def vacancy_update_dto(vacancy: UpdateVacancyRequest) -> VacancyUpdateSchema:
-    return VacancyUpdateSchema(
-        vacancy_id=vacancy.vacancy_id,
-        title=vacancy.title if vacancy.title else UNSET_VALUE,
-        description=vacancy.description if vacancy.description else UNSET_VALUE,
-        requirements=vacancy.requirements if vacancy.requirements else UNSET_VALUE,
-        conditions=vacancy.conditions if vacancy.conditions else UNSET_VALUE,
-        salary_min=Money(vacancy.salary_min) if vacancy.salary_min else UNSET_VALUE,
-        salary_max=Money(vacancy.salary_max) if vacancy.salary_max else UNSET_VALUE,
-        currency=Currency(vacancy.currency) if vacancy.currency else UNSET_VALUE,
-        city=vacancy.city if vacancy.city else UNSET_VALUE,
-        metro=vacancy.metro if vacancy.metro else UNSET_VALUE,
-        remote_type=RemoteType(vacancy.remote_type) if vacancy.remote_type else UNSET_VALUE,
-        time_type=TimeType(vacancy.time_type) if vacancy.time_type else UNSET_VALUE,
-        experience_min=Year(vacancy.experience_min) if vacancy.experience_min else UNSET_VALUE,
-        experience_max=Year(vacancy.experience_max) if vacancy.experience_max else UNSET_VALUE,
-        tags=list(vacancy.tags) if vacancy.tags else UNSET_VALUE,
-    )
+def vacancy_update_dto(request: UpdateVacancyRequest) -> VacancyUpdateSchema:
+    schema = VacancyUpdateSchema(vacancy_id=request.vacancy_id)
+
+    if request.HasField("title"):
+        schema.title = request.title
+
+    if request.HasField("description"):
+        schema.description = request.description
+
+    if request.HasField("requirements"):
+        schema.requirements = request.requirements
+
+    if request.HasField("conditions"):
+        schema.conditions = request.conditions
+
+    if request.HasField("salary_min"):
+        schema.salary_min = Money(request.salary_min)
+
+    if request.HasField("salary_max"):
+        schema.salary_max = Money(request.salary_max)
+
+    if request.HasField("currency"):
+        schema.currency = Currency(request.currency)
+
+    if request.HasField("city"):
+        schema.city = request.city
+
+    if request.HasField("metro"):
+        schema.metro = request.metro
+
+    if request.HasField("remote_type"):
+        schema.remote_type = RemoteType(request.remote_type)
+
+    if request.HasField("time_type"):
+        schema.time_type = TimeType(request.time_type)
+
+    if request.HasField("experience_min"):
+        schema.experience_min = Year(request.experience_min)
+
+    if request.HasField("experience_max"):
+        schema.experience_max = Year(request.experience_max)
+
+    if request.HasField("rags"):
+        schema.tags = list(request.tags)
+
+    return schema
