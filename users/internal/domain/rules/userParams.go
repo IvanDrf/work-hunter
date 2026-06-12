@@ -16,8 +16,8 @@ const (
 type UserRole string
 
 const (
-	UserRoleUser      UserRole = "USER_ROLE_USER"
-	UserRoleModerator UserRole = "USER_ROLE_MODERATOR"
+	UserRoleUser      UserRole = "USER_ROLE_EMPLOYEE"
+	UserRoleModerator UserRole = "USER_ROLE_EMPLOYER"
 	UserRoleAdmin     UserRole = "USER_ROLE_ADMIN"
 )
 
