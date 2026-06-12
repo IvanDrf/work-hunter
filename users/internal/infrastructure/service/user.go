@@ -205,7 +205,7 @@ func (s *UserService) ListUsers(ctx context.Context, req *dto.ListUsersRequest) 
 	}
 	if totalCount == 0 {
 		log.Error("users not found")
-		return nil, models.Error{
+		return nil, &models.Error{
 			Message: "users not found",
 			Code:    models.ErrCodeUserNotFound,
 		}
