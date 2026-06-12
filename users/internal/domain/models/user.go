@@ -23,7 +23,7 @@ type User struct {
 	UpdatedAt time.Time `db:"updated_at"`
 }
 
-func NewUser(id uuid.UUID, email, firstName, lastName, companyName string) *User {
+func NewUser(id uuid.UUID, email, firstName, lastName, companyName string, verificated bool) *User {
 	return &User{
 		ID:          id,
 		Email:       email,
@@ -33,6 +33,8 @@ func NewUser(id uuid.UUID, email, firstName, lastName, companyName string) *User
 
 		Status: rules.UserStatusActive,
 		Role:   rules.UserRoleUser,
+
+		Verificated: verificated,
 	}
 }
 

@@ -25,13 +25,13 @@ func NewUserRepository(conn *PostgresConnection) *UserRepository {
 func (r *UserRepository) CreateUser(ctx context.Context, user *models.User) error {
 	query := `
 	INSERT INTO users (
-		id, username, email,
-		first_name, last_name, phone_number,
-		status, role, metadata, created_at, updated_at
+		id, email,
+		first_name, last_name, company_name,
+		status, role, verificated
 	) VALUES(
-		:id, :username, :email,
-		:first_name, :last_name, :phone_number,
-		:status, :role, :metadata, :created_at, :updated_at
+		:id, :email,
+		:first_name, :last_name, :company_name,
+		:status, :role, :verificated
 	)`
 
 	_, err := r.db.NamedExecContext(ctx, query, user)
@@ -76,18 +76,18 @@ func (r *UserRepository) GetUserByID(ctx context.Context, id uuid.UUID) (*models
 	return &user, nil
 }
 
-func (r *UserRepository) GetUserByUsername(ctx context.Context, username string) (*models.User, error) {
+func (r *UserRepository) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
 	query := `
 	SELECT * FROM users
-	WHERE username = $1 AND status != 'deleted'
+	WHERE email = $1 AND status != 'deleted'
 	`
 
 	var user models.User
-	err := r.db.GetContext(ctx, &user, query, username)
+	err := r.db.GetContext(ctx, &user, query, email)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, &models.Error{
-				Message: fmt.Sprintf("user with username = %v not found", username),
+				Message: fmt.Sprintf("user with email = %v not found", email),
 				Code:    models.ErrCodeUserNotFound,
 			}
 		}
@@ -106,10 +106,8 @@ func (r *UserRepository) UpdateUser(ctx context.Context, updatedUser *models.Use
 	UPDATE users SET
 		first_name = :first_name,
 		last_name = :last_name,
-        phone_number = :phone_number,
-        avatar_url = :avatar_url,
-		metadata = :metadata,
-        updated_at = :updated_at
+        company_name = :company_name,
+		verificated = :verificated
 	WHERE id = :id AND status != 'deleted'
 	`
 
@@ -210,12 +208,11 @@ func (r *UserRepository) ListUsers(ctx context.Context, params map[string]string
 func (r *UserRepository) UpdateUserStatus(ctx context.Context, id uuid.UUID, status rules.UserStatus) error {
 	query := `
 	UPDATE users SET
-		status = $1,
-		updated_at = $2
-	WHERE id = $3 AND status != 'deleted'
+		status = $1
+	WHERE id = $2;
 	`
 
-	_, err := r.db.ExecContext(ctx, query, status, time.Now(), id)
+	_, err := r.db.ExecContext(ctx, query, status, id)
 	if err != nil {
 		return &models.Error{
 			Message: fmt.Sprintf("failed to update user status: %v", err),
