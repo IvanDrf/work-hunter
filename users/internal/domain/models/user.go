@@ -23,31 +23,43 @@ type User struct {
 	UpdatedAt time.Time `db:"updated_at"`
 }
 
-func NewUser(id uuid.UUID, email, firstName, lastName, companyName string, verificated bool) *User {
-	return &User{
-		ID:          id,
-		Email:       email,
-		FirstName:   firstName,
-		LastName:    lastName,
-		CompanyName: companyName,
+func NewUser(id uuid.UUID, email string, firstName, lastName, companyName *string, verificated bool) *User {
+	u := &User{
+		ID:    id,
+		Email: email,
 
 		Status: rules.UserStatusActive,
 		Role:   rules.UserRoleUser,
 
 		Verificated: verificated,
 	}
+
+	if firstName != nil {
+		u.FirstName = *firstName
+	}
+	if lastName != nil {
+		u.LastName = *lastName
+	}
+	if companyName != nil {
+		u.CompanyName = *companyName
+	}
+
+	return u
 }
 
-func (u *User) UpdateUser(firstName, lastName, companyName string, verificated bool) {
-	if firstName != "" {
-		u.FirstName = firstName
+func (u *User) UpdateUser(firstName, lastName, companyName *string, verificated *bool) {
+	if firstName != nil {
+		u.FirstName = *firstName
 	}
-	if lastName != "" {
-		u.LastName = lastName
+	if lastName != nil {
+		u.LastName = *lastName
 	}
-	if companyName != "" {
-		u.CompanyName = companyName
+	if companyName != nil {
+		u.CompanyName = *companyName
 	}
 
-	u.Verificated = verificated
+	if verificated != nil {
+		u.Verificated = *verificated
+	}
+
 }

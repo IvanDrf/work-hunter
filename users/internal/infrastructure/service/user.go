@@ -159,7 +159,7 @@ func (s *UserService) ListUsers(ctx context.Context, req *dto.ListUsersRequest) 
 
 	params["offset"] = strconv.Itoa(int(req.Offset))
 
-	if req.SortBy == "" {
+	if req.SortBy != "" {
 		params["order_by"] = req.SortBy
 	}
 
@@ -258,16 +258,25 @@ func parseUUID(id string, log *slog.Logger) (uuid.UUID, error) {
 }
 
 func modelToResp(user *models.User) *dto.UserResponse {
-	return &dto.UserResponse{
+	resp := &dto.UserResponse{
 		ID:          user.ID.String(),
 		Email:       user.Email,
-		FirstName:   user.FirstName,
-		LastName:    user.LastName,
-		CompanyName: user.CompanyName,
 		Status:      string(user.Status),
 		Role:        string(user.Role),
 		CreatedAt:   user.CreatedAt,
 		UpdatedAt:   user.UpdatedAt,
 		Verificated: user.Verificated,
 	}
+
+	if user.FirstName != "" {
+		resp.FirstName = &user.FirstName
+	}
+	if user.LastName != "" {
+		resp.LastName = &user.LastName
+	}
+	if user.CompanyName != "" {
+		resp.CompanyName = &user.CompanyName
+	}
+
+	return resp
 }

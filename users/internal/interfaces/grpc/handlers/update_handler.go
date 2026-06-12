@@ -16,7 +16,7 @@ func (h *Handler) UpdateProfile(ctx context.Context, req *user_api.UpdateProfile
 	log := h.log.With(slog.String("scope", "interfaces/grpc/handlers/UpdateProfile"))
 	log.Info("UpdateProfile got request")
 
-	dto, err := convertUpdateProfileResponseToDto(req)
+	dto, err := convertUpdateProfileRequestToDto(req)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}

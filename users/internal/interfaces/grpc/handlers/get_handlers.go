@@ -35,11 +35,11 @@ func (h *Handler) GetProfile(ctx context.Context, req *user_api.GetProfileReques
 	return convertUserResponseToUserProfile(user), nil
 }
 
-func (h *Handler) GetProfileByUsername(ctx context.Context, req *user_api.GetProfileByUsernameRequest) (*user_api.UserProfile, error) {
+func (h *Handler) GetProfileByUsername(ctx context.Context, req *user_api.GetProfileByEmailRequest) (*user_api.UserProfile, error) {
 	log := h.log.With(slog.String("scope", "interfaces/grpc/handlers/GetProfileByUsername"))
 
 	log.Info("GetProfileByUsername got request")
-	user, err := h.UserService.GetProfileByUsername(ctx, req.Username)
+	user, err := h.UserService.GetProfileByEmail(ctx, req.Email)
 
 	var e models.Error
 	if errors.As(err, &e) {

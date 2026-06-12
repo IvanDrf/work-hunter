@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log/slog"
 
+	"github.com/IvanDrf/work-hunter/pkg/common"
 	user_api "github.com/IvanDrf/work-hunter/pkg/user-api"
 	"github.com/IvanDrf/work-hunter/users/internal/domain/models"
 	"github.com/IvanDrf/work-hunter/users/internal/interfaces/grpc/dto"
@@ -19,7 +20,7 @@ func (h *Handler) ListUsers(ctx context.Context, req *user_api.ListUsersRequest)
 	resp, err := h.UserService.ListUsers(ctx, &dto.ListUsersRequest{
 		PageSize:    req.PageSize,
 		Status:      user_api.UserStatus_name[int32(req.Status)],
-		Role:        user_api.UserRole_name[int32(req.Role)],
+		Role:        common.UserRole_name[int32(req.Role)],
 		SearchQuery: req.SerchQuery,
 		SortBy:      req.SortBy,
 		// TODO: regenerate pb files

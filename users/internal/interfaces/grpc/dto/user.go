@@ -7,9 +7,9 @@ import (
 type UserResponse struct {
 	ID          string
 	Email       string
-	FirstName   string
-	LastName    string
-	CompanyName string
+	FirstName   *string
+	LastName    *string
+	CompanyName *string
 
 	Status string
 	Role   string
@@ -24,19 +24,19 @@ type UserResponse struct {
 type CreateUserRequest struct {
 	ID          string
 	Email       string
-	FirstName   string
-	LastName    string
-	CompanyName string
+	FirstName   *string
+	LastName    *string
+	CompanyName *string
 	Verificated bool
 }
 
 // DTO for updating user
 type UpdateUserRequest struct {
 	ID          string
-	FirstName   string
-	LastName    string
-	CompanyName string
-	Verificated bool
+	FirstName   *string
+	LastName    *string
+	CompanyName *string
+	Verificated *bool
 }
 
 // DTO for listing users
