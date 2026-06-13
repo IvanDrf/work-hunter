@@ -14,7 +14,7 @@ from tests.unit.dto.asserts import (
     assert_remote_and_time,
     assert_salary,
 )
-from tests.unit.dto.common import VacancyInfo, vacancy_info
+from tests.unit.dto.vacancy_info_gen import VacancyInfo, vacancy_info
 
 
 @given(requests=st.lists(vacancy_info(), min_size=5, max_size=10))
@@ -27,6 +27,7 @@ def test_vacancy_create_dto(requests: list[VacancyInfo]) -> None:
         assert_salary(r, schema)
         assert_currencies(r, schema)
         assert_additional(r, schema)
+        assert_remote_and_time(r, schema)
         assert_exp(r, schema)
         assert_author(r, schema)
 
@@ -37,22 +38,14 @@ def test_vacancy_create_dto_no_optional_fields(requests: list[VacancyInfo]) -> N
         r = _create_request_no_optional_fields(req)
 
         schema = vacancy_create_dto(r)
-        assert schema.title == r.title
-        assert schema.description == "No description"
-        assert schema.requirements == r.requirements
-        assert schema.conditions == r.conditions
+        assert_main(r, schema)
 
-        assert schema.salary_min is None
-        assert schema.salary_max is None
+        assert_salary(r, schema)
         assert schema.currency == Currency.RUB
 
-        assert schema.city is None
-        assert schema.metro is None
+        assert_additional(r, schema)
         assert_remote_and_time(r, schema)
-
-        assert schema.experience_min is None
-        assert schema.experience_max is None
-        assert schema.tags == list(r.tags)
+        assert_exp(r, schema)
 
 
 def _create_request(req: VacancyInfo) -> CreateVacancyRequest:

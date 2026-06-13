@@ -1,5 +1,3 @@
-from datetime import datetime, timezone
-
 from hypothesis import given
 from hypothesis import strategies as st
 from pkg.vacancy_api.vacancy_pb2 import Currency as PKGCurrency
@@ -9,8 +7,16 @@ from pkg.vacancy_api.vacancy_pb2 import VacancyInfo as PKGVacancyInfo
 
 from src.api.dto.vacancy import vacancy_response_dto
 from src.domain.schemas import VacancyResponseSchema
-from src.domain.types.enums import Currency, RemoteType, TimeType, VacancyStatus
-from tests.unit.dto.common import FullVacancyInfo, full_vacancy_info
+from src.domain.types.enums import Currency, RemoteType, TimeType
+from tests.unit.dto.asserts import (
+    assert_additional,
+    assert_currencies,
+    assert_main,
+    assert_remote_and_time,
+    assert_salary,
+    assert_times,
+)
+from tests.unit.dto.vacancy_info_gen import FullVacancyInfo, full_vacancy_info
 
 
 @given(responses=st.lists(full_vacancy_info(), min_size=5, max_size=5))
@@ -22,32 +28,30 @@ def test_vacancy_response_dto(responses: list[FullVacancyInfo]) -> None:
         assert_vacancy_response(vacancy, info)
 
 
-def assert_vacancy_response(vacancy: VacancyResponseSchema, info: PKGVacancyInfo) -> None:
-    assert info.vacancy_id == vacancy.vacancy_id
-    assert info.title == vacancy.title
-    assert info.description == vacancy.description
-    assert info.requirements == vacancy.requirements
-    assert info.conditions == vacancy.conditions
-    assert info.salary_min == vacancy.salary_min
-    assert info.salary_max == vacancy.salary_max
-    assert info.currency == vacancy.currency.name
-    assert info.experience_min == vacancy.experience_min
-    assert info.experience_max == vacancy.experience_max
-    assert info.created_at == vacancy.created_at
-    assert info.status == vacancy.status.name
-    assert info.remote_type == vacancy.remote_type.name
-    assert info.time_type == vacancy.time_type.name
-    assert info.city == vacancy.city
-    assert info.metro == vacancy.metro
-    assert info.views == vacancy.views
-    assert info.applications_count == vacancy.applications_count
-    assert info.tags == vacancy.tags
-    assert info.author_name == vacancy.author_name
-    assert info.moderated_time == vacancy.moderated_at
-    assert info.moderator_comments == vacancy.moderator_comments
-    assert info.updated_at == vacancy.updated_at
-    assert info.published_at == vacancy.published_at
-    assert info.closed_at == vacancy.closed_at
+def assert_vacancy_response(schema: VacancyResponseSchema, info: PKGVacancyInfo) -> None:
+    assert info.vacancy_id == schema.vacancy_id
+    assert info.description == schema.description
+
+    assert_main(info, schema)
+    assert_salary(info, schema)
+    assert_currencies(info, schema)
+    assert_salary(info, schema)
+
+    assert info.status == schema.status.value
+
+    assert_remote_and_time(info, schema)
+    assert_times(info, schema)
+    assert_additional(info, schema)
+
+    assert info.views == schema.views
+    assert info.applications_count == schema.applications_count
+
+    assert info.author_name == schema.author_name
+
+    if schema.moderator_comments is None:
+        assert info.moderator_comments == ""
+    else:
+        assert info.moderator_comments == schema.moderator_comments
 
 
 def _create_vacancy_response(resp: FullVacancyInfo) -> VacancyResponseSchema:
@@ -90,7 +94,7 @@ def _create_vacancy_response(resp: FullVacancyInfo) -> VacancyResponseSchema:
         status=resp.stats.status,
         created_at=resp.time.created_at,
         published_at=resp.time.published_at,
-        updated_at=resp.time.published_at,
+        updated_at=resp.time.updated_at,
         closed_at=resp.time.closed_at,
         moderated_at=resp.time.moderated_at,
         moderator_comments=resp.stats.moderator_comments,

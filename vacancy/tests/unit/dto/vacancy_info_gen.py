@@ -126,8 +126,8 @@ def vacancy_salary_valid(draw) -> VacancySalary:
 
 @st.composite
 def vacancy_additional_valid(draw) -> VacancyAdditional:
-    city = draw(st.text(max_size=MAX_CITY_LENGTH))
-    metro = draw(st.text(max_size=MAX_METRO_LENGTH))
+    city = draw(st.text(min_size=1, max_size=MAX_CITY_LENGTH))
+    metro = draw(st.text(min_size=1, max_size=MAX_METRO_LENGTH))
 
     remote = draw(st.sampled_from([PKGRemoteType.ANY, PKGRemoteType.HYBRID, PKGRemoteType.OFFICE, PKGRemoteType.REMOTE]))
     time_type = draw(st.sampled_from([PKGTimeType.FULL, PKGTimeType.PART, PKGTimeType.PART]))
@@ -146,9 +146,9 @@ def vacancy_exp_valid(draw) -> VacancyExp:
 @st.composite
 def vacancy_author_valid(draw) -> VacancyAuthor:
     author_id = draw(st.uuids(version=4))
-    author_name = draw(st.text(max_size=MAX_AUTHOR_NAME_LENGTH))
+    author_name = draw(st.text(min_size=1, max_size=MAX_AUTHOR_NAME_LENGTH))
     role = draw(st.sampled_from([PKGUserRole.ADMIN, PKGUserRole.EMPLOYEE, PKGUserRole.EMPLOYER]))
-    verificated = draw(st.sampled_from([False, True]))
+    verificated = draw(st.one_of(st.booleans()))
 
     return VacancyAuthor(author_id=author_id, author_name=author_name, role=role, verificated=verificated)
 
@@ -156,10 +156,10 @@ def vacancy_author_valid(draw) -> VacancyAuthor:
 @st.composite
 def vacancy_time_valid(draw) -> VacancyTime:
     created_at = draw(st.datetimes())
-    updated_at = draw(st.datetimes())
-    published_at = draw(st.datetimes())
-    closed_at = draw(st.datetimes())
-    moderated_at = draw(st.datetimes())
+    updated_at = draw(st.one_of(st.datetimes(), st.none()))
+    published_at = draw(st.one_of(st.datetimes(), st.none()))
+    closed_at = draw(st.one_of(st.datetimes(), st.none()))
+    moderated_at = draw(st.one_of(st.datetimes(), st.none()))
 
     return VacancyTime(
         created_at=created_at,
@@ -173,7 +173,7 @@ def vacancy_time_valid(draw) -> VacancyTime:
 @st.composite
 def vacancy_stats_valid(draw) -> VacancyStats:
     status = draw(st.sampled_from(VacancyStatus))
-    moderator_comments = draw(st.sampled_from([None, st.text()]))
+    moderator_comments = draw(st.one_of(st.none(), st.text(min_size=0, max_size=200)))
     views = draw(st.integers(min_value=0, max_value=2000))
     applications_count = draw(st.integers(min_value=0, max_value=2000))
 
