@@ -79,6 +79,10 @@ class VacancySearchService(BaseVacancyService):
         if not author:
             raise ArgumentError("invalid author name, author name is empty")
 
+        vacancies = await self._get_vacancies_by_author(author, offset, limit)
+        if vacancies is not None:
+            return vacancies
+
         async with self.uof_factory as uof:
             if user_info is not None and is_user_admin(user_info):
                 vacancies = await self.vacancy_repo.find_vacancies_for_admin_by_author(uof, author, offset, limit)
@@ -88,7 +92,10 @@ class VacancySearchService(BaseVacancyService):
             if vacancies is None:
                 return None
 
-        return [vacancy_orm_to_response_dto(vacancy) for vacancy in vacancies]
+        vacancies = [vacancy_orm_to_response_dto(vacancy) for vacancy in vacancies]
+        create_task(self._save_vacancies_by_author(vacancies, author, offset, limit))
+
+        return vacancies
 
     async def find_vacancies_by_title(
         self,
