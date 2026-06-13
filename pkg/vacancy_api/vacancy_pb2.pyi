@@ -1,17 +1,13 @@
 import datetime
-from collections.abc import Iterable as _Iterable
-from collections.abc import Mapping as _Mapping
-from typing import ClassVar as _ClassVar
-from typing import Optional as _Optional
-from typing import Union as _Union
 
-from google.protobuf import descriptor as _descriptor
-from google.protobuf import message as _message
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
+from ..common import common_pb2 as _common_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
-
-from ..common import common_pb2 as _common_pb2
+from google.protobuf import descriptor as _descriptor
+from google.protobuf import message as _message
+from collections.abc import Iterable as _Iterable, Mapping as _Mapping
+from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
@@ -47,6 +43,12 @@ class ResponseStatus(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     NOT_FOUND: _ClassVar[ResponseStatus]
     FORBIDDEN: _ClassVar[ResponseStatus]
 
+class OrderBy(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = ()
+    DATE: _ClassVar[OrderBy]
+    VIEWS: _ClassVar[OrderBy]
+    APPLICATIONS: _ClassVar[OrderBy]
+
 OFFICE: RemoteType
 REMOTE: RemoteType
 HYBRID: RemoteType
@@ -64,6 +66,9 @@ SUCCESS: ResponseStatus
 FAILED: ResponseStatus
 NOT_FOUND: ResponseStatus
 FORBIDDEN: ResponseStatus
+DATE: OrderBy
+VIEWS: OrderBy
+APPLICATIONS: OrderBy
 
 class Response(_message.Message):
     __slots__ = ("message", "status")
@@ -357,20 +362,23 @@ class FindVacancyByIDRequest(_message.Message):
     ) -> None: ...
 
 class FindVacancyByTagsRequest(_message.Message):
-    __slots__ = ("tags", "limit", "offset", "user_info")
+    __slots__ = ("tags", "limit", "offset", "order_by", "user_info")
     TAGS_FIELD_NUMBER: _ClassVar[int]
     LIMIT_FIELD_NUMBER: _ClassVar[int]
     OFFSET_FIELD_NUMBER: _ClassVar[int]
+    ORDER_BY_FIELD_NUMBER: _ClassVar[int]
     USER_INFO_FIELD_NUMBER: _ClassVar[int]
     tags: _containers.RepeatedScalarFieldContainer[str]
     limit: int
     offset: int
+    order_by: OrderBy
     user_info: _common_pb2.UserInfo
     def __init__(
         self,
         tags: _Optional[_Iterable[str]] = ...,
         limit: _Optional[int] = ...,
         offset: _Optional[int] = ...,
+        order_by: _Optional[_Union[OrderBy, str]] = ...,
         user_info: _Optional[_Union[_common_pb2.UserInfo, _Mapping]] = ...,
     ) -> None: ...
 
@@ -390,38 +398,44 @@ class Vacancies(_message.Message):
     ) -> None: ...
 
 class FindVacanciesByAuthorRequest(_message.Message):
-    __slots__ = ("author_name", "limit", "offset", "user_info")
+    __slots__ = ("author_name", "limit", "offset", "order_by", "user_info")
     AUTHOR_NAME_FIELD_NUMBER: _ClassVar[int]
     LIMIT_FIELD_NUMBER: _ClassVar[int]
     OFFSET_FIELD_NUMBER: _ClassVar[int]
+    ORDER_BY_FIELD_NUMBER: _ClassVar[int]
     USER_INFO_FIELD_NUMBER: _ClassVar[int]
     author_name: str
     limit: int
     offset: int
+    order_by: OrderBy
     user_info: _common_pb2.UserInfo
     def __init__(
         self,
         author_name: _Optional[str] = ...,
         limit: _Optional[int] = ...,
         offset: _Optional[int] = ...,
+        order_by: _Optional[_Union[OrderBy, str]] = ...,
         user_info: _Optional[_Union[_common_pb2.UserInfo, _Mapping]] = ...,
     ) -> None: ...
 
 class FindVacanciesByTitleRequest(_message.Message):
-    __slots__ = ("title", "limit", "offset", "user_info")
+    __slots__ = ("title", "limit", "offset", "order_by", "user_info")
     TITLE_FIELD_NUMBER: _ClassVar[int]
     LIMIT_FIELD_NUMBER: _ClassVar[int]
     OFFSET_FIELD_NUMBER: _ClassVar[int]
+    ORDER_BY_FIELD_NUMBER: _ClassVar[int]
     USER_INFO_FIELD_NUMBER: _ClassVar[int]
     title: str
     limit: int
     offset: int
+    order_by: OrderBy
     user_info: _common_pb2.UserInfo
     def __init__(
         self,
         title: _Optional[str] = ...,
         limit: _Optional[int] = ...,
         offset: _Optional[int] = ...,
+        order_by: _Optional[_Union[OrderBy, str]] = ...,
         user_info: _Optional[_Union[_common_pb2.UserInfo, _Mapping]] = ...,
     ) -> None: ...
 

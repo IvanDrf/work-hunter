@@ -69,6 +69,12 @@ enum ResponseStatus {
     FORBIDDEN = 3;
 }
 
+enum OrderBy {
+    DATE = 0;
+    VIEWS = 1;
+    APPLICATIONS = 2;
+}
+
 message Response {
     string message = 1;
     ResponseStatus status = 2;
@@ -181,8 +187,9 @@ message FindVacancyByTagsRequest {
     repeated string tags = 1;
     uint32 limit = 2;
     uint32 offset = 3;
+    OrderBy order_by = 4;
 
-    optional common.UserInfo user_info = 4;
+    optional common.UserInfo user_info = 5;
 }
 
 message Vacancies {
@@ -196,16 +203,18 @@ message FindVacanciesByAuthorRequest {
     string author_name = 1; // author name
     uint32 limit = 2;
     uint32 offset = 3;
+    OrderBy order_by = 4;
 
-    common.UserInfo user_info = 4;
+    common.UserInfo user_info = 5;
 }
 
 message FindVacanciesByTitleRequest {
     string title = 1;
     uint32 limit = 2;
     uint32 offset = 3;
+    OrderBy order_by = 4;
 
-    common.UserInfo user_info = 4;
+    common.UserInfo user_info = 5;
 }
 
 message SetVacancyStatusRequest {
