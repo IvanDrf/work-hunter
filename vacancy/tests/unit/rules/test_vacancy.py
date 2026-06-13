@@ -1,9 +1,10 @@
-from pytest import mark
+from hypothesis import given
+from hypothesis import strategies as st
 
 from src.domain.rules.vacancy import has_right_to_vacancy, is_vacancy_id_valid
 
 
-@mark.parametrize("vacancy_id", [1, -5, 2, 19, -3, 0, 23, -39, 123])
+@given(vacancy_id=st.integers(min_value=-100, max_value=100))
 def test_is_vacancy_id_valid(vacancy_id) -> None:
     assert is_vacancy_id_valid(vacancy_id) is (vacancy_id > 0)
 
