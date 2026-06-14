@@ -3,6 +3,7 @@ from uuid import UUID
 
 from src.domain.models import TagORM
 from src.domain.models.vacancy import VacancyORM
+from src.domain.types.enums import OrderBy
 from src.infrastructure.service.dependencies.unit_of_work import IUnitOfWork
 
 
@@ -12,6 +13,7 @@ class IVacancySearchRepo(Protocol):
         self,
         uof: IUnitOfWork,
         tags: list[str],
+        order_by: OrderBy,
         offset: int,
         limit: int,
     ) -> list[VacancyORM] | None: ...
@@ -19,6 +21,7 @@ class IVacancySearchRepo(Protocol):
         self,
         uof: IUnitOfWork,
         tags: list[str],
+        order_by: OrderBy,
         offset: int,
         limit: int,
     ) -> list[VacancyORM] | None: ...
@@ -26,6 +29,7 @@ class IVacancySearchRepo(Protocol):
         self,
         uof: IUnitOfWork,
         author: str,
+        order_by: OrderBy,
         offset: int,
         limit: int,
     ) -> list[VacancyORM] | None: ...
@@ -33,6 +37,7 @@ class IVacancySearchRepo(Protocol):
         self,
         uof: IUnitOfWork,
         author: str,
+        order_by: OrderBy,
         offset: int,
         limit: int,
     ) -> list[VacancyORM] | None: ...
@@ -40,6 +45,7 @@ class IVacancySearchRepo(Protocol):
         self,
         uof: IUnitOfWork,
         title: str,
+        order_by: OrderBy,
         offset: int,
         limit: int,
     ) -> list[VacancyORM] | None: ...
@@ -47,6 +53,7 @@ class IVacancySearchRepo(Protocol):
         self,
         uof: IUnitOfWork,
         title: str,
+        order_by: OrderBy,
         offset: int,
         limit: int,
     ) -> list[VacancyORM] | None: ...

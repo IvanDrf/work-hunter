@@ -1,7 +1,7 @@
 from typing import Protocol
 
 from src.domain.schemas import UserInfo, VacancyCreateSchema, VacancyResponseSchema, VacancyUpdateSchema
-from src.domain.types.enums import VacancyStatus
+from src.domain.types.enums import OrderBy, VacancyStatus
 
 
 class IVacancyService(Protocol):
@@ -13,6 +13,7 @@ class IVacancyService(Protocol):
         author: str,
         offset: int,
         limit: int,
+        order_by: OrderBy,
         user_info: UserInfo | None,
     ) -> list[VacancyResponseSchema] | None: ...
 
@@ -21,6 +22,7 @@ class IVacancyService(Protocol):
         tags: list[str],
         offset: int,
         limit: int,
+        order_by: OrderBy,
         user_info: UserInfo | None,
     ) -> list[VacancyResponseSchema] | None: ...
     async def find_vacancies_by_title(
@@ -28,6 +30,7 @@ class IVacancyService(Protocol):
         title: str,
         offset: int,
         limit: int,
+        order_by: OrderBy,
         user_info: UserInfo | None,
     ) -> list[VacancyResponseSchema] | None: ...
 

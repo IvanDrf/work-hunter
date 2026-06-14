@@ -1,6 +1,12 @@
 from enum import Enum
 
 
+class OrderBy(Enum):
+    CREATED_AT = "created_at desc"
+    VIEWS = "views desc"
+    APPLICATIONS_COUNT = "applications_count desc"
+
+
 class UserRole(Enum):
     UNSPECIFIED = 0
     ADMIN = 1

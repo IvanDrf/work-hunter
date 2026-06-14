@@ -1,12 +1,13 @@
 from uuid import UUID
 
-from sqlalchemy import and_, select
+from sqlalchemy import and_, select, text
 from sqlalchemy.exc import DBAPIError, SQLAlchemyError
 from sqlalchemy.orm import selectinload
 
 from src.core.exc import InternalError
 from src.domain.models import TagORM, VacanciesTagsORM, VacancyORM
 from src.domain.models.vacancy import VacancyStatus
+from src.domain.types.enums import OrderBy
 from src.infrastructure.persistence.postgresql_repo.unit_of_work import UnitOfWork
 from src.utils.catch_error import catch_raise_error
 
@@ -24,6 +25,7 @@ class VacancySearchRepo:
         self,
         uof: UnitOfWork,
         tags: list[str],
+        order_by: OrderBy,
         offset: int,
         limit: int,
     ) -> list[VacancyORM] | None:
@@ -32,6 +34,7 @@ class VacancySearchRepo:
             .join(VacanciesTagsORM, VacanciesTagsORM.vacancy_id == VacancyORM.vacancy_id)
             .join(TagORM, TagORM.tag_id == VacanciesTagsORM.tag_id)
             .where(and_(TagORM.tag.in_(tags), VacancyORM.status == VacancyStatus.PUBLISHED))
+            .order_by(text(order_by.value))
             .offset(offset)
             .limit(limit)
             .options(selectinload(VacancyORM.tags))
@@ -47,6 +50,7 @@ class VacancySearchRepo:
         self,
         uof: UnitOfWork,
         tags: list[str],
+        order_by: OrderBy,
         offset: int,
         limit: int,
     ) -> list[VacancyORM] | None:
@@ -55,6 +59,7 @@ class VacancySearchRepo:
             .join(VacanciesTagsORM, VacanciesTagsORM.vacancy_id == VacancyORM.vacancy_id)
             .join(TagORM, TagORM.tag_id == VacanciesTagsORM.tag_id)
             .where(TagORM.tag.in_(tags))
+            .order_by(text(order_by.value))
             .offset(offset)
             .limit(limit)
             .options(selectinload(VacancyORM.tags))
@@ -70,12 +75,14 @@ class VacancySearchRepo:
         self,
         uof: UnitOfWork,
         author: str,
+        order_by: OrderBy,
         offset: int,
         limit: int,
     ) -> list[VacancyORM] | None:
         query = (
             select(VacancyORM)
             .where(and_(VacancyORM.status == VacancyStatus.PUBLISHED, VacancyORM.author_name.contains(author)))
+            .order_by(text(order_by.value))
             .offset(offset)
             .limit(limit)
             .options(selectinload(VacancyORM.tags))
@@ -91,12 +98,14 @@ class VacancySearchRepo:
         self,
         uof: UnitOfWork,
         author: str,
+        order_by: OrderBy,
         offset: int,
         limit: int,
     ) -> list[VacancyORM] | None:
         query = (
             select(VacancyORM)
             .where(VacancyORM.author_name.contains(author))
+            .order_by(text(order_by.value))
             .offset(offset)
             .limit(limit)
             .options(selectinload(VacancyORM.tags))
@@ -119,12 +128,14 @@ class VacancySearchRepo:
         self,
         uof: UnitOfWork,
         title: str,
+        order_by: OrderBy,
         offset: int,
         limit: int,
     ) -> list[VacancyORM] | None:
         query = (
             select(VacancyORM)
             .where(VacancyORM.title.contains(title))
+            .order_by(text(order_by.value))
             .offset(offset)
             .limit(limit)
             .options(selectinload(VacancyORM.tags))
@@ -140,12 +151,14 @@ class VacancySearchRepo:
         self,
         uof: UnitOfWork,
         title: str,
+        order_by: OrderBy,
         offset: int,
         limit: int,
     ) -> list[VacancyORM] | None:
         query = (
             select(VacancyORM)
             .where(and_(VacancyORM.status == VacancyStatus.PUBLISHED, VacancyORM.title.contains(title)))
+            .order_by(text(order_by.value))
             .offset(offset)
             .limit(limit)
             .options(selectinload(VacancyORM.tags))

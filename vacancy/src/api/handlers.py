@@ -16,6 +16,7 @@ from pkg.vacancy_api.vacancy_pb2 import (
 from pkg.vacancy_api.vacancy_pb2_grpc import VacancyServicer
 
 from src.api.dependencies import IVacancyService
+from src.api.dto.order_by import order_by_dto
 from src.api.dto.status import vacancy_status_dto
 from src.api.dto.user_info import user_info_dto, user_info_none_dto
 from src.api.dto.vacancy import vacancy_create_dto, vacancy_response_dto, vacancy_update_dto
@@ -59,10 +60,11 @@ class VacancyHandlers(VacancyServicer):
         user_info = get_user_info(request)
 
         vacancies = await self.vacancy_service.find_vacancies_with_tags(
-            list(request.tags),
-            request.offset,
-            request.limit,
-            user_info_none_dto(user_info),
+            tags=list(request.tags),
+            offset=request.offset,
+            limit=request.limit,
+            order_by=order_by_dto(request),
+            user_info=user_info_none_dto(user_info),
         )
 
         if vacancies is None:
@@ -79,10 +81,10 @@ class VacancyHandlers(VacancyServicer):
     @handle_errors
     async def SetVacancyStatus(self, request: SetVacancyStatusRequest, context: ServicerContext) -> Response:
         await self.vacancy_service.set_vacancy_status(
-            request.vacancy_id,
-            vacancy_status_dto(request.status),
-            request.moderator_comments,
-            user_info_dto(request.user_info),
+            vacancy_id=request.vacancy_id,
+            status=vacancy_status_dto(request.status),
+            moderator_comments=request.moderator_comments,
+            user_info=user_info_dto(request.user_info),
         )
 
         return Response(message="successfully updated vacancy status", status=ResponseStatus.SUCCESS)
@@ -110,7 +112,11 @@ class VacancyHandlers(VacancyServicer):
             user_info = user_info_dto(user_info)
 
         vacancies = await self.vacancy_service.find_vacancies_by_author(
-            request.author_name, request.offset, request.limit, user_info
+            author=request.author_name,
+            offset=request.offset,
+            limit=request.limit,
+            order_by=order_by_dto(request),
+            user_info=user_info,
         )
         if vacancies is None:
             raise NotFoundError(
@@ -130,10 +136,11 @@ class VacancyHandlers(VacancyServicer):
         user_info = get_user_info(request)
 
         vacancies = await self.vacancy_service.find_vacancies_by_title(
-            request.title,
-            request.offset,
-            request.limit,
-            user_info_none_dto(user_info),
+            title=request.title,
+            offset=request.offset,
+            limit=request.limit,
+            order_by=order_by_dto(request),
+            user_info=user_info_none_dto(user_info),
         )
 
         if vacancies is None:
