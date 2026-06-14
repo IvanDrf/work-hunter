@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from uuid import UUID, uuid4
 
 from pkg.common.common_pb2 import UserInfo as PKGUserInfo
@@ -11,13 +12,24 @@ from src.core.exc import ArgumentError
 from src.domain.types.enums import UserRole, VacancyStatus
 
 
-@mark.parametrize(
-    "pkg_status", [PKGVacancyStatus.CLOSED, PKGVacancyStatus.PUBLISHED, PKGVacancyStatus.DELETED, PKGVacancyStatus.MODERATING]
-)
-def test_vacancy_status_dto(pkg_status: PKGVacancyStatus) -> None:
-    status = vacancy_status_dto(pkg_status)
+@dataclass(slots=True)
+class Request:
+    status: PKGVacancyStatus
 
-    match pkg_status:
+
+@mark.parametrize(
+    "req",
+    [
+        Request(PKGVacancyStatus.CLOSED),
+        Request(PKGVacancyStatus.PUBLISHED),
+        Request(PKGVacancyStatus.DELETED),
+        Request(PKGVacancyStatus.MODERATING),
+    ],
+)
+def test_vacancy_status_dto(req: Request) -> None:
+    status = vacancy_status_dto(req)
+
+    match req.status:
         case PKGVacancyStatus.CLOSED:
             assert status == VacancyStatus.CLOSED
 
