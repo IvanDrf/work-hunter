@@ -12,14 +12,18 @@ const (
 	UserStatusDeleted  UserStatus = "USER_STATUS_DELETED"
 )
 
+var UserStatusInDB = map[string]string{"USER_STATUS_ACTIVE": "active", "USER_STATUS_INACTIVE": "inactive", "USER_STATUS_BLOCKED": "blocked"}
+
 // user role
 type UserRole string
 
 const (
-	UserRoleUser      UserRole = "USER_ROLE_EMPLOYEE"
-	UserRoleModerator UserRole = "USER_ROLE_EMPLOYER"
-	UserRoleAdmin     UserRole = "USER_ROLE_ADMIN"
+	UserRoleEmployee UserRole = "USER_ROLE_EMPLOYEE"
+	UserRoleEmployer UserRole = "USER_ROLE_EMPLOYER"
+	UserRoleAdmin    UserRole = "USER_ROLE_ADMIN"
 )
+
+var UserRoleInDB = map[string]string{"USER_ROLE_EMPLOYEE": "employee", "USER_ROLE_EMPLOYER": "employer", "USER_ROLE_ADMIN": "admin"}
 
 func ValidateUserStatus(status UserStatus) error {
 	if status != UserStatusActive && status != UserStatusInactive && status != UserStatusBlocked && status != UserStatusDeleted {
@@ -29,7 +33,7 @@ func ValidateUserStatus(status UserStatus) error {
 }
 
 func ValidateUserRole(role UserRole) error {
-	if role != UserRoleUser && role != UserRoleModerator && role != UserRoleAdmin {
+	if role != UserRoleEmployee && role != UserRoleEmployer && role != UserRoleAdmin {
 		return errors.New("invalid user role")
 	}
 	return nil

@@ -26,7 +26,7 @@ func MigrateUp(databaseURL string) error {
 func MigrateDown(databaseURL string) error {
 	m, err := migrate.New("file://internal/migration/migrations", databaseURL)
 	if err != nil {
-		return fmt.Errorf("failed to create mugrator: %w", err)
+		return fmt.Errorf("failed to create migrator: %w", err)
 	}
 
 	defer m.Close()

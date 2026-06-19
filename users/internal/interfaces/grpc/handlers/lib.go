@@ -11,9 +11,9 @@ func convertCreateProfileResponseToDto(req *user_api.CreateProfileRequest) *dto.
 	return &dto.CreateUserRequest{
 		ID:          req.UserId,
 		Email:       req.Email,
-		FirstName:   req.FirstName,
-		LastName:    req.LastName,
-		CompanyName: req.CompanyName,
+		FirstName:   req.GetFirstName(),
+		LastName:    req.GetLastName(),
+		CompanyName: req.GetCompanyName(),
 		Verificated: req.Verificated,
 	}
 }
@@ -24,19 +24,19 @@ func convertUpdateProfileRequestToDto(req *user_api.UpdateProfileRequest) (*dto.
 	}
 
 	if req.FirstName != nil {
-		dto.FirstName = req.FirstName
+		dto.FirstName = req.GetFirstName()
 	}
 
 	if req.LastName != nil {
-		dto.LastName = req.LastName
+		dto.LastName = req.GetLastName()
 	}
 
 	if req.CompanyName != nil {
-		dto.CompanyName = req.CompanyName
+		dto.CompanyName = req.GetCompanyName()
 	}
 
 	if req.Verificated != nil {
-		dto.Verificated = req.Verificated
+		dto.Verificated = req.GetVerificated()
 	}
 	return dto, nil
 }
@@ -45,9 +45,9 @@ func convertUserResponseToUserProfile(user *dto.UserResponse) *user_api.UserProf
 	return &user_api.UserProfile{
 		Id:          user.ID,
 		Email:       user.Email,
-		FirstName:   user.FirstName,
-		LastName:    user.LastName,
-		CompanyName: user.CompanyName,
+		FirstName:   &user.FirstName,
+		LastName:    &user.LastName,
+		CompanyName: &user.CompanyName,
 		Status:      user_api.UserStatus(user_api.UserStatus_value[user.Status]),
 		Role:        common.UserRole(common.UserRole_value[user.Role]),
 		CreatedAt:   timestamppb.New(user.CreatedAt),
@@ -58,7 +58,7 @@ func convertUserResponseToUserProfile(user *dto.UserResponse) *user_api.UserProf
 
 func convertListDtoToListResp(dto *dto.ListUsersResponse) *user_api.ListUsersResponse {
 	resp := &user_api.ListUsersResponse{
-		Users:      make([]*user_api.UserProfile, len(dto.Users)),
+		Users:      make([]*user_api.UserProfile, 0, len(dto.Users)),
 		TotalCount: dto.TotalCount,
 	}
 

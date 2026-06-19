@@ -269,13 +269,13 @@ func modelToResp(user *models.User) *dto.UserResponse {
 	}
 
 	if user.FirstName != "" {
-		resp.FirstName = &user.FirstName
+		resp.FirstName = user.FirstName
 	}
 	if user.LastName != "" {
-		resp.LastName = &user.LastName
+		resp.LastName = user.LastName
 	}
 	if user.CompanyName != "" {
-		resp.CompanyName = &user.CompanyName
+		resp.CompanyName = user.CompanyName
 	}
 
 	return resp

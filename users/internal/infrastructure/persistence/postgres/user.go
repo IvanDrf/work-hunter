@@ -79,7 +79,7 @@ func (r *UserRepository) GetUserByID(ctx context.Context, id uuid.UUID) (*models
 func (r *UserRepository) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
 	query := `
 	SELECT * FROM users
-	WHERE email = $1 AND status != 'deleted'
+	WHERE email = $1 AND status != 'USER_STATUS_DELETED'
 	`
 
 	var user models.User
@@ -108,7 +108,7 @@ func (r *UserRepository) UpdateUser(ctx context.Context, updatedUser *models.Use
 		last_name = :last_name,
         company_name = :company_name,
 		verificated = :verificated
-	WHERE id = :id AND status != 'deleted'
+	WHERE id = :id AND status != 'USER_STATUS_DELETED'
 	`
 
 	_, err := r.db.NamedExecContext(ctx, query, updatedUser)
@@ -131,7 +131,7 @@ func (r *UserRepository) DeleteUser(ctx context.Context, id uuid.UUID, permanent
 		`
 	} else {
 		query = `
-		UPDATE users SET status = 'deleted' WHERE id = $1 AND status != 'deleted'
+		UPDATE users SET status = 'USER_STATUS_DELETED' WHERE id = $1 AND status != 'USER_STATUS_DELETED'
 		`
 	}
 
@@ -150,10 +150,10 @@ func (r *UserRepository) DeleteUser(ctx context.Context, id uuid.UUID, permanent
 func (r *UserRepository) ListUsers(ctx context.Context, params map[string]string) ([]*models.User, int32, error) {
 	baseQuery := `
 	SELECT * FROM users
-	WHERE status != 'deleted'
+	WHERE status != 'USER_STATUS_DELETED'
 	`
 
-	countQuery := `SELECT COUNT(*) FROM users WHERE status != 'deleted'`
+	countQuery := `SELECT COUNT(*) FROM users WHERE status != 'USER_STATUS_DELETED'`
 
 	var whereConditions string
 

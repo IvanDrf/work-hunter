@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS users (
     status user_status NOT NULL DEFAULT 'active',
     role user_role NOT NULL DEFAULT 'employee',
 
-    BOOLEAN verificated NOT NULL DEFAULT false,
+    verificated BOOLEAN NOT NULL DEFAULT false,
 
     -- time points 
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -35,8 +35,8 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
-CREATE TRIGGER IF NOT EXISTS update_users_updated_at
-    AFTER UPDATE ON users
+CREATE TRIGGER update_users_updated_at
+    BEFORE UPDATE ON users
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
@@ -48,7 +48,7 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
-CREATE TRIGGER IF NOT EXISTS set_users_created_at
-    AFTER INSERT ON users
+CREATE TRIGGER set_users_created_at
+    BEFORE INSERT ON users
     FOR EACH ROW
     EXECUTE FUNCTION set_created_at_column();
