@@ -37,12 +37,12 @@ func (r *UserRepository) CreateUser(ctx context.Context, user *models.User) erro
 	_, err := r.db.NamedExecContext(ctx, query, user)
 	if err != nil {
 		if isUniqueViolation(err) {
-			return &models.Error{
+			return models.Error{
 				Message: fmt.Sprintf("user %v already exists", user),
 				Code:    models.ErrCodeUserAlreadyExists,
 			}
 		}
-		return &models.Error{
+		return models.Error{
 			Message: fmt.Sprintf("failed to create user %v: %v", user, err),
 			Code:    models.ErrCodeInternal,
 		}
@@ -61,13 +61,13 @@ func (r *UserRepository) GetUserByID(ctx context.Context, id uuid.UUID) (*models
 	err := r.db.GetContext(ctx, &user, query, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, &models.Error{
+			return nil, models.Error{
 				Message: fmt.Sprintf("user with id = %v not found", id),
 				Code:    models.ErrCodeUserNotFound,
 			}
 		}
 
-		return nil, &models.Error{
+		return nil, models.Error{
 			Message: fmt.Sprintf("failed to get user by id: %v", err),
 			Code:    models.ErrCodeInternal,
 		}
@@ -79,20 +79,20 @@ func (r *UserRepository) GetUserByID(ctx context.Context, id uuid.UUID) (*models
 func (r *UserRepository) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
 	query := `
 	SELECT * FROM users
-	WHERE email = $1 AND status != 'USER_STATUS_DELETED'
+	WHERE email = $1 AND status != 'deleted'
 	`
 
 	var user models.User
 	err := r.db.GetContext(ctx, &user, query, email)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, &models.Error{
+			return nil, models.Error{
 				Message: fmt.Sprintf("user with email = %v not found", email),
 				Code:    models.ErrCodeUserNotFound,
 			}
 		}
 
-		return nil, &models.Error{
+		return nil, models.Error{
 			Message: fmt.Sprintf("failed to get user by username: %v", err),
 			Code:    models.ErrCodeInternal,
 		}
@@ -108,12 +108,12 @@ func (r *UserRepository) UpdateUser(ctx context.Context, updatedUser *models.Use
 		last_name = :last_name,
         company_name = :company_name,
 		verificated = :verificated
-	WHERE id = :id AND status != 'USER_STATUS_DELETED'
+	WHERE id = :id AND status != 'deleted'
 	`
 
 	_, err := r.db.NamedExecContext(ctx, query, updatedUser)
 	if err != nil {
-		return &models.Error{
+		return models.Error{
 			Message: fmt.Sprintf("failed to update user: %v", err),
 			Code:    models.ErrCodeInternal,
 		}
@@ -131,14 +131,14 @@ func (r *UserRepository) DeleteUser(ctx context.Context, id uuid.UUID, permanent
 		`
 	} else {
 		query = `
-		UPDATE users SET status = 'USER_STATUS_DELETED' WHERE id = $1 AND status != 'USER_STATUS_DELETED'
+		UPDATE users SET status = 'deleted' WHERE id = $1 AND status != 'deleted'
 		`
 	}
 
 	_, err := r.db.ExecContext(ctx, query, string(rules.UserStatusDeleted), time.Now(), id)
 
 	if err != nil {
-		return &models.Error{
+		return models.Error{
 			Message: fmt.Sprintf("failed to delete user: %v", err),
 			Code:    models.ErrCodeInternal,
 		}
@@ -150,10 +150,10 @@ func (r *UserRepository) DeleteUser(ctx context.Context, id uuid.UUID, permanent
 func (r *UserRepository) ListUsers(ctx context.Context, params map[string]string) ([]*models.User, int32, error) {
 	baseQuery := `
 	SELECT * FROM users
-	WHERE status != 'USER_STATUS_DELETED'
+	WHERE status != 'deleted'
 	`
 
-	countQuery := `SELECT COUNT(*) FROM users WHERE status != 'USER_STATUS_DELETED'`
+	countQuery := `SELECT COUNT(*) FROM users WHERE status != 'deleted'`
 
 	var whereConditions string
 
@@ -184,7 +184,7 @@ func (r *UserRepository) ListUsers(ctx context.Context, params map[string]string
 
 	var totalCount int32
 	if err := r.db.GetContext(ctx, &totalCount, countQuery+whereConditions, args); err != nil {
-		return nil, 0, &models.Error{
+		return nil, 0, models.Error{
 			Message: fmt.Sprintf("failed to count users: %v", err),
 			Code:    models.ErrCodeInternal,
 		}
@@ -196,7 +196,7 @@ func (r *UserRepository) ListUsers(ctx context.Context, params map[string]string
 
 	var users []*models.User
 	if err := r.db.SelectContext(ctx, &users, baseQuery, args); err != nil {
-		return nil, 0, &models.Error{
+		return nil, 0, models.Error{
 			Message: fmt.Sprintf("failed to list users: %v", err),
 			Code:    models.ErrCodeInternal,
 		}
@@ -214,7 +214,7 @@ func (r *UserRepository) UpdateUserStatus(ctx context.Context, id uuid.UUID, sta
 
 	_, err := r.db.ExecContext(ctx, query, status, id)
 	if err != nil {
-		return &models.Error{
+		return models.Error{
 			Message: fmt.Sprintf("failed to update user status: %v", err),
 			Code:    models.ErrCodeInternal,
 		}

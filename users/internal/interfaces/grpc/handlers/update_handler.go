@@ -50,7 +50,7 @@ func (h *Handler) UpdateUserStatus(ctx context.Context, req *user_api.UpdateUser
 
 	user, err := h.UserService.UpdateUserStatus(ctx, &dto.UpdateUserStatusRequest{
 		ID:     req.UserId,
-		Status: user_api.UserStatus_name[int32(req.Status)],
+		Status: userStatus_DB[user_api.UserStatus_name[int32(req.Status)]],
 	})
 
 	if err != nil {
