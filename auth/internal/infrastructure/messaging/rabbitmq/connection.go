@@ -7,8 +7,8 @@ import (
 	rabbit "github.com/rabbitmq/amqp091-go"
 )
 
-func Connect(cfg *config.RabbitMQConfig, queueName string) (*rabbit.Connection, *rabbit.Channel, *rabbit.Queue) {
-	conn, err := rabbit.Dial(cfg.DSN())
+func Connect(cfg *config.Config, queueName string) (*rabbit.Connection, *rabbit.Channel, *rabbit.Queue) {
+	conn, err := rabbit.Dial(cfg.RABBITMQ_DSN())
 	if err != nil {
 		log.Fatalf("can't connect to rabbitmq: %s", err)
 	}

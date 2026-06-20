@@ -9,8 +9,8 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func Connect(cfg *config.PostgreConfig) *sql.DB {
-	db, err := sql.Open("postgres", cfg.DSN())
+func Connect(cfg *config.Config) *sql.DB {
+	db, err := sql.Open("postgres", cfg.POSTGRES_DSN())
 	if err != nil {
 		log.Fatalf("can't connect to postgres database: %s", err)
 	}

@@ -17,7 +17,7 @@ const (
 	errorLevel LoggerLevel = "error"
 )
 
-func InitLogger(cfg *config.AppConfig) {
+func InitLogger(cfg *config.Config) {
 	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 		AddSource: selectSource(cfg.LoggerLevel),
 		Level:     selectLevel(cfg.LoggerLevel),

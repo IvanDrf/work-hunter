@@ -11,8 +11,8 @@ import (
 )
 
 func main() {
-	cfg := config.LoadFromYAML()
-	adapters.InitLogger(&cfg.App)
+	cfg := config.LoadFromENV()
+	adapters.InitLogger(cfg)
 
 	app := app.NewApp(cfg)
 

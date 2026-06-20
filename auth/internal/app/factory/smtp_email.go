@@ -6,5 +6,5 @@ import (
 )
 
 func (f *Factory) newSmtpEmailService() service.EmailService {
-	return s.NewSmtpEmailService(f.cfg.Email.Host, f.cfg.Email.Username, f.cfg.Email.Password)
+	return s.NewSmtpEmailService(f.cfg.EmailHost, f.cfg.EmailUsername, f.cfg.EmailPassword)
 }

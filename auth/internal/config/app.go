@@ -1,8 +1,8 @@
 package config
 
 type AppConfig struct {
-	LoggerLevel string `yaml:"logger_level"`
+	LoggerLevel string `env:"LOGGER_LEVEL"`
 
-	Host string `yaml:"host"`
-	Port int    `yaml:"port"`
+	AppHost string `env:"APP_HOST"`
+	AppPort int    `env:"APP_PORT"`
 }
