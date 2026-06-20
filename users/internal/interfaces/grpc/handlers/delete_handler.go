@@ -16,19 +16,23 @@ func (h *Handler) DeleteProfile(ctx context.Context, req *user_api.DeleteProfile
 	log := h.log.With(slog.String("scope", "interfaces/grpc/handlers/DeleteProfile"))
 	log.Info("DeleteProfile got request")
 
-	err := h.UserService.DeleteProfile(ctx, req.UserId)
-	var e models.Error
-	if errors.As(err, &e) {
-		log.Error("Delete profile error", slog.String("error", e.Error()))
+	if err := h.UserService.DeleteProfile(ctx, req.UserId); err != nil {
+		var e models.Error
+		if errors.As(err, &e) {
+			log.Error("Delete profile error", slog.String("error", e.Error()))
 
-		switch e.Code {
-		case models.ErrCodeInternal:
-			return nil, status.Error(codes.Internal, e.Message)
-		case models.ErrCodeUserNotFound:
-			return nil, status.Error(codes.NotFound, e.Message)
-		default:
-			return nil, status.Error(codes.InvalidArgument, e.Message)
+			switch e.Code {
+			case models.ErrCodeInternal:
+				return nil, status.Error(codes.Internal, e.Message)
+			case models.ErrCodeUserNotFound:
+				return nil, status.Error(codes.NotFound, e.Message)
+			default:
+				return nil, status.Error(codes.InvalidArgument, e.Message)
+			}
 		}
+
+		log.Error("Unhandled system error during profile delete", slog.String("error", err.Error()))
+		return nil, status.Error(codes.Internal, "internal server error")
 	}
 
 	log.Info("Delete profile successfully response")

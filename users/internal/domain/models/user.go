@@ -24,7 +24,7 @@ type User struct {
 }
 
 func NewUser(id uuid.UUID, email string, firstName, lastName, companyName string, verificated bool) *User {
-	return &User{
+	u := User{
 		ID:          id,
 		Email:       email,
 		FirstName:   firstName,
@@ -36,6 +36,12 @@ func NewUser(id uuid.UUID, email string, firstName, lastName, companyName string
 
 		Verificated: verificated,
 	}
+
+	if companyName != "" {
+		u.Role = rules.UserRoleEmployer
+	}
+
+	return &u
 }
 
 func (u *User) UpdateUser(firstName, lastName, companyName string, verificated bool) {
