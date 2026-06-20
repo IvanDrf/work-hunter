@@ -1,0 +1,99 @@
+version: '3.9'
+
+services:
+  database:
+    image: postgres:17.10
+    container_name: auth_database_postgres
+    restart: always
+
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes: 
+      - pgdata:/var/lib/postgresql/data
+
+    networks:
+    - auth_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  tokens_database:
+    image: redis:8.6
+    container_name: tokens_database_redis
+    restart: always
+
+    ports:
+      - "${REDIS_PORT}:6379"
+
+    volumes:
+      - redis_data:/data
+    networks:
+      - auth_network
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  broker:
+    image: rabbitmq:4.3.0
+    hostname: broker
+    container_name: auth_broker_rabbitmq
+    restart: always
+
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
+    
+    ports:
+      - "${RABBITMQ_PORT}:5672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - rabbitmq_logs:/var/log/rabbitmq
+
+    networks:
+      - auth_network
+
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
+
+
+  app:
+    build: .
+    container_name: auth_app
+    restart: always
+    ports:
+      - "${APP_PORT}:50052"
+    depends_on:
+      database:
+        condition: service_healthy
+      tokens_database:
+        condition: service_healthy
+      broker:
+        condition: service_healthy
+      
+    networks:
+      - auth_network
+    restart: on-failure
+
+volumes:
+  pgdata:
+  redis_data:
+  rabbitmq_data:
+  rabbitmq_logs:
+
+networks:
+  auth_network:
+    driver: bridge

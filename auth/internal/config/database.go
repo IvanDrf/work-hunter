@@ -6,16 +6,16 @@ type PostgreConfig struct {
 	PostgresHost string `env:"POSTGRES_HOST"`
 	PostgresPort uint16 `env:"POSTGRES_PORT"`
 
-	PostgresUsername string `env:"POSTGRES_USERNAME"`
+	PostgresUser     string `env:"POSTGRES_USER"`
 	PostgresPassword string `env:"POSTGRES_PASSWORD"`
 
-	PostgresDatabase string `env:"POSTGRES_DB_NAME"`
+	PostgresDatabase string `env:"POSTGRES_DB"`
 }
 
 func (d *PostgreConfig) POSTGRES_DSN() string {
 	return fmt.Sprintf(
 		"postgres://%s:%s@%s:%d/%s?sslmode=disable",
-		d.PostgresUsername, d.PostgresPassword, d.PostgresHost, d.PostgresPort, d.PostgresDatabase,
+		d.PostgresUser, d.PostgresPassword, d.PostgresHost, d.PostgresPort, d.PostgresDatabase,
 	)
 }
 

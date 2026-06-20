@@ -4,7 +4,6 @@ package main
 // Example usage
 // go run cmd/migrator/main.go
 // --mig=./internal/infrastructure/persistence/postgres/migrations/
-// --config=./config/config.yaml
 // --cmd=up
 // --steps=1
 
