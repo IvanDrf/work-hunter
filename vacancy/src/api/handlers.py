@@ -1,4 +1,5 @@
 from grpc import ServicerContext
+from pkg.common.common_pb2 import Empty, ServiceStatus, Status
 from pkg.vacancy_api.vacancy_pb2 import (
     CreateVacancyRequest,
     DeleteVacancyRequest,
@@ -30,6 +31,9 @@ class VacancyHandlers(VacancyServicer):
     def __init__(self, vacancy_service: IVacancyService) -> None:
         self.vacancy_service: IVacancyService = vacancy_service
         super().__init__()
+
+    async def Health(self, request: Empty, context: ServicerContext) -> ServiceStatus:
+        return ServiceStatus(status=Status.AVAILABLE)
 
     @handle_errors
     async def CreateVacancy(self, request: CreateVacancyRequest, context: ServicerContext) -> VacancyInfo:

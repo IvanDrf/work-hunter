@@ -1,11 +1,12 @@
-from asyncio import create_task
+import logging
+from asyncio import create_task, gather
 from datetime import timedelta
 
-from src.core.exc import AccessError, ArgumentError
+from src.core.exc import AccessError, ArgumentError, InternalError
 from src.domain.rules.user import is_user_admin
 from src.domain.rules.vacancy import has_right_to_vacancy, is_vacancy_id_valid
 from src.domain.schemas import UserInfo, VacancyResponseSchema
-from src.domain.types.enums import OrderBy
+from src.domain.types.enums import OrderBy, UserRole, VacancyStatus
 from src.infrastructure.service.base_vacancy import BaseVacancyService
 from src.infrastructure.service.dependencies import ICache, IUnitOfWork, IVacancyRepo
 from src.infrastructure.service.dto.vacancy_dto import vacancy_orm_to_response_dto
@@ -31,6 +32,7 @@ class VacancySearchService(BaseVacancyService):
 
         vacancy = await self._get_vacancy_from_cache_by_id(vacancy_id)
         if vacancy is not None and has_right_to_vacancy(vacancy, user_info):
+            create_task(self._update_vacancy_views(vacancy, user_info))
             return vacancy
 
         async with self.uof_factory as uof:
@@ -42,7 +44,7 @@ class VacancySearchService(BaseVacancyService):
             raise AccessError("this vacancy is moderating now or deleted, you can't see it now")
 
         vacancySchema = vacancy_orm_to_response_dto(vacancy)
-        create_task(self._save_vacancy_in_cache_by_id(vacancySchema))
+        gather(*[self._save_vacancy_in_cache_by_id(vacancySchema), self._update_vacancy_views(vacancySchema, user_info)])
 
         return vacancySchema
 
@@ -118,3 +120,16 @@ class VacancySearchService(BaseVacancyService):
             return None
 
         return [vacancy_orm_to_response_dto(vacancy) for vacancy in vacancies]
+
+    async def _update_vacancy_views(self, vacancy: VacancyResponseSchema, user_info: UserInfo | None) -> None:
+        if vacancy.status != VacancyStatus.PUBLISHED:
+            return
+
+        if user_info is not None and user_info.user_role != UserRole.EMPLOYEE:
+            return
+
+        async with self.uof_factory as uof:
+            try:
+                await self.vacancy_repo.update_vacancy(uof, vacancy.vacancy_id, {"views": vacancy.views + 1})
+            except InternalError as e:
+                logging.critical(f"can't update views for {vacancy.vacancy_id=}, details={e}")

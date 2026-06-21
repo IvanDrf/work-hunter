@@ -7,6 +7,9 @@ import "common.proto";
 
 // Vacancy service
 service Vacancy {
+    // check service health
+    rpc Health(common.Empty) returns (common.ServiceStatus);
+
     // Create vacancy, returns vacancy_id if success
     rpc CreateVacancy(CreateVacancyRequest) returns (VacancyInfo);
 

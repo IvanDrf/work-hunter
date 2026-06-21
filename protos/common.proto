@@ -21,3 +21,16 @@ message FullUserInfo {
     string username = 3;
     bool verificated = 4;
 }
+
+message Empty {
+}
+
+// service status
+enum Status { 
+    UNAVAILABLE = 0;
+    AVAILABLE = 1;
+}
+
+message ServiceStatus {
+    Status status = 1;
+}
