@@ -3,8 +3,8 @@ package config
 import "time"
 
 type JwtConfig struct {
-	Secret string `yaml:"secret"`
+	JWTSecret string `env:"JWT_SECRET"`
 
-	AccessTime  time.Duration `yaml:"access_time"`
-	RefreshTime time.Duration `yaml:"refresh_time"`
+	JWTAccessTime  time.Duration `env:"JWT_ACCESS_TIME"`
+	JWTRefreshTime time.Duration `env:"JWT_REFRESH_TIME"`
 }

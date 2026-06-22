@@ -4,7 +4,6 @@ package main
 // Example usage
 // go run cmd/migrator/main.go
 // --mig=./internal/infrastructure/persistence/postgres/migrations/
-// --config=./config/config.yaml
 // --cmd=up
 // --steps=1
 
@@ -33,9 +32,11 @@ func main() {
 	flag.StringVar(&migrations, "mig", "", "path to migration files")
 	flag.StringVar(&command, "cmd", "", "command for migration: up or down")
 	flag.IntVar(&steps, "steps", 1, "amount of steps for migrations")
-	cfg := config.LoadFromYAML()
+	flag.Parse()
 
-	m, err := migrate.New(fmt.Sprintf("file://%s", migrations), cfg.Database.DSN())
+	cfg := config.LoadFromENV()
+
+	m, err := migrate.New(fmt.Sprintf("file://%s", migrations), cfg.POSTGRES_DSN())
 	if err != nil {
 		log.Fatal(err)
 	}

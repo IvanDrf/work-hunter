@@ -35,12 +35,12 @@ func NewApp(cfg *config.Config) *App {
 }
 
 func (a *App) Run() {
-	l, err := net.Listen("tcp", fmt.Sprintf("%s:%d", a.cfg.App.Host, a.cfg.App.Port))
+	l, err := net.Listen("tcp", fmt.Sprintf("%s:%d", a.cfg.AppHost, a.cfg.AppPort))
 	if err != nil {
 		log.Fatalf("can't start AUTH service: %s", err)
 	}
 
-	slog.Info("Starting AUTH service", slog.String("host", a.cfg.App.Host), slog.Int("port", a.cfg.App.Port))
+	slog.Info("Starting AUTH service", slog.String("host", a.cfg.AppHost), slog.Int("port", a.cfg.AppPort))
 
 	if err := a.server.Serve(l); err != nil {
 		log.Fatalf("can't start AUTH servie: %s", err)
@@ -48,7 +48,7 @@ func (a *App) Run() {
 }
 
 func (a *App) Stop() {
-	slog.Info("Stopping AUTH service", slog.String("host", a.cfg.App.Host), slog.Int("port", a.cfg.App.Port))
+	slog.Info("Stopping AUTH service", slog.String("host", a.cfg.AppHost), slog.Int("port", a.cfg.AppPort))
 
 	a.server.GracefulStop()
 	a.handlers.Close()

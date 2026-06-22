@@ -28,5 +28,5 @@ func (f *Factory) newVerificationService(producer service.EmailProducer, userRep
 }
 
 func (f *Factory) newJwter() jwt.Jwter {
-	return j.NewJwt(f.cfg.Jwt.Secret, f.cfg.Jwt.AccessTime, f.cfg.Jwt.RefreshTime)
+	return j.NewJwt(f.cfg.JWTSecret, f.cfg.JWTAccessTime, f.cfg.JWTRefreshTime)
 }

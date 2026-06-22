@@ -1,8 +1,8 @@
 package config
 
 type EmailConfig struct {
-	Host string `yaml:"host_addr"`
+	EmailHost string `env:"EMAIL_HOST_ADDR"`
 
-	Username string `yaml:"username"`
-	Password string `yaml:"password"`
+	EmailUsername string `env:"EMAIL_USERNAME"`
+	EmailPassword string `env:"EMAIL_PASSWORD"`
 }

@@ -3,30 +3,30 @@ package config
 import "fmt"
 
 type PostgreConfig struct {
-	Host string `yaml:"host"`
-	Port uint16 `yaml:"port"`
+	PostgresHost string `env:"POSTGRES_HOST"`
+	PostgresPort uint16 `env:"POSTGRES_PORT"`
 
-	Username string `yaml:"username"`
-	Password string `yaml:"password"`
+	PostgresUser     string `env:"POSTGRES_USER"`
+	PostgresPassword string `env:"POSTGRES_PASSWORD"`
 
-	Name string `yaml:"db_name"`
+	PostgresDatabase string `env:"POSTGRES_DB"`
 }
 
-func (d *PostgreConfig) DSN() string {
+func (d *PostgreConfig) POSTGRES_DSN() string {
 	return fmt.Sprintf(
 		"postgres://%s:%s@%s:%d/%s?sslmode=disable",
-		d.Username, d.Password, d.Host, d.Port, d.Name,
+		d.PostgresUser, d.PostgresPassword, d.PostgresHost, d.PostgresPort, d.PostgresDatabase,
 	)
 }
 
 type RedisConfig struct {
-	Host string `yaml:"host"`
-	Port int    `yaml:"port"`
+	RedisHost string `env:"REDIS_HOST"`
+	RedisPort int    `env:"REDIS_PORT"`
 
-	Password string `yaml:"password"`
-	Database int    `yaml:"database"`
+	RedisPassword string `env:"REDIS_PASSWORD"`
+	RedisDatabase int    `env:"REDIS_DATABASE"`
 }
 
-func (r *RedisConfig) DSN() string {
-	return fmt.Sprintf("%s:%d", r.Host, r.Port)
+func (r *RedisConfig) REDIS_DSN() string {
+	return fmt.Sprintf("%s:%d", r.RedisHost, r.RedisPort)
 }

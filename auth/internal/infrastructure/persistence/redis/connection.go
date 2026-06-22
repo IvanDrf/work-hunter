@@ -8,11 +8,11 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-func Connect(cfg *config.RedisConfig) *redis.Client {
+func Connect(cfg *config.Config) *redis.Client {
 	client := redis.NewClient(&redis.Options{
-		Addr:     cfg.DSN(),
-		Password: cfg.Password,
-		DB:       cfg.Database,
+		Addr:     cfg.REDIS_DSN(),
+		Password: cfg.RedisPassword,
+		DB:       cfg.RedisDatabase,
 	})
 
 	err := client.Ping(context.Background()).Err()

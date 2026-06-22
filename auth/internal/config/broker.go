@@ -3,16 +3,16 @@ package config
 import "fmt"
 
 type RabbitMQConfig struct {
-	Host string `yaml:"host"`
-	Port int    `yaml:"port"`
+	RabbitMQHost string `env:"RABBITMQ_HOST"`
+	RabbitMQPort int    `env:"RABBITMQ_PORT"`
 
-	Username string `yaml:"username"`
-	Password string `yaml:"password"`
+	RabbitMQUsername string `env:"RABBITMQ_USER"`
+	RabbitMQPassword string `env:"RABBITMQ_PASSWORD"`
 
-	ProducerQueue string `yaml:"producer_queue"`
-	ConsumerQueue string `yaml:"consumer_queue"`
+	RabbitMQProducerQueue string `env:"RABBITMQ_PRODUCER_QUEUE"`
+	RabbitMQConsumerQueue string `env:"RABBITMQ_CONSUMER_QUEUE"`
 }
 
-func (r *RabbitMQConfig) DSN() string {
-	return fmt.Sprintf("amqp://%s:%s@%s:%d/", r.Username, r.Password, r.Host, r.Port)
+func (r *RabbitMQConfig) RABBITMQ_DSN() string {
+	return fmt.Sprintf("amqp://%s:%s@%s:%d/", r.RabbitMQUsername, r.RabbitMQPassword, r.RabbitMQHost, r.RabbitMQPort)
 }

@@ -1,50 +1,35 @@
 package config
 
 import (
-	"flag"
 	"log"
-	"os"
 
-	"github.com/ilyakaznacheev/cleanenv"
+	"github.com/caarlos0/env/v11"
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
-	App AppConfig `yaml:"app"`
+	AppConfig
 
-	Database PostgreConfig `yaml:"database"`
-	Redis    RedisConfig   `yaml:"redis"`
+	PostgreConfig
+	RedisConfig
 
-	Broker RabbitMQConfig `yaml:"broker"`
-	Email  EmailConfig    `yaml:"email"`
+	RabbitMQConfig
+	EmailConfig
 
-	Jwt JwtConfig `yaml:"jwt"`
+	JwtConfig
 }
 
-const defaultPath = "config/config.yaml"
-
-func LoadFromYAML() *Config {
-	filePath := getPathFromCmdArgs()
-	if filePath == "" {
-		filePath = defaultPath
+func LoadFromENV() *Config {
+	if err := godotenv.Load(); err != nil {
+		log.Fatalf("can't load config settings from .env, error=%s", err)
 	}
 
-	if _, err := os.Stat(filePath); os.IsNotExist(err) {
-		log.Fatalf("config file doesn't exists: %s\n%s", filePath, err)
+	cfg := &Config{}
+
+	err := env.Parse(cfg)
+	if err != nil {
+		log.Fatalf("can't load config from env file, error=%s", err)
 	}
 
-	config := Config{}
-	if err := cleanenv.ReadConfig(filePath, &config); err != nil {
-		log.Fatalf("can't read config file: %s", err)
-	}
-
-	return &config
-}
-
-func getPathFromCmdArgs() string {
-	path := ""
-
-	flag.StringVar(&path, "config", "", "config path")
-	flag.Parse()
-
-	return path
+	return cfg
 }
