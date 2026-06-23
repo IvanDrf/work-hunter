@@ -43,10 +43,10 @@ class VacancySearchService(BaseVacancyService):
         if not has_right_to_vacancy(vacancy, user_info):
             raise AccessError("this vacancy is moderating now or deleted, you can't see it now")
 
-        vacancySchema = vacancy_orm_to_response_dto(vacancy)
-        gather(*[self._save_vacancy_in_cache_by_id(vacancySchema), self._update_vacancy_views(vacancySchema, user_info)])
+        vacancy_schema = vacancy_orm_to_response_dto(vacancy)
+        gather(*[self._save_vacancy_in_cache_by_id(vacancy_schema), self._update_vacancy_views(vacancy_schema, user_info)])
 
-        return vacancySchema
+        return vacancy_schema
 
     async def find_vacancies_with_tags(
         self,
@@ -103,13 +103,14 @@ class VacancySearchService(BaseVacancyService):
         self,
         offset: int,
         limit: int,
+        order_by: OrderBy,
         user_info: UserInfo,
     ) -> list[VacancyResponseSchema] | None:
-        if not is_user_employer(user_info):
-            raise AccessError(f"only employer can see his vacancies, but user_role={user_info.user_role.name}")
+        if not is_user_employer(user_info) and not is_user_admin(user_info):
+            raise AccessError(f"only employer or admin can see his vacancies, but user_role={user_info.user_role.name}")
 
         async with self.uof_factory as uof:
-            vacancies = await self.vacancy_repo.find_vacancies_by_author_id(uof, user_info.user_id, offset, limit)
+            vacancies = await self.vacancy_repo.find_vacancies_by_author_id(uof, user_info.user_id, order_by, offset, limit)
 
         if vacancies is None:
             return None
@@ -142,7 +143,7 @@ class VacancySearchService(BaseVacancyService):
         if vacancy.status != VacancyStatus.PUBLISHED:
             return
 
-        if user_info is not None and user_info.user_role != UserRole.EMPLOYEE:
+        if user_info is not None and (user_info.user_role != UserRole.EMPLOYEE or user_info.user_id == vacancy.author_id):
             return
 
         async with self.uof_factory as uof:

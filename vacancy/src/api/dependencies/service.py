@@ -20,6 +20,7 @@ class IVacancyService(Protocol):
         self,
         offset: int,
         limit: int,
+        order_by: OrderBy,
         user_info: UserInfo,
     ) -> list[VacancyResponseSchema] | None: ...
 

@@ -170,6 +170,7 @@ class VacancyHandlers(VacancyServicer):
         vacancies = await self.vacancy_service.find_vacancies_by_author_id(
             offset=request.offset,
             limit=request.limit,
+            order_by=order_by_dto(request),
             user_info=user_info_dto(user_info),
         )
 

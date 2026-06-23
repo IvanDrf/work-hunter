@@ -46,6 +46,7 @@ class IVacancySearchRepo(Protocol):
         self,
         uof: IUnitOfWork,
         author_id: UUID,
+        order_by: OrderBy,
         offset: int,
         limit: int,
     ) -> list[VacancyORM] | None: ...

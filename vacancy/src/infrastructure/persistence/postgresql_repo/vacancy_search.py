@@ -70,6 +70,29 @@ class VacancySearchRepo:
 
         return vacancies if len(vacancies) > 0 else None
 
+    @catch_raise_error((SQLAlchemyError, DBAPIError), InternalError, "critical", "can't find vacancies by author_id")
+    async def find_vacancies_by_author_id(
+        self,
+        uof: UnitOfWork,
+        author_id: UUID,
+        order_by: OrderBy,
+        offset: int,
+        limit: int,
+    ) -> list[VacancyORM] | None:
+        query = (
+            select(VacancyORM)
+            .where(VacancyORM.author_id == author_id)
+            .order_by(text(order_by.value))
+            .offset(offset)
+            .limit(limit)
+            .options(selectinload(VacancyORM.tags))
+        )
+
+        res = await uof.session.execute(query)
+        vacancies = list(res.scalars().all())
+
+        return vacancies if len(vacancies) > 0 else None
+
     @catch_raise_error((SQLAlchemyError, DBAPIError), InternalError, "critical", "can't find vacancies by author")
     async def find_only_published_vacancies_by_author(
         self,
