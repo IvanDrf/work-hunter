@@ -22,60 +22,11 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type Role int32
-
-const (
-	Role_ADMIN    Role = 0
-	Role_EMPLOYEE Role = 1
-	Role_EMPLOYER Role = 2
-)
-
-// Enum value maps for Role.
-var (
-	Role_name = map[int32]string{
-		0: "ADMIN",
-		1: "EMPLOYEE",
-		2: "EMPLOYER",
-	}
-	Role_value = map[string]int32{
-		"ADMIN":    0,
-		"EMPLOYEE": 1,
-		"EMPLOYER": 2,
-	}
-)
-
-func (x Role) Enum() *Role {
-	p := new(Role)
-	*p = x
-	return p
-}
-
-func (x Role) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (Role) Descriptor() protoreflect.EnumDescriptor {
-	return file_protos_auth_proto_enumTypes[0].Descriptor()
-}
-
-func (Role) Type() protoreflect.EnumType {
-	return &file_protos_auth_proto_enumTypes[0]
-}
-
-func (x Role) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use Role.Descriptor instead.
-func (Role) EnumDescriptor() ([]byte, []int) {
-	return file_protos_auth_proto_rawDescGZIP(), []int{0}
-}
-
 type User struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
 	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
-	Role          Role                   `protobuf:"varint,3,opt,name=role,proto3,enum=auth.Role" json:"role,omitempty"` // ADMIN, EMPLOYEE, EMPLOYER
+	Role          common.UserRole        `protobuf:"varint,3,opt,name=role,proto3,enum=common.UserRole" json:"role,omitempty"` // ADMIN, EMPLOYEE, EMPLOYER
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -124,11 +75,11 @@ func (x *User) GetPassword() string {
 	return ""
 }
 
-func (x *User) GetRole() Role {
+func (x *User) GetRole() common.UserRole {
 	if x != nil {
 		return x.Role
 	}
-	return Role_ADMIN
+	return common.UserRole(0)
 }
 
 type AccessToken struct {
@@ -275,7 +226,7 @@ type TokenPayload struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Verificated   bool                   `protobuf:"varint,2,opt,name=verificated,proto3" json:"verificated,omitempty"`
-	Role          Role                   `protobuf:"varint,3,opt,name=role,proto3,enum=auth.Role" json:"role,omitempty"`
+	Role          common.UserRole        `protobuf:"varint,3,opt,name=role,proto3,enum=common.UserRole" json:"role,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -324,11 +275,11 @@ func (x *TokenPayload) GetVerificated() bool {
 	return false
 }
 
-func (x *TokenPayload) GetRole() Role {
+func (x *TokenPayload) GetRole() common.UserRole {
 	if x != nil {
 		return x.Role
 	}
-	return Role_ADMIN
+	return common.UserRole(0)
 }
 
 type VerifToken struct {
@@ -527,24 +478,22 @@ var File_protos_auth_proto protoreflect.FileDescriptor
 
 const file_protos_auth_proto_rawDesc = "" +
 	"\n" +
-	"\x11protos/auth.proto\x12\x04auth\x1a\fcommon.proto\"X\n" +
+	"\x11protos/auth.proto\x12\x04auth\x1a\fcommon.proto\"^\n" +
 	"\x04User\x12\x14\n" +
 	"\x05email\x18\x01 \x01(\tR\x05email\x12\x1a\n" +
-	"\bpassword\x18\x02 \x01(\tR\bpassword\x12\x1e\n" +
-	"\x04role\x18\x03 \x01(\x0e2\n" +
-	".auth.RoleR\x04role\"%\n" +
+	"\bpassword\x18\x02 \x01(\tR\bpassword\x12$\n" +
+	"\x04role\x18\x03 \x01(\x0e2\x10.common.UserRoleR\x04role\"%\n" +
 	"\vAccessToken\x12\x16\n" +
 	"\x06access\x18\x01 \x01(\tR\x06access\"(\n" +
 	"\fRefreshToken\x12\x18\n" +
 	"\arefresh\x18\x01 \x01(\tR\arefresh\"=\n" +
 	"\tJwtTokens\x12\x16\n" +
 	"\x06access\x18\x01 \x01(\tR\x06access\x12\x18\n" +
-	"\arefresh\x18\x02 \x01(\tR\arefresh\"`\n" +
+	"\arefresh\x18\x02 \x01(\tR\arefresh\"f\n" +
 	"\fTokenPayload\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12 \n" +
-	"\vverificated\x18\x02 \x01(\bR\vverificated\x12\x1e\n" +
-	"\x04role\x18\x03 \x01(\x0e2\n" +
-	".auth.RoleR\x04role\"\"\n" +
+	"\vverificated\x18\x02 \x01(\bR\vverificated\x12$\n" +
+	"\x04role\x18\x03 \x01(\x0e2\x10.common.UserRoleR\x04role\"\"\n" +
 	"\n" +
 	"VerifToken\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\"G\n" +
@@ -555,11 +504,7 @@ const file_protos_auth_proto_rawDesc = "" +
 	"\x06access\x18\x01 \x01(\tR\x06access\x12\x10\n" +
 	"\x03old\x18\x02 \x01(\tR\x03old\x12\x10\n" +
 	"\x03new\x18\x03 \x01(\tR\x03new\"\a\n" +
-	"\x05Empty*-\n" +
-	"\x04Role\x12\t\n" +
-	"\x05ADMIN\x10\x00\x12\f\n" +
-	"\bEMPLOYEE\x10\x01\x12\f\n" +
-	"\bEMPLOYER\x10\x022\xcd\x03\n" +
+	"\x05Empty2\xcd\x03\n" +
 	"\x04Auth\x12.\n" +
 	"\x06Health\x12\r.common.Empty\x1a\x15.common.ServiceStatus\x12'\n" +
 	"\bRegister\x12\n" +
@@ -586,43 +531,42 @@ func file_protos_auth_proto_rawDescGZIP() []byte {
 	return file_protos_auth_proto_rawDescData
 }
 
-var file_protos_auth_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_protos_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_protos_auth_proto_goTypes = []any{
-	(Role)(0),                     // 0: auth.Role
-	(*User)(nil),                  // 1: auth.User
-	(*AccessToken)(nil),           // 2: auth.AccessToken
-	(*RefreshToken)(nil),          // 3: auth.RefreshToken
-	(*JwtTokens)(nil),             // 4: auth.JwtTokens
-	(*TokenPayload)(nil),          // 5: auth.TokenPayload
-	(*VerifToken)(nil),            // 6: auth.VerifToken
-	(*DeleteUserRequest)(nil),     // 7: auth.DeleteUserRequest
-	(*ChangePasswordRequest)(nil), // 8: auth.ChangePasswordRequest
-	(*Empty)(nil),                 // 9: auth.Empty
+	(*User)(nil),                  // 0: auth.User
+	(*AccessToken)(nil),           // 1: auth.AccessToken
+	(*RefreshToken)(nil),          // 2: auth.RefreshToken
+	(*JwtTokens)(nil),             // 3: auth.JwtTokens
+	(*TokenPayload)(nil),          // 4: auth.TokenPayload
+	(*VerifToken)(nil),            // 5: auth.VerifToken
+	(*DeleteUserRequest)(nil),     // 6: auth.DeleteUserRequest
+	(*ChangePasswordRequest)(nil), // 7: auth.ChangePasswordRequest
+	(*Empty)(nil),                 // 8: auth.Empty
+	(common.UserRole)(0),          // 9: common.UserRole
 	(*common.Empty)(nil),          // 10: common.Empty
 	(*common.ServiceStatus)(nil),  // 11: common.ServiceStatus
 }
 var file_protos_auth_proto_depIdxs = []int32{
-	0,  // 0: auth.User.role:type_name -> auth.Role
-	0,  // 1: auth.TokenPayload.role:type_name -> auth.Role
+	9,  // 0: auth.User.role:type_name -> common.UserRole
+	9,  // 1: auth.TokenPayload.role:type_name -> common.UserRole
 	10, // 2: auth.Auth.Health:input_type -> common.Empty
-	1,  // 3: auth.Auth.Register:input_type -> auth.User
-	1,  // 4: auth.Auth.Login:input_type -> auth.User
-	7,  // 5: auth.Auth.DeleteUser:input_type -> auth.DeleteUserRequest
-	8,  // 6: auth.Auth.ChangePassword:input_type -> auth.ChangePasswordRequest
-	2,  // 7: auth.Auth.SendVerificationEmail:input_type -> auth.AccessToken
-	6,  // 8: auth.Auth.VerifyEmail:input_type -> auth.VerifToken
-	2,  // 9: auth.Auth.IsTokenValid:input_type -> auth.AccessToken
-	3,  // 10: auth.Auth.RefreshTokens:input_type -> auth.RefreshToken
+	0,  // 3: auth.Auth.Register:input_type -> auth.User
+	0,  // 4: auth.Auth.Login:input_type -> auth.User
+	6,  // 5: auth.Auth.DeleteUser:input_type -> auth.DeleteUserRequest
+	7,  // 6: auth.Auth.ChangePassword:input_type -> auth.ChangePasswordRequest
+	1,  // 7: auth.Auth.SendVerificationEmail:input_type -> auth.AccessToken
+	5,  // 8: auth.Auth.VerifyEmail:input_type -> auth.VerifToken
+	1,  // 9: auth.Auth.IsTokenValid:input_type -> auth.AccessToken
+	2,  // 10: auth.Auth.RefreshTokens:input_type -> auth.RefreshToken
 	11, // 11: auth.Auth.Health:output_type -> common.ServiceStatus
-	4,  // 12: auth.Auth.Register:output_type -> auth.JwtTokens
-	4,  // 13: auth.Auth.Login:output_type -> auth.JwtTokens
-	9,  // 14: auth.Auth.DeleteUser:output_type -> auth.Empty
-	9,  // 15: auth.Auth.ChangePassword:output_type -> auth.Empty
-	9,  // 16: auth.Auth.SendVerificationEmail:output_type -> auth.Empty
-	4,  // 17: auth.Auth.VerifyEmail:output_type -> auth.JwtTokens
-	5,  // 18: auth.Auth.IsTokenValid:output_type -> auth.TokenPayload
-	4,  // 19: auth.Auth.RefreshTokens:output_type -> auth.JwtTokens
+	3,  // 12: auth.Auth.Register:output_type -> auth.JwtTokens
+	3,  // 13: auth.Auth.Login:output_type -> auth.JwtTokens
+	8,  // 14: auth.Auth.DeleteUser:output_type -> auth.Empty
+	8,  // 15: auth.Auth.ChangePassword:output_type -> auth.Empty
+	8,  // 16: auth.Auth.SendVerificationEmail:output_type -> auth.Empty
+	3,  // 17: auth.Auth.VerifyEmail:output_type -> auth.JwtTokens
+	4,  // 18: auth.Auth.IsTokenValid:output_type -> auth.TokenPayload
+	3,  // 19: auth.Auth.RefreshTokens:output_type -> auth.JwtTokens
 	11, // [11:20] is the sub-list for method output_type
 	2,  // [2:11] is the sub-list for method input_type
 	2,  // [2:2] is the sub-list for extension type_name
@@ -640,14 +584,13 @@ func file_protos_auth_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_protos_auth_proto_rawDesc), len(file_protos_auth_proto_rawDesc)),
-			NumEnums:      1,
+			NumEnums:      0,
 			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_protos_auth_proto_goTypes,
 		DependencyIndexes: file_protos_auth_proto_depIdxs,
-		EnumInfos:         file_protos_auth_proto_enumTypes,
 		MessageInfos:      file_protos_auth_proto_msgTypes,
 	}.Build()
 	File_protos_auth_proto = out.File

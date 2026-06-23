@@ -36,17 +36,11 @@ service Auth {
     rpc RefreshTokens(RefreshToken) returns (JwtTokens);
 }
 
-enum Role {
-    ADMIN = 0;
-    EMPLOYEE = 1;
-    EMPLOYER = 2;
-}
-
 
 message User {
     string email = 1;
     string password = 2;
-    Role role = 3; // ADMIN, EMPLOYEE, EMPLOYER
+    common.UserRole role = 3; // ADMIN, EMPLOYEE, EMPLOYER
 }
 
 
@@ -66,7 +60,7 @@ message JwtTokens {
 message TokenPayload {
     string id = 1;
     bool verificated = 2;
-    Role role = 3;
+    common.UserRole role = 3;
 }
 
 
