@@ -1,14 +1,12 @@
 from typing import Final, Sequence
 
 from src.core.exc import ArgumentError
+from src.domain.schemas.vacancy import MAX_TAGS_AMOUNT, MIN_TAGS_AMOUNT
 
 MIN_OFFSET: Final[int] = 0
 
 MIN_LIMIT: Final[int] = 5
 MAX_LIMIT: Final[int] = 30
-
-MIN_TAGS_AMOUNT: Final[int] = 1
-MAX_TAGS_AMOUNT: Final[int] = 20
 
 
 def validate_limit_offset(limit: int, offset: int) -> None:

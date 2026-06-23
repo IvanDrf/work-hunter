@@ -5,6 +5,7 @@ import warnings
 
 import grpc
 
+from ..common import common_pb2 as common__pb2
 from . import vacancy_pb2 as vacancy__pb2
 
 GRPC_GENERATED_VERSION = "1.80.0"
@@ -39,6 +40,12 @@ class VacancyStub(object):
         Args:
             channel: A grpc.Channel.
         """
+        self.Health = channel.unary_unary(
+            "/vacancy.Vacancy/Health",
+            request_serializer=common__pb2.Empty.SerializeToString,
+            response_deserializer=common__pb2.ServiceStatus.FromString,
+            _registered_method=True,
+        )
         self.CreateVacancy = channel.unary_unary(
             "/vacancy.Vacancy/CreateVacancy",
             request_serializer=vacancy__pb2.CreateVacancyRequest.SerializeToString,
@@ -60,6 +67,12 @@ class VacancyStub(object):
         self.FindVacanciesByAuthor = channel.unary_unary(
             "/vacancy.Vacancy/FindVacanciesByAuthor",
             request_serializer=vacancy__pb2.FindVacanciesByAuthorRequest.SerializeToString,
+            response_deserializer=vacancy__pb2.Vacancies.FromString,
+            _registered_method=True,
+        )
+        self.FindVacanciesByAuthorID = channel.unary_unary(
+            "/vacancy.Vacancy/FindVacanciesByAuthorID",
+            request_serializer=vacancy__pb2.FindVacanciesByAuthorIDRequest.SerializeToString,
             response_deserializer=vacancy__pb2.Vacancies.FromString,
             _registered_method=True,
         )
@@ -92,6 +105,12 @@ class VacancyStub(object):
 class VacancyServicer(object):
     """Vacancy service"""
 
+    def Health(self, request, context):
+        """check service health"""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
+
     def CreateVacancy(self, request, context):
         """Create vacancy, returns vacancy_id if success"""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -117,6 +136,14 @@ class VacancyServicer(object):
     def FindVacanciesByAuthor(self, request, context):
         """Find vacancies by author name
         If vacancy has status - MODERATING only moderator or user who created this vacancy can see it
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
+
+    def FindVacanciesByAuthorID(self, request, context):
+        """Find vacancies by author ID
+        Main usage - 'my vacancies'
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details("Method not implemented!")
@@ -153,6 +180,11 @@ class VacancyServicer(object):
 
 def add_VacancyServicer_to_server(servicer, server):
     rpc_method_handlers = {
+        "Health": grpc.unary_unary_rpc_method_handler(
+            servicer.Health,
+            request_deserializer=common__pb2.Empty.FromString,
+            response_serializer=common__pb2.ServiceStatus.SerializeToString,
+        ),
         "CreateVacancy": grpc.unary_unary_rpc_method_handler(
             servicer.CreateVacancy,
             request_deserializer=vacancy__pb2.CreateVacancyRequest.FromString,
@@ -171,6 +203,11 @@ def add_VacancyServicer_to_server(servicer, server):
         "FindVacanciesByAuthor": grpc.unary_unary_rpc_method_handler(
             servicer.FindVacanciesByAuthor,
             request_deserializer=vacancy__pb2.FindVacanciesByAuthorRequest.FromString,
+            response_serializer=vacancy__pb2.Vacancies.SerializeToString,
+        ),
+        "FindVacanciesByAuthorID": grpc.unary_unary_rpc_method_handler(
+            servicer.FindVacanciesByAuthorID,
+            request_deserializer=vacancy__pb2.FindVacanciesByAuthorIDRequest.FromString,
             response_serializer=vacancy__pb2.Vacancies.SerializeToString,
         ),
         "FindVacanciesByTitle": grpc.unary_unary_rpc_method_handler(
@@ -204,6 +241,36 @@ def add_VacancyServicer_to_server(servicer, server):
 # This class is part of an EXPERIMENTAL API.
 class Vacancy(object):
     """Vacancy service"""
+
+    @staticmethod
+    def Health(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            "/vacancy.Vacancy/Health",
+            common__pb2.Empty.SerializeToString,
+            common__pb2.ServiceStatus.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True,
+        )
 
     @staticmethod
     def CreateVacancy(
@@ -313,6 +380,36 @@ class Vacancy(object):
             target,
             "/vacancy.Vacancy/FindVacanciesByAuthor",
             vacancy__pb2.FindVacanciesByAuthorRequest.SerializeToString,
+            vacancy__pb2.Vacancies.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True,
+        )
+
+    @staticmethod
+    def FindVacanciesByAuthorID(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            "/vacancy.Vacancy/FindVacanciesByAuthorID",
+            vacancy__pb2.FindVacanciesByAuthorIDRequest.SerializeToString,
             vacancy__pb2.Vacancies.FromString,
             options,
             channel_credentials,

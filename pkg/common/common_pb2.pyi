@@ -11,10 +11,17 @@ class UserRole(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     ADMIN: _ClassVar[UserRole]
     EMPLOYEE: _ClassVar[UserRole]
     EMPLOYER: _ClassVar[UserRole]
+
+class Status(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = ()
+    UNAVAILABLE: _ClassVar[Status]
+    AVAILABLE: _ClassVar[Status]
 UNSPECIFIED: UserRole
 ADMIN: UserRole
 EMPLOYEE: UserRole
 EMPLOYER: UserRole
+UNAVAILABLE: Status
+AVAILABLE: Status
 
 class UserInfo(_message.Message):
     __slots__ = ("role", "user_id", "verificated")
@@ -37,3 +44,13 @@ class FullUserInfo(_message.Message):
     username: str
     verificated: bool
     def __init__(self, role: _Optional[_Union[UserRole, str]] = ..., user_id: _Optional[str] = ..., username: _Optional[str] = ..., verificated: bool = ...) -> None: ...
+
+class Empty(_message.Message):
+    __slots__ = ()
+    def __init__(self) -> None: ...
+
+class ServiceStatus(_message.Message):
+    __slots__ = ("status",)
+    STATUS_FIELD_NUMBER: _ClassVar[int]
+    status: Status
+    def __init__(self, status: _Optional[_Union[Status, str]] = ...) -> None: ...

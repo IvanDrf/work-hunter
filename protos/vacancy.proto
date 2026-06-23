@@ -7,6 +7,9 @@ import "common.proto";
 
 // Vacancy service
 service Vacancy {
+    // check service health
+    rpc Health(common.Empty) returns (common.ServiceStatus);
+
     // Create vacancy, returns vacancy_id if success
     rpc CreateVacancy(CreateVacancyRequest) returns (VacancyInfo);
 
@@ -21,6 +24,10 @@ service Vacancy {
     // Find vacancies by author name
     // If vacancy has status - MODERATING only moderator or user who created this vacancy can see it  
     rpc FindVacanciesByAuthor(FindVacanciesByAuthorRequest) returns (Vacancies);
+
+    // Find vacancies by author ID
+    // Main usage - 'my vacancies'
+    rpc FindVacanciesByAuthorID(FindVacanciesByAuthorIDRequest) returns (Vacancies);
 
     // Find vacancies by title
     // If vacancy has status - MODERATING only moderator can see this
@@ -69,6 +76,12 @@ enum ResponseStatus {
     FORBIDDEN = 3;
 }
 
+enum OrderBy {
+    DATE = 0;
+    VIEWS = 1;
+    APPLICATIONS = 2;
+}
+
 message Response {
     string message = 1;
     ResponseStatus status = 2;
@@ -113,9 +126,28 @@ message VacancyInfo {
 }
 
 message CreateVacancyRequest {
-    VacancyInfo vacancy = 1;
+    string title = 1; 
+    optional string description = 2;
+
+    string requirements = 3;
+    string conditions = 4;
+
+    optional uint64 salary_min =  5;
+    optional uint64 salary_max = 6; 
+    Currency currency = 7;
+
+    optional string city = 8;
+    optional string metro = 9;
+
+    RemoteType remote_type = 10;
+    TimeType time_type = 11;
     
-    common.FullUserInfo user_info = 2;
+    optional uint32 experience_min = 12;
+    optional uint32 experience_max = 13;
+    
+    repeated string tags = 14; // vacancies tags: golang, javascript, manager
+    
+    common.FullUserInfo user_info = 15;
 }
 
 
@@ -162,8 +194,9 @@ message FindVacancyByTagsRequest {
     repeated string tags = 1;
     uint32 limit = 2;
     uint32 offset = 3;
+    optional OrderBy order_by = 4;
 
-    optional common.UserInfo user_info = 4;
+    optional common.UserInfo user_info = 5;
 }
 
 message Vacancies {
@@ -174,9 +207,18 @@ message Vacancies {
 }
 
 message FindVacanciesByAuthorRequest {
-    string author = 1; // author name
+    string author_name = 1; // author name
     uint32 limit = 2;
     uint32 offset = 3;
+    optional OrderBy order_by = 4;
+
+    common.UserInfo user_info = 5;
+}
+
+message FindVacanciesByAuthorIDRequest {
+    uint32 limit = 1;
+    uint32 offset = 2;
+    optional OrderBy order_by = 3;
 
     common.UserInfo user_info = 4;
 }
@@ -185,8 +227,9 @@ message FindVacanciesByTitleRequest {
     string title = 1;
     uint32 limit = 2;
     uint32 offset = 3;
+    optional OrderBy order_by = 4;
 
-    common.UserInfo user_info = 4;
+    common.UserInfo user_info = 5;
 }
 
 message SetVacancyStatusRequest {
