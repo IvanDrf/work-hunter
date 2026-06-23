@@ -3,6 +3,7 @@ from pkg.common.common_pb2 import Empty, ServiceStatus, Status
 from pkg.vacancy_api.vacancy_pb2 import (
     CreateVacancyRequest,
     DeleteVacancyRequest,
+    FindVacanciesByAuthorIDRequest,
     FindVacanciesByAuthorRequest,
     FindVacanciesByTitleRequest,
     FindVacancyByIDRequest,
@@ -23,7 +24,7 @@ from src.api.dto.user_info import user_info_dto, user_info_none_dto
 from src.api.dto.vacancy import vacancy_create_dto, vacancy_response_dto, vacancy_update_dto
 from src.api.rules.params import MAX_TAGS_AMOUNT, MIN_TAGS_AMOUNT, is_tags_amount_valid, validate_limit_offset
 from src.api.rules.user_info import get_user_info
-from src.core.exc import ArgumentError, NotFoundError
+from src.core.exc import AccessError, ArgumentError, NotFoundError
 from src.utils.handle_errors import handle_errors
 
 
@@ -50,7 +51,7 @@ class VacancyHandlers(VacancyServicer):
 
         vacancy = await self.vacancy_service.find_vacancy_by_id(request.vacancy_id, user_info_none_dto(user_info))
         if vacancy is None:
-            raise NotFoundError(f"can't find vacancy with given {request.vacancy_id=}")
+            raise NotFoundError(f"can't find vacancy with vacancy_id={request.vacancy_id}")
 
         return vacancy_response_dto(vacancy)
 
@@ -73,7 +74,7 @@ class VacancyHandlers(VacancyServicer):
 
         if vacancies is None:
             raise NotFoundError(
-                f"can't find vacancies with given params {list(request.tags)}, {request.offset=}, {request.limit=}"
+                f"can't find any vacancies with tags={list(request.tags)}, limit={request.limit}, offset={request.offset}"
             )
 
         return Vacancies(
@@ -124,7 +125,7 @@ class VacancyHandlers(VacancyServicer):
         )
         if vacancies is None:
             raise NotFoundError(
-                f"can't find vacancies with given params {request.author_name=}, {request.offset=}, {request.limit=}"
+                f"can't find any vacancies with author_name={request.author_name}, limit={request.limit}, offset={request.offset}"
             )
 
         return Vacancies(
@@ -148,7 +149,34 @@ class VacancyHandlers(VacancyServicer):
         )
 
         if vacancies is None:
-            raise NotFoundError(f"can't find vacancies with given params {request.title=}, {request.offset=}, {request.limit=}")
+            raise NotFoundError(
+                f"can't find any vacancies with title={request.title}, limit={request.limit}, offset={request.offset}"
+            )
+
+        return Vacancies(
+            vacancies=[vacancy_response_dto(vacancy) for vacancy in vacancies],
+            limit=request.limit,
+            offset=request.offset,
+        )
+
+    @handle_errors
+    async def FindVacanciesByAuthorID(self, request: FindVacanciesByAuthorIDRequest, context: ServicerContext) -> Vacancies:
+        validate_limit_offset(request.limit, request.offset)
+
+        user_info = get_user_info(request)
+        if user_info is None:
+            raise AccessError("invalid user_info in request, user_info is empty")
+
+        vacancies = await self.vacancy_service.find_vacancies_by_author_id(
+            offset=request.offset,
+            limit=request.limit,
+            user_info=user_info_dto(user_info),
+        )
+
+        if vacancies is None:
+            raise NotFoundError(
+                f"can't find any vacancies with user_id={user_info.user_id} with limit={request.limit}, offset={request.offset}"
+            )
 
         return Vacancies(
             vacancies=[vacancy_response_dto(vacancy) for vacancy in vacancies],

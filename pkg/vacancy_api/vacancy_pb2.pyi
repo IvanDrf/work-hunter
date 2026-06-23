@@ -418,6 +418,24 @@ class FindVacanciesByAuthorRequest(_message.Message):
         user_info: _Optional[_Union[_common_pb2.UserInfo, _Mapping]] = ...,
     ) -> None: ...
 
+class FindVacanciesByAuthorIDRequest(_message.Message):
+    __slots__ = ("limit", "offset", "order_by", "user_info")
+    LIMIT_FIELD_NUMBER: _ClassVar[int]
+    OFFSET_FIELD_NUMBER: _ClassVar[int]
+    ORDER_BY_FIELD_NUMBER: _ClassVar[int]
+    USER_INFO_FIELD_NUMBER: _ClassVar[int]
+    limit: int
+    offset: int
+    order_by: OrderBy
+    user_info: _common_pb2.UserInfo
+    def __init__(
+        self,
+        limit: _Optional[int] = ...,
+        offset: _Optional[int] = ...,
+        order_by: _Optional[_Union[OrderBy, str]] = ...,
+        user_info: _Optional[_Union[_common_pb2.UserInfo, _Mapping]] = ...,
+    ) -> None: ...
+
 class FindVacanciesByTitleRequest(_message.Message):
     __slots__ = ("title", "limit", "offset", "order_by", "user_info")
     TITLE_FIELD_NUMBER: _ClassVar[int]

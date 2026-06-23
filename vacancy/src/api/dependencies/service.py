@@ -16,6 +16,12 @@ class IVacancyService(Protocol):
         order_by: OrderBy,
         user_info: UserInfo | None,
     ) -> list[VacancyResponseSchema] | None: ...
+    async def find_vacancies_by_author_id(
+        self,
+        offset: int,
+        limit: int,
+        user_info: UserInfo,
+    ) -> list[VacancyResponseSchema] | None: ...
 
     async def find_vacancies_with_tags(
         self,
