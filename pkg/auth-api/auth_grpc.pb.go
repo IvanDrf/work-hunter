@@ -8,6 +8,7 @@ package auth_api
 
 import (
 	context "context"
+	common "github.com/IvanDrf/work-hunter/pkg/common"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -37,7 +38,7 @@ const (
 // auth servuce by jwt
 type AuthClient interface {
 	// check service health
-	Health(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ServiceStatus, error)
+	Health(ctx context.Context, in *common.Empty, opts ...grpc.CallOption) (*common.ServiceStatus, error)
 	// register user by username, password
 	Register(ctx context.Context, in *User, opts ...grpc.CallOption) (*JwtTokens, error)
 	// login user by username, password
@@ -64,9 +65,9 @@ func NewAuthClient(cc grpc.ClientConnInterface) AuthClient {
 	return &authClient{cc}
 }
 
-func (c *authClient) Health(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ServiceStatus, error) {
+func (c *authClient) Health(ctx context.Context, in *common.Empty, opts ...grpc.CallOption) (*common.ServiceStatus, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ServiceStatus)
+	out := new(common.ServiceStatus)
 	err := c.cc.Invoke(ctx, Auth_Health_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -161,7 +162,7 @@ func (c *authClient) RefreshTokens(ctx context.Context, in *RefreshToken, opts .
 // auth servuce by jwt
 type AuthServer interface {
 	// check service health
-	Health(context.Context, *Empty) (*ServiceStatus, error)
+	Health(context.Context, *common.Empty) (*common.ServiceStatus, error)
 	// register user by username, password
 	Register(context.Context, *User) (*JwtTokens, error)
 	// login user by username, password
@@ -188,7 +189,7 @@ type AuthServer interface {
 // pointer dereference when methods are called.
 type UnimplementedAuthServer struct{}
 
-func (UnimplementedAuthServer) Health(context.Context, *Empty) (*ServiceStatus, error) {
+func (UnimplementedAuthServer) Health(context.Context, *common.Empty) (*common.ServiceStatus, error) {
 	return nil, status.Error(codes.Unimplemented, "method Health not implemented")
 }
 func (UnimplementedAuthServer) Register(context.Context, *User) (*JwtTokens, error) {
@@ -237,7 +238,7 @@ func RegisterAuthServer(s grpc.ServiceRegistrar, srv AuthServer) {
 }
 
 func _Auth_Health_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
+	in := new(common.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -249,7 +250,7 @@ func _Auth_Health_Handler(srv interface{}, ctx context.Context, dec func(interfa
 		FullMethod: Auth_Health_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServer).Health(ctx, req.(*Empty))
+		return srv.(AuthServer).Health(ctx, req.(*common.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }

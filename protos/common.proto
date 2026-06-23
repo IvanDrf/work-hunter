@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package common;
 
-option go_package = "pkg/common";
+option go_package = "github.com/IvanDrf/work-hunter/pkg/common";
 
 enum UserRole {
     UNSPECIFIED = 0;

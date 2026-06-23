@@ -2,12 +2,14 @@ syntax = "proto3";
 
 package auth;
 
-option  go_package = "pkg/auth-api";
+option go_package = "pkg/auth-api";
+
+import "common.proto";
 
 // auth servuce by jwt
 service Auth {
     // check service health
-    rpc Health(Empty) returns (ServiceStatus);
+    rpc Health(common.Empty) returns (common.ServiceStatus);
 
     // register user by username, password
     rpc Register(User) returns (JwtTokens); 
@@ -84,8 +86,4 @@ message ChangePasswordRequest {
 }
 
 message Empty {
-}
-
-message ServiceStatus {
-    int32 code = 1;
 }
