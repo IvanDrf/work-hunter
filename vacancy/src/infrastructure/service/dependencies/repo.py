@@ -25,6 +25,7 @@ class IVacancySearchRepo(Protocol):
         offset: int,
         limit: int,
     ) -> list[VacancyORM] | None: ...
+
     async def find_only_published_vacancies_by_author(
         self,
         uof: IUnitOfWork,
@@ -41,6 +42,14 @@ class IVacancySearchRepo(Protocol):
         offset: int,
         limit: int,
     ) -> list[VacancyORM] | None: ...
+    async def find_vacancies_by_author_id(
+        self,
+        uof: IUnitOfWork,
+        author_id: UUID,
+        offset: int,
+        limit: int,
+    ) -> list[VacancyORM] | None: ...
+
     async def find_vacancies_for_admin_by_title(
         self,
         uof: IUnitOfWork,
@@ -57,6 +66,7 @@ class IVacancySearchRepo(Protocol):
         offset: int,
         limit: int,
     ) -> list[VacancyORM] | None: ...
+
     async def find_vacancy_author(self, uof: IUnitOfWork, vacancy_id: int) -> UUID | None: ...
 
 

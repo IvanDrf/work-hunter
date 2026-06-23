@@ -3,7 +3,7 @@ from asyncio import create_task, gather
 from datetime import timedelta
 
 from src.core.exc import AccessError, ArgumentError, InternalError
-from src.domain.rules.user import is_user_admin
+from src.domain.rules.user import is_user_admin, is_user_employer
 from src.domain.rules.vacancy import has_right_to_vacancy, is_vacancy_id_valid
 from src.domain.schemas import UserInfo, VacancyResponseSchema
 from src.domain.types.enums import OrderBy, UserRole, VacancyStatus
@@ -98,6 +98,23 @@ class VacancySearchService(BaseVacancyService):
         create_task(self._save_vacancies_by_author(vacancies, author, order_by, user_info, offset, limit))
 
         return vacancies
+
+    async def find_vacancies_by_author_id(
+        self,
+        offset: int,
+        limit: int,
+        user_info: UserInfo,
+    ) -> list[VacancyResponseSchema] | None:
+        if not is_user_employer(user_info):
+            raise AccessError(f"only employer can see his vacancies, but user_role={user_info.user_role.name}")
+
+        async with self.uof_factory as uof:
+            vacancies = await self.vacancy_repo.find_vacancies_by_author_id(uof, user_info.user_id, offset, limit)
+
+        if vacancies is None:
+            return None
+
+        return [vacancy_orm_to_response_dto(vacancy) for vacancy in vacancies]
 
     async def find_vacancies_by_title(
         self,
