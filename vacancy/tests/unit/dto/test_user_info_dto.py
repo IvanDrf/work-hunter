@@ -6,8 +6,8 @@ from pkg.common.common_pb2 import UserRole as PKGUserRole
 from pkg.vacancy_api.vacancy_pb2 import VacancyStatus as PKGVacancyStatus
 from pytest import mark, raises
 
-from src.api.dto.status import vacancy_status_dto
-from src.api.dto.user_info import user_info_dto, user_info_none_dto
+from src.api.grpc.dto.status import vacancy_status_dto
+from src.api.grpc.dto.user_info import user_info_dto, user_info_none_dto
 from src.core.exc import ArgumentError
 from src.domain.types.enums import UserRole, VacancyStatus
 

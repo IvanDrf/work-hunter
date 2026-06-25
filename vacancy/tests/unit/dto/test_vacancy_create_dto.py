@@ -3,7 +3,7 @@ from hypothesis import strategies as st
 from pkg.common.common_pb2 import FullUserInfo as PKGFullUserInfo
 from pkg.vacancy_api.vacancy_pb2 import CreateVacancyRequest
 
-from src.api.dto.vacancy import vacancy_create_dto
+from src.api.grpc.dto.vacancy import vacancy_create_dto
 from src.domain.types.enums import Currency
 from tests.unit.dto.asserts import (
     assert_additional,

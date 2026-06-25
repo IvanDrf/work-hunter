@@ -6,7 +6,7 @@ from grpc.aio import server
 from grpc_reflection.v1alpha.reflection import SERVICE_NAME, enable_server_reflection
 from pkg.vacancy_api.vacancy_pb2_grpc import add_VacancyServicer_to_server
 
-from src.api.handlers import VacancyHandlers
+from src.api.grpc.handlers import VacancyHandlers
 from src.core.config import AppConfig
 from src.core.exc import InternalError
 
