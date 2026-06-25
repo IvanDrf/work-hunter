@@ -1,6 +1,10 @@
 from pydantic import BaseModel, Field
 
+from src.domain.schemas import UserInfo
 
-class Application(BaseModel):
+
+class ApplicationMessage(BaseModel):
     vacancy_id: int = Field(ge=0)
     applications: int = Field(gt=0)
+
+    user_info: UserInfo
