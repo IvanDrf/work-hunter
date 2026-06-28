@@ -1,11 +1,11 @@
+from src.api.rabbitmq.consumer import RabbitMQConsumer
 from src.app.fabric import Fabric
 from src.app.server import Server
 from src.core.config import Config
 
 
-class App:
+class ServerApp:
     def __init__(self, config: Config) -> None:
-        self.config: Config = config
         self.server: Server = Server(config)
 
         self.fabric: Fabric = Fabric(config)
@@ -17,3 +17,20 @@ class App:
 
     async def run(self) -> None:
         await self.server.run()
+
+
+class ConsumerApp:
+    def __init__(self, config: Config) -> None:
+        self.config: Config = config
+        self.fabric: Fabric = Fabric(config)
+
+        self.rabbitmq_consumer: RabbitMQConsumer | None = None
+
+    async def init(self) -> None:
+        self.rabbitmq_consumer = await self.fabric.new_rabbitmq_consumer()
+
+    async def run(self) -> None:
+        if self.rabbitmq_consumer is None:
+            raise RuntimeError("RabbitMQ is not initialized")
+
+        await self.rabbitmq_consumer.start_consuming()

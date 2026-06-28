@@ -1,11 +1,15 @@
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from src.api.handlers import VacancyHandlers
+from src.api.grpc.handlers import VacancyHandlers
+from src.api.rabbitmq.connection import connect_to_rabbitmq, declare_channel, declare_exchange, declare_queue
+from src.api.rabbitmq.consumer import RabbitMQConsumer
+from src.api.rabbitmq.dependencies import IApplicationService
 from src.core.config import Config
 from src.infrastructure.persistence.postgresql_repo import TagRepo, UnitOfWork, VacancyRepo
 from src.infrastructure.persistence.postgresql_repo import connect as connect_postgresql
 from src.infrastructure.persistence.redis_cache import RedisCache
 from src.infrastructure.persistence.redis_cache import connect as connect_redis
+from src.infrastructure.service.application import ApplicationService
 from src.infrastructure.service.dependencies import ICache, ITagRepo, IUnitOfWork, IVacancyRepo
 from src.infrastructure.service.vacancy_service import VacancyService
 
@@ -26,6 +30,21 @@ class Fabric:
         vacancy_service = self.new_vacancy_service(vacancy_repo, tag_repo, cache, uof)
 
         return VacancyHandlers(vacancy_service)
+
+    async def new_rabbitmq_consumer(self) -> RabbitMQConsumer:
+        session_maker = await connect_postgresql(self.config)
+        uof = self.new_unit_of_work(session_maker)
+        vacancy_repo = self.new_vacancy_repo()
+
+        application_service: IApplicationService = ApplicationService(vacancy_repo, uof)
+
+        conn = await connect_to_rabbitmq(self.config)
+        chan = await declare_channel(conn)
+
+        exchange = await declare_exchange(self.config, chan)
+        consumer_queue = await declare_queue(self.config, chan, exchange)
+
+        return RabbitMQConsumer(conn, chan, consumer_queue, application_service, self.config.rabbitmq_service_timeout)
 
     def new_vacancy_repo(self) -> VacancyRepo:
         return VacancyRepo()
