@@ -3,4 +3,11 @@ name = "validation-service"
 version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "pydantic>=2.13.4",
+    "pydantic-settings>=2.14.2",
+    "ruff>=0.15.20",
+]
+
+[tool.ruff]
+line-length = 130
