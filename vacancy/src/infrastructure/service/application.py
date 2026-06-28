@@ -9,17 +9,17 @@ class ApplicationService:
         self.vacancy_repo: IVacancyRepo = vacancy_repo
         self.uof_factory: IUnitOfWork = uof
 
-    async def increase_vacancy_applications(self, application: ApplicationMessage) -> None:
-        if not is_user_employee(application.user_info):
+    async def increase_vacancy_applications(self, message: ApplicationMessage) -> None:
+        if not is_user_employee(message.user_info):
             raise AccessError("only employee can apply for the vacacny")
 
         async with self.uof_factory as uof:
-            vacancy = await self.vacancy_repo.find_vacancy_by_id(uof, application.vacancy_id)
+            vacancy = await self.vacancy_repo.find_vacancy_by_id(uof, message.vacancy_id)
             if vacancy is None:
-                raise ArgumentError(f"can't find vacancy with vacancy_id={application.vacancy_id}")
+                raise ArgumentError(f"can't find vacancy with vacancy_id={message.vacancy_id}")
 
             await self.vacancy_repo.update_vacancy(
                 uof=uof,
-                vacancy_id=application.vacancy_id,
-                fields={"applications_count": vacancy.applications_count + 1},
+                vacancy_id=message.vacancy_id,
+                fields={"applications_count": vacancy.applications_count + message.applications},
             )

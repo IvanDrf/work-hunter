@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
-from src.domain.schemas import UserInfo
+from src.domain.schemas.user import UserInfo
 
 
 class ApplicationMessage(BaseModel):

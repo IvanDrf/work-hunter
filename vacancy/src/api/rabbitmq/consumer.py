@@ -1,8 +1,7 @@
 import logging
-from asyncio import Semaphore, create_task
+from asyncio import wait_for
 
-from aio_pika import RobustChannel, RobustConnection, RobustQueue
-from aio_pika.abc import AbstractIncomingMessage
+from aio_pika.abc import AbstractChannel, AbstractIncomingMessage, AbstractQueue, AbstractRobustConnection
 from pydantic import ValidationError
 
 from src.api.rabbitmq.dependencies import IApplicationService
@@ -10,33 +9,35 @@ from src.core.exc import AccessError, ArgumentError, InternalError
 from src.domain.schemas import ApplicationMessage
 
 
-class Consumer:
+class RabbitMQConsumer:
     def __init__(
         self,
-        conn: RobustConnection,
-        chan: RobustChannel,
-        queue: RobustQueue,
+        conn: AbstractRobustConnection,
+        chan: AbstractChannel,
+        queue: AbstractQueue,
         application_service: IApplicationService,
-        parallel_messages_amount: int,
+        service_timeout: float,
     ) -> None:
-        self.conn: RobustConnection = conn
-        self.chan: RobustChannel = chan
-        self.queue: RobustQueue = queue
+        self.conn: AbstractRobustConnection = conn
+        self.chan: AbstractChannel = chan
+        self.queue: AbstractQueue = queue
 
         self.application_service: IApplicationService = application_service
-
-        self.sem: Semaphore = Semaphore(parallel_messages_amount)
+        self.service_timeout: float = service_timeout
 
     async def start_consuming(self) -> None:
+        logging.info("Starting consumer")
         async with self.queue.iterator() as it:
             async for message in it:
-                create_task(self._process_message(message))
+                logging.info(f"message=got, {message.message_id=}")
+                await self._process_message(message)
 
     async def _process_message(self, message: AbstractIncomingMessage) -> None:
         try:
-            async with self.sem:
-                application = ApplicationMessage.model_validate_json(message.body)
-                await self.application_service.increase_vacancy_applications(application)
+            application = ApplicationMessage.model_validate_json(message.body)
+            await wait_for(self.application_service.increase_vacancy_applications(application), timeout=self.service_timeout)
+            await message.ack()
+            logging.info(f"message=handled, {message.message_id=}")
 
         except ValidationError as e:
             logging.error(f"invalid incoming message, message_id={message.message_id}, details={e}")
@@ -51,5 +52,13 @@ class Consumer:
             await message.nack(requeue=False)
 
         except InternalError as e:
+            logging.critical(f"can't update vacancy applications, details={e}")
+            await message.nack(requeue=True)
+
+        except TimeoutError as e:
             logging.error(f"can't update vacancy applications, details={e}")
+            await message.nack(requeue=True)
+
+        except OSError as e:
+            logging.critical(f"can't update vacancy applications, details={e}")
             await message.nack(requeue=True)
