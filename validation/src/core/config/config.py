@@ -4,3 +4,6 @@ from src.core.config.database import RedisConfig
 
 class Config(AppConfig, RedisConfig):
     pass
+
+
+CONFIG = Config()
