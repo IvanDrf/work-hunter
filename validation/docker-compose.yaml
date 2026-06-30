@@ -1,0 +1,42 @@
+version: '3.9'
+
+services:
+  database:
+    container_name: validation_redis
+    restart: always
+    image: redis:8.6
+    ports:
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - validation_network
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    
+  app:
+    container_name: validation_app
+    build: .
+    ports:
+      - "${APP_PORT}:8080"
+    depends_on:
+      database:
+        condition: service_healthy
+
+    networks:
+      - shared_network
+      - validation_network
+
+volumes:
+  redis_data:
+
+networks:
+  shared_network:
+    driver: bridge
+  validation_network:
+    driver: bridge

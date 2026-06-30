@@ -17,4 +17,4 @@ COPY . .
 
 EXPOSE 8080
 
-CMD ["uv run -m src.app.main"]
+CMD ["uv", "run", "-m", "src.app.main"]
