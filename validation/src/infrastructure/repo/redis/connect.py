@@ -4,7 +4,13 @@ from src.core.config import RedisConfig
 
 
 async def connect_to_redis(config: RedisConfig) -> Redis:
-    redis = Redis(host=config.redis_host, port=config.redis_port, db=config.redis_database)
+    redis = Redis(
+        host=config.redis_host,
+        port=config.redis_port,
+        db=config.redis_database,
+        decode_responses=True,
+        encoding="utf-8",
+    )
 
     if not await redis.ping():
         raise TimeoutError(f"can't connect to redis, {config=}")

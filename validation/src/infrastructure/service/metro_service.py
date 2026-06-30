@@ -20,3 +20,6 @@ class MetroService:
         except TimeoutError as e:
             logging.critical(f"request to database is too long, {city=}, {metro=}, details={e}")
             raise InternalError(f"can't check is {metro=} exists in {city=}")
+
+    async def close(self) -> None:
+        await self.metro_repo.close()
