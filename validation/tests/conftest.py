@@ -3,6 +3,11 @@ from pytest import fixture
 
 
 @fixture(scope="session")
+def requests_amount() -> int:
+    return 5
+
+
+@fixture(scope="function")
 def cities_and_metro_json():
     METRO_FILE = "metro.json"
 

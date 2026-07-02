@@ -1,0 +1,8 @@
+version: '3.9'
+
+services:
+  test_database: 
+    image: redis:8.6-alpine
+    restart: always
+    ports:
+      - "6379:6379"

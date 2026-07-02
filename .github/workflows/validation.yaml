@@ -27,4 +27,4 @@ jobs:
 
       - name: Run tests
         working-directory: ./validation
-        run: uv run -m pytest tests/ -v -ss
+        run: chmod +x run_tests.sh && ./run_tests.sh
