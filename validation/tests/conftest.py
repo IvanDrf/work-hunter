@@ -3,7 +3,7 @@ from pytest import fixture
 
 
 @fixture(scope="session")
-def city_and_metro():
+def cities_and_metro_json():
     METRO_FILE = "metro.json"
 
     with open(METRO_FILE, "r", encoding="utf-8") as metro_file:
