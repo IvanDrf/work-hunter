@@ -18,18 +18,22 @@ func (h *Handler) CreateProfile(ctx context.Context, req *user_api.CreateProfile
 
 	user, err := h.UserService.CreateProfile(ctx, convertCreateProfileResponseToDto(req))
 
-	var e models.Error
-	if errors.As(err, &e) {
-		log.Error("Create profile error", slog.String("error", e.Error()))
-
-		switch e.Code {
-		case models.ErrCodeInternal:
-			return nil, status.Error(codes.Internal, e.Message)
-		case models.ErrCodeUserAlreadyExists:
-			return nil, status.Error(codes.AlreadyExists, e.Message)
-		default:
-			return nil, status.Error(codes.InvalidArgument, e.Message)
+	if err != nil {
+		var e models.Error
+		if errors.As(err, &e) {
+			log.Error("Create profile business error", slog.String("error", e.Error()))
+			switch e.Code {
+			case models.ErrCodeInternal:
+				return nil, status.Error(codes.Internal, e.Message)
+			case models.ErrCodeUserAlreadyExists:
+				return nil, status.Error(codes.AlreadyExists, e.Message)
+			default:
+				return nil, status.Error(codes.InvalidArgument, e.Message)
+			}
 		}
+
+		log.Error("Unhandled system error during profile creation", slog.String("error", err.Error()))
+		return nil, status.Error(codes.Internal, "internal server error")
 	}
 
 	log.Info("Get profile successfully response")

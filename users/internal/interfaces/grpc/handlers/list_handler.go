@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log/slog"
 
+	"github.com/IvanDrf/work-hunter/pkg/common"
 	user_api "github.com/IvanDrf/work-hunter/pkg/user-api"
 	"github.com/IvanDrf/work-hunter/users/internal/domain/models"
 	"github.com/IvanDrf/work-hunter/users/internal/interfaces/grpc/dto"
@@ -19,23 +20,27 @@ func (h *Handler) ListUsers(ctx context.Context, req *user_api.ListUsersRequest)
 	resp, err := h.UserService.ListUsers(ctx, &dto.ListUsersRequest{
 		PageSize:    req.PageSize,
 		Status:      user_api.UserStatus_name[int32(req.Status)],
-		Role:        user_api.UserRole_name[int32(req.Role)],
+		Role:        common.UserRole_name[int32(req.Role)],
 		SearchQuery: req.SerchQuery,
 		SortBy:      req.SortBy,
 		// TODO: regenerate pb files
 		Offset: 0,
 	})
 
-	var e models.Error
-	if errors.As(err, &e) {
-		switch e.Code {
-		case models.ErrCodeInternal:
-			return nil, status.Error(codes.Internal, e.Message)
-		case models.ErrCodeUserNotFound:
-			return nil, status.Error(codes.NotFound, e.Message)
-		default:
-			return nil, status.Error(codes.InvalidArgument, e.Message)
+	if err != nil {
+		var e models.Error
+		if errors.As(err, &e) {
+			switch e.Code {
+			case models.ErrCodeInternal:
+				return nil, status.Error(codes.Internal, e.Message)
+			case models.ErrCodeUserNotFound:
+				return nil, status.Error(codes.NotFound, e.Message)
+			default:
+				return nil, status.Error(codes.InvalidArgument, e.Message)
+			}
 		}
+		log.Error("Unhandled system error during profile listing", slog.String("error", err.Error()))
+		return nil, status.Error(codes.Internal, "internal server error")
 	}
 
 	log.Info("List users successfully response")

@@ -6,12 +6,10 @@ import (
 
 type UserResponse struct {
 	ID          string
-	Username    string
 	Email       string
 	FirstName   string
 	LastName    string
-	PhoneNumber string
-	AvatarURL   string
+	CompanyName string
 
 	Status string
 	Role   string
@@ -19,17 +17,17 @@ type UserResponse struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 
-	Metadata map[string]string
+	Verificated bool
 }
 
 // DTO for creating user
 type CreateUserRequest struct {
 	ID          string
-	Username    string
 	Email       string
 	FirstName   string
 	LastName    string
-	PhoneNumber string
+	CompanyName string
+	Verificated bool
 }
 
 // DTO for updating user
@@ -37,9 +35,8 @@ type UpdateUserRequest struct {
 	ID          string
 	FirstName   string
 	LastName    string
-	PhoneNumber string
-	AvatarURL   string
-	Metadata    []byte
+	CompanyName string
+	Verificated bool
 }
 
 // DTO for listing users

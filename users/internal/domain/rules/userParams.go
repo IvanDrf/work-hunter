@@ -6,19 +6,19 @@ import "errors"
 type UserStatus string
 
 const (
-	UserStatusActive   UserStatus = "USER_STATUS_ACTIVE"
-	UserStatusInactive UserStatus = "USER_STATUS_INACTIVE"
-	UserStatusBlocked  UserStatus = "USER_STATUS_BLOCKED"
-	UserStatusDeleted  UserStatus = "USER_STATUS_DELETED"
+	UserStatusActive   UserStatus = "active"
+	UserStatusInactive UserStatus = "inactive"
+	UserStatusBlocked  UserStatus = "blocked"
+	UserStatusDeleted  UserStatus = "deleted"
 )
 
 // user role
 type UserRole string
 
 const (
-	UserRoleUser      UserRole = "USER_ROLE_USER"
-	UserRoleModerator UserRole = "USER_ROLE_MODERATOR"
-	UserRoleAdmin     UserRole = "USER_ROLE_ADMIN"
+	UserRoleEmployee UserRole = "employee"
+	UserRoleEmployer UserRole = "employer"
+	UserRoleAdmin    UserRole = "admin"
 )
 
 func ValidateUserStatus(status UserStatus) error {
@@ -29,7 +29,7 @@ func ValidateUserStatus(status UserStatus) error {
 }
 
 func ValidateUserRole(role UserRole) error {
-	if role != UserRoleUser && role != UserRoleModerator && role != UserRoleAdmin {
+	if role != UserRoleEmployee && role != UserRoleEmployer && role != UserRoleAdmin {
 		return errors.New("invalid user role")
 	}
 	return nil

@@ -9,7 +9,7 @@ import (
 type UserService interface {
 	CreateProfile(ctx context.Context, req *dto.CreateUserRequest) (*dto.UserResponse, error)
 	GetProfile(ctx context.Context, id string) (*dto.UserResponse, error)
-	GetProfileByUsername(ctx context.Context, username string) (*dto.UserResponse, error)
+	GetProfileByEmail(ctx context.Context, email string) (*dto.UserResponse, error)
 	UpdateProfile(ctx context.Context, req *dto.UpdateUserRequest) (*dto.UserResponse, error)
 	DeleteProfile(ctx context.Context, id string) error
 	ListUsers(ctx context.Context, req *dto.ListUsersRequest) (*dto.ListUsersResponse, error)

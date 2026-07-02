@@ -2,5 +2,6 @@ package config
 
 // Server configuration
 type ServerConfig struct {
-	Port int `yaml:"port"`
+	Host string `yaml:"host"`
+	Port int    `yaml:"port"`
 }
