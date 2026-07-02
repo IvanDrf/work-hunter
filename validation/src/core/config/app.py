@@ -1,4 +1,4 @@
-from pydantic import Field, field_validator
+from pydantic import Field, ValidationInfo, field_validator
 
 from src.core.config.base import BaseConfig
 
@@ -15,8 +15,8 @@ class AppConfig(BaseConfig):
     logger_level: str = Field(default="DEBUG", validation_alias="LOGGER_LEVEL")
 
     @field_validator("api_key")
-    def validate_api_key(cls, value: str) -> str:
-        if len(value) == 0 and cls.env != "TESTS":
+    def validate_api_key(cls, value: str, info: ValidationInfo) -> str:
+        if len(value) == 0 and info.data.get("env") != "TESTS":
             raise ValueError("api-key must be non empty")
 
         return value
