@@ -166,7 +166,7 @@ func (s *UserService) ListUsers(ctx context.Context, req *dto.ListUsersRequest) 
 	values, err := url.ParseQuery(req.SearchQuery)
 	if err != nil {
 		log.Error("failed to parse query", slog.String("error", err.Error()))
-		return nil, &models.Error{
+		return nil, models.Error{
 			Message: fmt.Sprintf("failed to parse search query: %v", err),
 			Code:    models.ErrCodeInvalidRequest,
 		}
@@ -176,7 +176,7 @@ func (s *UserService) ListUsers(ctx context.Context, req *dto.ListUsersRequest) 
 		_, ok := enabledFields[key]
 		if !ok {
 			log.Error("cannot use this field", slog.String("field", key))
-			return nil, &models.Error{
+			return nil, models.Error{
 				Message: fmt.Sprintf("cannot use this field: %s", key),
 				Code:    models.ErrCodeInvalidRequest,
 			}
@@ -248,7 +248,7 @@ func parseUUID(id string, log *slog.Logger) (uuid.UUID, error) {
 	uuid, err := uuid.Parse(id)
 	if err != nil {
 		log.Error("failed to parse uuid from string", slog.String("error", err.Error()))
-		return uuid, &models.Error{
+		return uuid, models.Error{
 			Message: fmt.Sprintf("failed to parse uuid from string: %v", err),
 			Code:    models.ErrCodeInvalidRequest,
 		}
