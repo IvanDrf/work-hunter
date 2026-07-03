@@ -1,8 +1,9 @@
 from src.core.config.app import AppConfig
 from src.core.config.broker import RabbitMQConfig
 from src.core.config.cache import RedisConfig
+from src.core.config.clients import ValidationServiceConfig
 from src.core.config.database import PostgreSQLConfig
 
 
-class Config(AppConfig, RedisConfig, PostgreSQLConfig, RabbitMQConfig):
+class Config(AppConfig, RedisConfig, PostgreSQLConfig, RabbitMQConfig, ValidationServiceConfig):
     pass
