@@ -62,6 +62,7 @@ def vacancy_response_dto(vacancy: VacancyResponseSchema) -> VacancyInfo:
         time_type=vacancy.time_type.name,
         city=vacancy.city,
         metro=vacancy.metro,
+        is_metro_valid=vacancy.is_metro_valid,
         views=vacancy.views,
         applications_count=vacancy.applications_count,
         tags=vacancy.tags,

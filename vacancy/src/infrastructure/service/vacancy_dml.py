@@ -8,7 +8,7 @@ from src.domain.rules.vacancy import is_vacancy_id_valid
 from src.domain.schemas import UserInfo, VacancyCreateSchema, VacancyResponseSchema, VacancyUpdateSchema
 from src.domain.types.types import UNSET_VALUE, UnsetValue
 from src.infrastructure.service.base_vacancy import BaseVacancyService
-from src.infrastructure.service.dependencies import ICache, ITagRepo, IUnitOfWork, IVacancyRepo
+from src.infrastructure.service.dependencies import ICache, ITagRepo, IUnitOfWork, IVacancyRepo, IValidationServiceClient
 from src.infrastructure.service.dto.vacancy_dto import (
     create_vacancy_dto,
     vacancy_orm_to_response_dto,
@@ -22,6 +22,7 @@ class VacancyDMLService(BaseVacancyService):
         tag_repo: ITagRepo,
         uof: IUnitOfWork,
         cache: ICache,
+        validation_client: IValidationServiceClient,
         vacancy_ttl: timedelta,
         cache_timeout: float,
     ) -> None:
@@ -29,12 +30,16 @@ class VacancyDMLService(BaseVacancyService):
 
         self.vacancy_repo: IVacancyRepo = vacancy_repo
         self.tag_repo: ITagRepo = tag_repo
-
         self.uof_factory: IUnitOfWork = uof
+
+        self.validation_client: IValidationServiceClient = validation_client
 
     async def create_vacancy(self, vacancy: VacancyCreateSchema, user_info: UserInfo) -> VacancyResponseSchema:
         if not vacancy.author_name:
             raise ArgumentError("author name can't be empty")
+
+        if vacancy.city is None and vacancy.metro is not None:
+            raise ArgumentError(f"city is empty, but metro doesn't, metro={vacancy.metro}")
 
         if not user_info.verificated:
             raise AccessError("user is not verificated, can't create vacancy")
@@ -46,14 +51,17 @@ class VacancyDMLService(BaseVacancyService):
         vacancy_status = VacancyStatus.MODERATING
         vacancyORM = create_vacancy_dto(vacancy, user_info, vacancy_create_date, vacancy_status)
 
+        if vacancy.city is not None and vacancy.metro is not None:
+            vacancyORM.is_metro_valid = await self.validation_client.is_metro_valid(vacancy.city, vacancy.metro)
+
         async with self.uof_factory as uof:
             tags = await self.tag_repo.add_tags(uof, vacancy.tags)
             await self.vacancy_repo.create_vacancy(uof, vacancyORM, tags)
 
-        vacancySchema = vacancy_orm_to_response_dto(vacancyORM)
-        create_task(self._save_vacancy_in_cache_by_id(vacancySchema))
+        vacancy_schema = vacancy_orm_to_response_dto(vacancyORM)
+        create_task(self._save_vacancy_in_cache_by_id(vacancy_schema))
 
-        return vacancySchema
+        return vacancy_schema
 
     async def set_vacancy_status(
         self,

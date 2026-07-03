@@ -54,6 +54,7 @@ def vacancy_orm_to_response_dto(vacancy: VacancyORM) -> VacancyResponseSchema:
         currency=vacancy.currency,
         city=vacancy.city,
         metro=vacancy.metro,
+        is_metro_valid=vacancy.is_metro_valid,
         remote_type=vacancy.remote_type,
         time_type=vacancy.time_type,
         experience_min=vacancy.experience_min,
