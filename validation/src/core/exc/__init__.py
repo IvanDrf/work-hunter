@@ -1,6 +1,5 @@
-from src.core.exc.exceptions import ArgumentError, InternalError
+from src.core.exc.exceptions import InternalError
 
 __all__ = [
-    "ArgumentError",
     "InternalError",
 ]

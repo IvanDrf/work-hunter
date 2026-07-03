@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from prometheus_fastapi_instrumentator.instrumentation import PrometheusFastApiInstrumentator
 from uvicorn import run
 
 from src.api.dependencies import init_metro_service
@@ -30,6 +31,7 @@ app = FastAPI(lifespan=lifespan)
 app.include_router(health_router)
 app.include_router(metro_router)
 
+PrometheusFastApiInstrumentator().instrument(app).expose(app)
 
 if __name__ == "__main__":
     run(app=app, host=config.app_host, port=config.app_port)

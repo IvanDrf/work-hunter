@@ -18,6 +18,16 @@ services:
       timeout: 5s
       retries: 5
       start_period: 5s
+
+  prometheus:
+    image: prom/prometheus:v3
+    container_name: validation_prometheus
+    volumes:
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - validation_network
     
   app:
     container_name: validation_app

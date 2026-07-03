@@ -4,6 +4,7 @@ from src.core.config.base import BaseConfig
 
 
 class AppConfig(BaseConfig):
+    env: str = Field(default="TESTS", validation_alias="ENV")
     app_host: str = Field(default="localhost", validation_alias="APP_HOST")
     app_port: int = Field(default=8080, validation_alias="APP_PORT")
 

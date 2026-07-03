@@ -1,7 +1,7 @@
 import logging
 from asyncio import wait_for
 
-from src.core.exc import ArgumentError, InternalError
+from src.core.exc import InternalError
 from src.infrastructure.service.dependencies import IMetroRepo
 
 
@@ -11,9 +11,6 @@ class MetroService:
         self.repo_timeout: float = repo_timeout
 
     async def is_metro_valid(self, city: str, metro: str) -> bool:
-        if not city or not metro:
-            raise ArgumentError("city or metro is empty")
-
         try:
             return await wait_for(self.metro_repo.is_metro_exists(city.lower(), metro.lower()), timeout=self.repo_timeout)
 
