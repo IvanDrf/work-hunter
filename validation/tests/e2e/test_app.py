@@ -31,6 +31,7 @@ def test_validate_metro(cities_and_metro_json) -> None:
 def test_validate_metro_limiter(cities_and_metro_json) -> None:
     RPS = 30
     requests_amount = 0
+    limiter._storage.reset()
 
     with TestClient(app=app) as client:
         for city, stations in cities_and_metro_json:
@@ -42,8 +43,10 @@ def test_validate_metro_limiter(cities_and_metro_json) -> None:
                 )
 
                 requests_amount += 1
-                if requests_amount >= RPS:
+                if requests_amount > RPS:
                     assert response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
+                else:
+                    assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
 def assert_valid_request(client: TestClient, city: str, station: str) -> None:
