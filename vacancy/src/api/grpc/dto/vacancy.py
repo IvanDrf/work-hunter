@@ -3,8 +3,7 @@ from uuid import UUID
 from pkg.vacancy_api.vacancy_pb2 import CreateVacancyRequest, UpdateVacancyRequest, VacancyInfo
 
 from src.domain.schemas import VacancyCreateSchema, VacancyResponseSchema, VacancyUpdateSchema
-from src.domain.types.enums import Currency, RemoteType, TimeType
-from src.domain.types.types import Money, Year
+from src.domain.types import Currency, Money, RemoteType, TimeType, Year
 
 
 def vacancy_create_dto(request: CreateVacancyRequest) -> VacancyCreateSchema:
@@ -13,7 +12,7 @@ def vacancy_create_dto(request: CreateVacancyRequest) -> VacancyCreateSchema:
         requirements=request.requirements,
         conditions=request.conditions,
         author_id=UUID(request.user_info.user_id),
-        author_name=request.user_info.username,
+        author_name=request.user_info.company_name,
         currency=Currency(request.currency),
         remote_type=RemoteType(request.remote_type),
         time_type=TimeType(request.time_type),
@@ -91,19 +90,19 @@ def vacancy_update_dto(request: UpdateVacancyRequest) -> VacancyUpdateSchema:
         schema.conditions = request.conditions
 
     if request.HasField("salary_min"):
-        schema.salary_min = Money(request.salary_min)
+        schema.salary_min = Money(request.salary_min) if request.salary_min else None
 
     if request.HasField("salary_max"):
-        schema.salary_max = Money(request.salary_max)
+        schema.salary_max = Money(request.salary_max) if request.salary_max else None
 
     if request.HasField("currency"):
         schema.currency = Currency(request.currency)
 
     if request.HasField("city"):
-        schema.city = request.city
+        schema.city = request.city if request.city else None
 
     if request.HasField("metro"):
-        schema.metro = request.metro
+        schema.metro = request.metro if request.metro else None
 
     if request.HasField("remote_type"):
         schema.remote_type = RemoteType(request.remote_type)
@@ -112,12 +111,12 @@ def vacancy_update_dto(request: UpdateVacancyRequest) -> VacancyUpdateSchema:
         schema.time_type = TimeType(request.time_type)
 
     if request.HasField("experience_min"):
-        schema.experience_min = Year(request.experience_min)
+        schema.experience_min = Year(request.experience_min) if request.experience_min else None
 
     if request.HasField("experience_max"):
-        schema.experience_max = Year(request.experience_max)
+        schema.experience_max = Year(request.experience_max) if request.experience_max else None
 
-    if request.HasField("rags"):
+    if request.update_tags:
         schema.tags = list(request.tags)
 
     return schema

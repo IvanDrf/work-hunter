@@ -9,7 +9,7 @@ from pytest import mark, raises
 from src.api.grpc.dto.status import vacancy_status_dto
 from src.api.grpc.dto.user_info import user_info_dto, user_info_none_dto
 from src.core.exc import ArgumentError
-from src.domain.types.enums import UserRole, VacancyStatus
+from src.domain.types import UserRole, VacancyStatus
 
 
 @dataclass(slots=True)

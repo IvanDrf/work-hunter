@@ -8,7 +8,7 @@ from pytest import raises
 
 from src.core.exc import ArgumentError
 from src.domain.schemas.mixins import MAX_YEAR, MIN_YEAR, ExperienceValidatorMixin
-from src.domain.types.types import UNSET_VALUE, Money, UnsetValue
+from src.domain.types import UNSET_VALUE, Money, UnsetValue
 
 
 class ExperienceTestClass(BaseModel, ExperienceValidatorMixin):

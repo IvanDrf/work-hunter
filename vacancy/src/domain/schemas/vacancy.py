@@ -5,8 +5,7 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 
 from src.domain.schemas.mixins import ExperienceValidatorMixin, SalaryValidatorMixin
-from src.domain.types.enums import Currency, RemoteType, TimeType, VacancyStatus
-from src.domain.types.types import UNSET_VALUE, Money, UnsetValue, Year
+from src.domain.types import UNSET_VALUE, Currency, Money, RemoteType, TimeType, UnsetValue, VacancyStatus, Year
 
 MIN_TITLE_LENGTH: Final[int] = 5
 MAX_TITLE_LENGTH: Final[int] = 150

@@ -1,7 +1,7 @@
 from pkg.vacancy_api.vacancy_pb2 import OrderBy as PKGOrderBy
 
 from src.core.exc import ArgumentError
-from src.domain.types.enums import OrderBy
+from src.domain.types import OrderBy
 
 
 def order_by_dto(request) -> OrderBy:

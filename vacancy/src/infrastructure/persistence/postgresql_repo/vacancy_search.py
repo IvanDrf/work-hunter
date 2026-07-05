@@ -7,7 +7,7 @@ from sqlalchemy.orm import selectinload
 from src.core.exc import InternalError
 from src.domain.models import TagORM, VacanciesTagsORM, VacancyORM
 from src.domain.models.vacancy import VacancyStatus
-from src.domain.types.enums import OrderBy
+from src.domain.types import OrderBy
 from src.infrastructure.persistence.postgresql_repo.unit_of_work import UnitOfWork
 from src.utils.catch_error import catch_raise_error
 

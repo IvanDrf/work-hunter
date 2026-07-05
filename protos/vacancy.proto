@@ -175,6 +175,7 @@ message UpdateVacancyRequest {
     optional uint32 experience_max = 14;
 
     repeated string tags = 24; // vacancies tags: golang, javascript, manager
+    bool update_tags = 26;
 
     common.UserInfo user_info = 25;
 }

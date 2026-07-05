@@ -2,11 +2,11 @@ from asyncio import create_task
 from datetime import datetime, timedelta, timezone
 
 from src.core.exc import AccessError, ArgumentError, NotFoundError
-from src.domain.models.vacancy import VacancyStatus
+from src.domain.models.vacancy import VacancyORM, VacancyStatus
 from src.domain.rules.user import is_user_admin, is_user_employer, is_user_vacancy_author
 from src.domain.rules.vacancy import is_vacancy_id_valid
 from src.domain.schemas import UserInfo, VacancyCreateSchema, VacancyResponseSchema, VacancyUpdateSchema
-from src.domain.types.types import UNSET_VALUE, UnsetValue
+from src.domain.types import UNSET_VALUE, UnsetValue
 from src.infrastructure.service.base_vacancy import BaseVacancyService
 from src.infrastructure.service.dependencies import ICache, ITagRepo, IUnitOfWork, IVacancyRepo, IValidationServiceClient
 from src.infrastructure.service.dto.vacancy_dto import (
@@ -127,6 +127,8 @@ class VacancyDMLService(BaseVacancyService):
             if not fields:
                 return vacancy_orm_to_response_dto(vacancy)
 
+            await self.__update_vacancy_is_metro_valid(vacancy, fields)
+
             vacancy = await self.vacancy_repo.update_vacancy(uof, vacancy.vacancy_id, fields)
         return vacancy_orm_to_response_dto(vacancy)
 
@@ -137,6 +139,22 @@ class VacancyDMLService(BaseVacancyService):
                 raise NotFoundError(f"can't find vacancy with {vacancy_id=}")
 
             await self.vacancy_repo.delete_vacancy(uof, vacancy_id)
+
+    async def __update_vacancy_is_metro_valid(self, vacancy: VacancyORM, fields: dict) -> None:
+        city = fields.get("city", UNSET_VALUE)
+        if city is UNSET_VALUE:
+            city = vacancy.city
+
+        metro = fields.get("metro", UNSET_VALUE)
+        if metro is UNSET_VALUE:
+            metro = vacancy.metro
+
+        if city is None or metro is None:
+            vacancy.is_metro_valid = False
+            return
+
+        if city is not UNSET_VALUE and metro is not UNSET_VALUE:
+            vacancy.is_metro_valid = await self.validation_client.is_metro_valid(city, metro)
 
 
 def create_fields_for_update(vacancy_update_schema: VacancyUpdateSchema) -> dict:

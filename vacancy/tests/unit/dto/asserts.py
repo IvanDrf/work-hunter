@@ -8,8 +8,7 @@ from pkg.vacancy_api.vacancy_pb2 import RemoteType as PKGRemoteType
 from pkg.vacancy_api.vacancy_pb2 import TimeType as PKGTimeType
 
 from src.domain.schemas import VacancyCreateSchema
-from src.domain.types.enums import Currency, RemoteType, TimeType
-from src.domain.types.types import Money, Year
+from src.domain.types import Currency, Money, RemoteType, TimeType, Year
 
 
 class VacancyMain(Protocol):
@@ -129,7 +128,7 @@ def assert_exp(vacancy, schema: VacancyExp) -> None:
 
 
 def assert_author(vacancy: CreateVacancyRequest, schema: VacancyCreateSchema) -> None:
-    assert vacancy.user_info.username == schema.author_name
+    assert vacancy.user_info.company_name == schema.author_name
     assert vacancy.user_info.user_id == str(schema.author_id)
 
 

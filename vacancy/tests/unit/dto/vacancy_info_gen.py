@@ -21,8 +21,7 @@ from src.domain.schemas.vacancy import (
     MIN_TAGS_AMOUNT,
     MIN_TITLE_LENGTH,
 )
-from src.domain.types.enums import VacancyStatus
-from src.domain.types.types import Money, Year
+from src.domain.types import Money, VacancyStatus, Year
 
 
 @dataclass(frozen=True)

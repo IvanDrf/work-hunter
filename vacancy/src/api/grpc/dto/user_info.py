@@ -6,7 +6,7 @@ from pkg.common.common_pb2 import UserInfo as PBUserInfo
 
 from src.core.exc import ArgumentError
 from src.domain.schemas import UserInfo
-from src.domain.types.enums import UserRole
+from src.domain.types import UserRole
 
 
 def user_info_dto(user_info: PBUserInfo | PBFullUserInfo) -> UserInfo:

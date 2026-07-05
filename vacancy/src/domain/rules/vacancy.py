@@ -1,6 +1,6 @@
 from src.domain.models import VacancyORM
 from src.domain.schemas import UserInfo, VacancyResponseSchema
-from src.domain.types.enums import UserRole, VacancyStatus
+from src.domain.types import UserRole, VacancyStatus
 
 
 def has_right_to_vacancy(vacancy: VacancyORM | VacancyResponseSchema, user_info: UserInfo | None) -> bool:

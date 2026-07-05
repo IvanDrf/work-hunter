@@ -1,15 +1,11 @@
 from datetime import datetime
-from typing import TypeAlias
 from uuid import UUID as PyUUID
 
 from sqlalchemy import BIGINT, BOOLEAN, INT, TIMESTAMP, UUID, VARCHAR, CheckConstraint, Enum, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.domain.models.base import Base
-from src.domain.types.enums import Currency, RemoteType, TimeType, VacancyStatus
-
-Year: TypeAlias = int
-Money: TypeAlias = int
+from src.domain.types import Currency, Money, RemoteType, TimeType, VacancyStatus, Year
 
 
 class VacancyORM(Base):
@@ -26,10 +22,10 @@ class VacancyORM(Base):
     conditions: Mapped[str] = mapped_column(Text, nullable=False)
 
     salary_min: Mapped[Money | None] = mapped_column(
-        INT, CheckConstraint("salary_min >= 0", name="check_positive_salary_min"), nullable=True, default=0
+        INT, CheckConstraint("salary_min >= 0", name="check_positive_salary_min"), nullable=True
     )
     salary_max: Mapped[Money | None] = mapped_column(
-        INT, CheckConstraint("salary_max >= 0", name="check_positive_salary_max"), nullable=True, default=0
+        INT, CheckConstraint("salary_max >= 0", name="check_positive_salary_max"), nullable=True
     )
 
     currency: Mapped[Currency] = mapped_column(Enum(Currency), nullable=False)
