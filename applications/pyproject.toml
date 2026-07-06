@@ -1,0 +1,8 @@
+[project]
+name = "applications-service"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.12"
+dependencies = [
+    "grpcio-tools>=1.82.0",
+]
