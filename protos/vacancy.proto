@@ -79,7 +79,8 @@ enum ResponseStatus {
 enum OrderBy {
     DATE = 0;
     VIEWS = 1;
-    APPLICATIONS = 2;
+    APPLICATIONS_ASC = 2;
+    APPLICATIONS_DESC=3;
 }
 
 message Response {

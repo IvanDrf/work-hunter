@@ -18,7 +18,7 @@ def user_info_dto(user_info: PBUserInfo | PBFullUserInfo) -> UserInfo:
         )
     except ValueError as e:
         logging.info(f"Invalid user_id was given: {user_info.user_id}, details={e}")
-        raise ArgumentError(f"invalid user_id was given: {user_info.user_id}")
+        raise ArgumentError(f"invalid user_id was given, not uuid: {user_info.user_id}")
 
 
 def user_info_none_dto(user_info: PBUserInfo | PBFullUserInfo | None) -> UserInfo | None:
