@@ -24,6 +24,18 @@ message FullUserInfo {
     bool verificated = 4;
 }
 
+enum ResponseStatus {
+    SUCCESS = 0;
+    FAILED = 1;
+    NOT_FOUND = 2;
+    FORBIDDEN = 3;
+}
+
+message Response {
+    ResponseStatus status = 1;
+    string details = 2;
+}
+
 message Empty {
 }
 
