@@ -4,3 +4,11 @@ class BaseError(Exception):
 
 class ArgumentError(Exception):
     pass
+
+
+class InternalError(Exception):
+    pass
+
+
+class AccessError(Exception):
+    pass
