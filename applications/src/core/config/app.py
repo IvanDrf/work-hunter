@@ -8,6 +8,7 @@ class AppConfig(BaseConfig):
 
     service_timeout: float = Field(default=2, validation_alias="SERVICE_TIMEOUT")
     workers: int = Field(default=4, gt=0, validation_alias="WORKERS")
+    logger_level: str = Field(default="debug", validation_alias="LOGGER_LEVEL")
 
     @property
     def app_address(self) -> str:

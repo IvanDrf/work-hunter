@@ -1,6 +1,7 @@
 from src.app.fabric import Fabric
 from src.app.server import Server
 from src.core.config import Config
+from src.core.logger import setup_logger
 
 
 class App:
@@ -11,6 +12,7 @@ class App:
         self.server: Server = Server(config)
 
     async def init(self) -> None:
+        setup_logger(self.config.logger_level)
         handlers = await self.fabric.new_handlers()
 
         self.server.register(handlers)
