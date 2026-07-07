@@ -70,7 +70,7 @@ def test_user_info_dto(role: PKGUserRole, user_id: str, verificated: bool, is_us
 
     pkg_user_info = PKGUserInfo(role=role, user_id=user_id, verificated=verificated)
     if not is_user_id_valid:
-        error_message = f"invalid user_id was given: {user_id}"
+        error_message = f"invalid user_id was given, not uuid: {user_id}"
 
         with raises(ArgumentError, match=error_message):
             user_info_dto(pkg_user_info)
@@ -108,7 +108,7 @@ def test_user_info_none_dto(role: PKGUserRole, user_id: str, verificated: bool, 
 
     pkg_user_info = PKGUserInfo(role=role, user_id=user_id, verificated=verificated)
     if not is_user_id_valid:
-        error_message = f"invalid user_id was given: {user_id}"
+        error_message = f"invalid user_id was given, not uuid: {user_id}"
 
         with raises(ArgumentError, match=error_message):
             user_info_none_dto(pkg_user_info)
