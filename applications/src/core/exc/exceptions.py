@@ -12,3 +12,7 @@ class InternalError(Exception):
 
 class AccessError(Exception):
     pass
+
+
+class AlreadyExistsError(Exception):
+    pass
