@@ -1,7 +1,7 @@
-from src.api.dependencies.metro_service import IMetroService, get_metro_service, init_metro_service
+from src.api.dependencies.validation_service import IValidationService, get_validation_service, init_validation_service
 
 __all__ = [
-    "get_metro_service",
-    "IMetroService",
-    "init_metro_service",
+    "get_validation_service",
+    "IValidationService",
+    "init_validation_service",
 ]

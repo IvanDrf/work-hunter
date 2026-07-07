@@ -1,9 +1,9 @@
-from pydantic import BaseModel, Field
+from pydantic import Field
 
-MAX_CITY_NAME_LENGTH = 200
+from src.domain.schemas.city import CitySchema
+
 MAX_METRO_NAME_LENGTH = 80
 
 
-class ValidateMetroSchema(BaseModel):
-    city: str = Field(min_length=1, max_length=MAX_CITY_NAME_LENGTH)
+class MetroSchema(CitySchema):
     metro: str = Field(min_length=1, max_length=MAX_METRO_NAME_LENGTH)

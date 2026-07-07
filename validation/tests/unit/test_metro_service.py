@@ -3,11 +3,11 @@ from asyncio import gather
 from pytest import mark, raises
 
 from src.core.exc import InternalError
-from src.infrastructure.service.metro_service import MetroService
+from src.infrastructure.service import ValidationService
 
 
 @mark.asyncio
-async def test_metro_service(metro_service: MetroService, cities_and_metro: dict[str, set[str]]) -> None:
+async def test_metro_service(metro_service: ValidationService, cities_and_metro: dict[str, set[str]]) -> None:
     for city, stations in cities_and_metro.items():
         for station in stations:
             assert await metro_service.is_metro_valid(city, station) is True
@@ -16,7 +16,7 @@ async def test_metro_service(metro_service: MetroService, cities_and_metro: dict
 
 
 @mark.asyncio
-async def test_metro_slow_service(metro_slow_service: MetroService, cities_and_metro: dict[str, set[str]]) -> None:
+async def test_metro_slow_service(metro_slow_service: ValidationService, cities_and_metro: dict[str, set[str]]) -> None:
     async def assert_exc(city: str, station: str) -> None:
         with raises(InternalError) as e:
             await metro_slow_service.is_metro_valid(city, station)

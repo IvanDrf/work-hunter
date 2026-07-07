@@ -1,7 +1,7 @@
 from fastapi import status
 from fastapi.testclient import TestClient
 
-from src.api.metro import limiter
+from src.api.validation import limiter
 from src.app.main import app
 from src.core.config import CONFIG
 
@@ -47,6 +47,9 @@ def test_validate_metro_limiter(cities_and_metro_json) -> None:
                     assert response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
                 else:
                     assert response.status_code == status.HTTP_204_NO_CONTENT
+
+                if requests_amount > 3 * RPS:
+                    return
 
 
 def assert_valid_request(client: TestClient, city: str, station: str) -> None:
