@@ -32,6 +32,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "alembic" },
     { name = "asyncpg" },
+    { name = "grpcio-reflection" },
     { name = "grpcio-tools" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
@@ -42,6 +43,7 @@ dependencies = [
 requires-dist = [
     { name = "alembic", specifier = ">=1.18.5" },
     { name = "asyncpg", specifier = ">=0.31.0" },
+    { name = "grpcio-reflection", specifier = ">=1.82.0" },
     { name = "grpcio-tools", specifier = ">=1.82.0" },
     { name = "pydantic", specifier = ">=2.13.4" },
     { name = "pydantic-settings", specifier = ">=2.14.2" },
@@ -182,6 +184,19 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/06/62/826da0b0f01c7ba3f7ea0185968f551290deb28968d98b1edf604c895db8/grpcio-1.82.0-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:2472b72a55da8570e089f1ca22f34a350d86c109be2755f6ee1cca5ebbdd9b54", size = 7912573, upload-time = "2026-07-06T04:22:46.187Z" },
     { url = "https://files.pythonhosted.org/packages/4d/b4/d8824a66ac1ac7fbcdf63806f1a8725d95426654e859afa4606070c78740/grpcio-1.82.0-cp314-cp314-win32.whl", hash = "sha256:c9feb986151c2726789599b3672c1c9faa1d0824da921dc3f33a8cb1f93e2861", size = 4321824, upload-time = "2026-07-06T04:22:48.866Z" },
     { url = "https://files.pythonhosted.org/packages/da/08/02e581cc0bbb4c7b842f85e66a945b46d5bcc5927575c1086edfbc3360e7/grpcio-1.82.0-cp314-cp314-win_amd64.whl", hash = "sha256:b1eeb0480d86965263f8c8ae7ee5360c284d22176a196aab02fce7fba8d89dd8", size = 5141112, upload-time = "2026-07-06T04:22:51.443Z" },
+]
+
+[[package]]
+name = "grpcio-reflection"
+version = "1.82.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "grpcio" },
+    { name = "protobuf" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/96/f9/d8af78f26994aea36824cfb3293474f0a6dfe2c25115184b672ee3ee2fe5/grpcio_reflection-1.82.0.tar.gz", hash = "sha256:0d26f5cf29d87cc2984c8a6f72030cba1db5c5a4f72e79f31859e0c408f1265e", size = 19220, upload-time = "2026-07-06T04:26:50.564Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2d/72/6a8e56b8fc4731fb9715f5a5c5be850dfd5a18150eff5f735af219da1084/grpcio_reflection-1.82.0-py3-none-any.whl", hash = "sha256:6fa84a6eb39c974f504cf261a2a2a7374b4759c8df08338417bec55c47af10ef", size = 22908, upload-time = "2026-07-06T04:26:37.374Z" },
 ]
 
 [[package]]

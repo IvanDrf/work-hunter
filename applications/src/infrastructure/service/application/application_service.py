@@ -12,6 +12,9 @@ class ApplicationService:
         self.application_repo: IApplicationRepo = application_repo
         self.repo_timeout: float = repo_timeout
 
+    async def stop(self) -> None:
+        await self.uof.stop()
+
     async def update_application(self, application: ApplicationSchema) -> None:
         if not application.user_info.verificated:
             raise AccessError("only verificated users can apply for a job")

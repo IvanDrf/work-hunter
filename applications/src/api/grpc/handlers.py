@@ -10,12 +10,15 @@ from pkg.applications_api.applications_pb2_grpc import ApplicationServiceService
 from pkg.common.common_pb2 import Response, ResponseStatus, ServiceStatus, Status
 
 
-class Handlers(ApplicationServiceServicer):
+class ApplicationHandlers(ApplicationServiceServicer):
     def __init__(self, application_service: IApplicationService, service_timeout: float) -> None:
         super().__init__()
 
         self.application_service: IApplicationService = application_service
         self.service_timeout: float = service_timeout
+
+    async def stop(self) -> None:
+        await self.application_service.stop()
 
     async def Health(self, request, context) -> ServiceStatus:
         return ServiceStatus(status=Status.AVAILABLE)
@@ -23,7 +26,7 @@ class Handlers(ApplicationServiceServicer):
     @handle_errors
     async def UpdateApplications(self, request: UpdateApplicationsRequest, context: ServicerContext) -> Response:
         await wait_for(
-            self.application_service.update_applications(application=application_dto(request)),
+            self.application_service.update_application(application=application_dto(request)),
             timeout=self.service_timeout,
         )
 
