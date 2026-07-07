@@ -1,4 +1,4 @@
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, AsyncEngine
 
 from src.api.grpc.handlers import VacancyHandlers
 from src.api.rabbitmq.connection import connect_to_rabbitmq, declare_channel, declare_exchange, declare_queue
@@ -20,12 +20,12 @@ class Fabric:
         self.config: Config = config
 
     async def new_handlers(self) -> VacancyHandlers:
-        session_maker = await connect_postgresql(self.config)
+        engine, session_maker = await connect_postgresql(self.config)
 
         vacancy_repo: IVacancyRepo = self.new_vacancy_repo()
         tag_repo: ITagRepo = self.new_tag_repo()
         cache: ICache = await self.new_cache()
-        uof: IUnitOfWork = self.new_unit_of_work(session_maker)
+        uof: IUnitOfWork = self.new_unit_of_work(engine, session_maker)
 
         validation_client = self.new_validation_client()
 
@@ -34,8 +34,8 @@ class Fabric:
         return VacancyHandlers(vacancy_service)
 
     async def new_rabbitmq_consumer(self) -> RabbitMQConsumer:
-        session_maker = await connect_postgresql(self.config)
-        uof = self.new_unit_of_work(session_maker)
+        engine, session_maker = await connect_postgresql(self.config)
+        uof = self.new_unit_of_work(engine, session_maker)
         vacancy_repo = self.new_vacancy_repo()
 
         application_service: IApplicationService = ApplicationService(vacancy_repo, uof)
@@ -58,8 +58,8 @@ class Fabric:
         conn = await connect_redis(self.config)
         return RedisCache(conn)
 
-    def new_unit_of_work(self, session_maker: async_sessionmaker[AsyncSession]) -> UnitOfWork:
-        return UnitOfWork(session_maker)
+    def new_unit_of_work(self, engine: AsyncEngine, session_maker: async_sessionmaker[AsyncSession]) -> UnitOfWork:
+        return UnitOfWork(engine, session_maker)
 
     def new_validation_client(self) -> IValidationServiceClient:
         return ValidationClient(self.config.validation_service_url, self.config.validation_service_api_key)

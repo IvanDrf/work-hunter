@@ -11,12 +11,16 @@ class ServerApp:
         self.fabric: Fabric = Fabric(config)
 
     async def init(self) -> None:
-        handlers = await self.fabric.new_handlers()
+        self.handlers = await self.fabric.new_handlers()
 
-        self.server.register(handlers)
+        self.server.register(self.handlers)
 
     async def run(self) -> None:
         await self.server.run()
+
+    async def stop(self) -> None:
+        await self.server.stop()
+        await self.handlers.stop()
 
 
 class ConsumerApp:

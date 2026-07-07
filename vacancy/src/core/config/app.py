@@ -6,6 +6,7 @@ from src.core.config.base import BaseConfig
 class AppConfig(BaseConfig):
     app_host: str = Field(default="localhost", validation_alias="APP_HOST")
     app_port: int = Field(default=50052, validation_alias="APP_PORT")
+    app_shutdown_time: float = Field(default=2, validation_alias="APP_SHUTDOWN_TIME")
 
     logger_level: str = Field(default="INFO", validation_alias="LOGGER_LEVEL")
 

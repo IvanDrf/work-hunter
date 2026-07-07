@@ -11,8 +11,14 @@ async def main() -> None:
 
     app = ServerApp(config)
     await app.init()
-    await app.run()
+    try:
+        await app.run()
+    finally:
+        await app.stop()
 
 
 if __name__ == "__main__":
-    run(main())
+    try:
+        run(main())
+    except KeyboardInterrupt:
+        pass

@@ -18,3 +18,6 @@ class VacancyService(VacancyDMLService, VacancySearchService):
     ) -> None:
         VacancyDMLService.__init__(self, vacancy_repo, tag_repo, uof, cache, validation_client, vacancy_ttl, cache_timeout)
         VacancySearchService.__init__(self, vacancy_repo, uof, cache, vacancy_ttl, cache_timeout)
+
+    async def stop(self) -> None:
+        await self.uof_factory.stop()
