@@ -3,7 +3,7 @@ from functools import wraps
 
 from grpc import StatusCode
 from grpc.aio import ServicerContext
-from src.core.exc import AccessError, ArgumentError, InternalError
+from src.core.exc import AccessError, AlreadyExistsError, ArgumentError, InternalError
 
 
 def handle_errors(func):
@@ -12,7 +12,7 @@ def handle_errors(func):
         if "context" in kwargs:
             context: ServicerContext = kwargs["context"]
 
-        elif len(args) >= 2 and isinstance(args[-1], ServicerContext):
+        elif len(args) >= 3:
             context: ServicerContext = args[-1]
         else:
             raise RuntimeError("invalid function in wrapper, msut be like func(..., context: ServicerContext)")
@@ -34,5 +34,9 @@ def handle_errors(func):
         except AccessError as e:
             logging.critical(f"AccessError {func.__name__}, details={e}")
             await context.abort(code=StatusCode.PERMISSION_DENIED, details=str(e))
+
+        except AlreadyExistsError as e:
+            logging.info(f"AlreadyExistsError {func.__name__}, details={e}")
+            await context.abort(code=StatusCode.ALREADY_EXISTS, details=str(e))
 
     return wrapper
