@@ -1,13 +1,17 @@
 import datetime
+from collections.abc import Iterable as _Iterable
+from collections.abc import Mapping as _Mapping
+from typing import ClassVar as _ClassVar
+from typing import Optional as _Optional
+from typing import Union as _Union
 
-from google.protobuf import timestamp_pb2 as _timestamp_pb2
-from ..common import common_pb2 as _common_pb2
-from google.protobuf.internal import containers as _containers
-from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from collections.abc import Iterable as _Iterable, Mapping as _Mapping
-from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
+from google.protobuf import timestamp_pb2 as _timestamp_pb2
+from google.protobuf.internal import containers as _containers
+from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
+
+from ..common import common_pb2 as _common_pb2
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
@@ -47,7 +51,8 @@ class OrderBy(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
     DATE: _ClassVar[OrderBy]
     VIEWS: _ClassVar[OrderBy]
-    APPLICATIONS: _ClassVar[OrderBy]
+    APPLICATIONS_ASC: _ClassVar[OrderBy]
+    APPLICATIONS_DESC: _ClassVar[OrderBy]
 
 OFFICE: RemoteType
 REMOTE: RemoteType
@@ -68,7 +73,8 @@ NOT_FOUND: ResponseStatus
 FORBIDDEN: ResponseStatus
 DATE: OrderBy
 VIEWS: OrderBy
-APPLICATIONS: OrderBy
+APPLICATIONS_ASC: OrderBy
+APPLICATIONS_DESC: OrderBy
 
 class Response(_message.Message):
     __slots__ = ("message", "status")
@@ -76,11 +82,7 @@ class Response(_message.Message):
     STATUS_FIELD_NUMBER: _ClassVar[int]
     message: str
     status: ResponseStatus
-    def __init__(
-        self,
-        message: _Optional[str] = ...,
-        status: _Optional[_Union[ResponseStatus, str]] = ...,
-    ) -> None: ...
+    def __init__(self, message: _Optional[str] = ..., status: _Optional[_Union[ResponseStatus, str]] = ...) -> None: ...
 
 class VacancyInfo(_message.Message):
     __slots__ = (
@@ -94,6 +96,7 @@ class VacancyInfo(_message.Message):
         "currency",
         "city",
         "metro",
+        "is_metro_valid",
         "remote_type",
         "time_type",
         "experience_min",
@@ -120,6 +123,7 @@ class VacancyInfo(_message.Message):
     CURRENCY_FIELD_NUMBER: _ClassVar[int]
     CITY_FIELD_NUMBER: _ClassVar[int]
     METRO_FIELD_NUMBER: _ClassVar[int]
+    IS_METRO_VALID_FIELD_NUMBER: _ClassVar[int]
     REMOTE_TYPE_FIELD_NUMBER: _ClassVar[int]
     TIME_TYPE_FIELD_NUMBER: _ClassVar[int]
     EXPERIENCE_MIN_FIELD_NUMBER: _ClassVar[int]
@@ -145,6 +149,7 @@ class VacancyInfo(_message.Message):
     currency: Currency
     city: str
     metro: str
+    is_metro_valid: bool
     remote_type: RemoteType
     time_type: TimeType
     experience_min: int
@@ -172,26 +177,17 @@ class VacancyInfo(_message.Message):
         currency: _Optional[_Union[Currency, str]] = ...,
         city: _Optional[str] = ...,
         metro: _Optional[str] = ...,
+        is_metro_valid: bool = ...,
         remote_type: _Optional[_Union[RemoteType, str]] = ...,
         time_type: _Optional[_Union[TimeType, str]] = ...,
         experience_min: _Optional[int] = ...,
         experience_max: _Optional[int] = ...,
-        created_at: _Optional[
-            _Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]
-        ] = ...,
-        updated_at: _Optional[
-            _Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]
-        ] = ...,
-        published_at: _Optional[
-            _Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]
-        ] = ...,
-        closed_at: _Optional[
-            _Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]
-        ] = ...,
+        created_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ...,
+        updated_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ...,
+        published_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ...,
+        closed_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ...,
         status: _Optional[_Union[VacancyStatus, str]] = ...,
-        moderated_time: _Optional[
-            _Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]
-        ] = ...,
+        moderated_time: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ...,
         moderator_comments: _Optional[str] = ...,
         views: _Optional[int] = ...,
         applications_count: _Optional[int] = ...,
@@ -283,6 +279,7 @@ class UpdateVacancyRequest(_message.Message):
         "experience_min",
         "experience_max",
         "tags",
+        "update_tags",
         "user_info",
     )
     VACANCY_ID_FIELD_NUMBER: _ClassVar[int]
@@ -300,6 +297,7 @@ class UpdateVacancyRequest(_message.Message):
     EXPERIENCE_MIN_FIELD_NUMBER: _ClassVar[int]
     EXPERIENCE_MAX_FIELD_NUMBER: _ClassVar[int]
     TAGS_FIELD_NUMBER: _ClassVar[int]
+    UPDATE_TAGS_FIELD_NUMBER: _ClassVar[int]
     USER_INFO_FIELD_NUMBER: _ClassVar[int]
     vacancy_id: int
     title: str
@@ -316,6 +314,7 @@ class UpdateVacancyRequest(_message.Message):
     experience_min: int
     experience_max: int
     tags: _containers.RepeatedScalarFieldContainer[str]
+    update_tags: bool
     user_info: _common_pb2.UserInfo
     def __init__(
         self,
@@ -334,6 +333,7 @@ class UpdateVacancyRequest(_message.Message):
         experience_min: _Optional[int] = ...,
         experience_max: _Optional[int] = ...,
         tags: _Optional[_Iterable[str]] = ...,
+        update_tags: bool = ...,
         user_info: _Optional[_Union[_common_pb2.UserInfo, _Mapping]] = ...,
     ) -> None: ...
 
@@ -344,9 +344,7 @@ class DeleteVacancyRequest(_message.Message):
     vacancy_id: int
     user_info: _common_pb2.UserInfo
     def __init__(
-        self,
-        vacancy_id: _Optional[int] = ...,
-        user_info: _Optional[_Union[_common_pb2.UserInfo, _Mapping]] = ...,
+        self, vacancy_id: _Optional[int] = ..., user_info: _Optional[_Union[_common_pb2.UserInfo, _Mapping]] = ...
     ) -> None: ...
 
 class FindVacancyByIDRequest(_message.Message):
@@ -356,9 +354,7 @@ class FindVacancyByIDRequest(_message.Message):
     vacancy_id: int
     user_info: _common_pb2.UserInfo
     def __init__(
-        self,
-        vacancy_id: _Optional[int] = ...,
-        user_info: _Optional[_Union[_common_pb2.UserInfo, _Mapping]] = ...,
+        self, vacancy_id: _Optional[int] = ..., user_info: _Optional[_Union[_common_pb2.UserInfo, _Mapping]] = ...
     ) -> None: ...
 
 class FindVacancyByTagsRequest(_message.Message):

@@ -7,7 +7,7 @@ from pkg.vacancy_api.vacancy_pb2 import VacancyInfo as PKGVacancyInfo
 
 from src.api.grpc.dto.vacancy import vacancy_response_dto
 from src.domain.schemas import VacancyResponseSchema
-from src.domain.types.enums import Currency, RemoteType, TimeType
+from src.domain.types import Currency, RemoteType, TimeType
 from tests.unit.dto.asserts import (
     assert_additional,
     assert_currencies,

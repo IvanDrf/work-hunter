@@ -8,7 +8,7 @@ from pytest import raises
 
 from src.core.exc import ArgumentError
 from src.domain.schemas.mixins import MAX_MONEY, MIN_MONEY, SalaryValidatorMixin
-from src.domain.types.types import UNSET_VALUE, Money, UnsetValue
+from src.domain.types import UNSET_VALUE, Money, UnsetValue
 
 
 class SalaryTestClass(BaseModel, SalaryValidatorMixin):

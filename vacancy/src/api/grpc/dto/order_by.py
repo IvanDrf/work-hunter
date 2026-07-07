@@ -1,7 +1,7 @@
 from pkg.vacancy_api.vacancy_pb2 import OrderBy as PKGOrderBy
 
 from src.core.exc import ArgumentError
-from src.domain.types.enums import OrderBy
+from src.domain.types import OrderBy
 
 
 def order_by_dto(request) -> OrderBy:
@@ -11,7 +11,8 @@ def order_by_dto(request) -> OrderBy:
     order_by = {
         PKGOrderBy.DATE: OrderBy.CREATED_AT,
         PKGOrderBy.VIEWS: OrderBy.VIEWS,
-        PKGOrderBy.APPLICATIONS: OrderBy.APPLICATIONS_COUNT,
+        PKGOrderBy.APPLICATIONS_ASC: OrderBy.APPLICATIONS_ASC,
+        PKGOrderBy.APPLICATIONS_DESC: OrderBy.APPLICATIONS_DESC,
     }
 
     if request.order_by not in order_by:

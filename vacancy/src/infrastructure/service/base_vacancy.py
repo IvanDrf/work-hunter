@@ -6,7 +6,7 @@ from typing import Final
 from pydantic import TypeAdapter, ValidationError
 
 from src.domain.schemas import UserInfo, VacancyResponseSchema
-from src.domain.types.enums import OrderBy
+from src.domain.types import OrderBy
 from src.infrastructure.service.dependencies import ICache
 
 Vacancies = TypeAdapter(list[VacancyResponseSchema])

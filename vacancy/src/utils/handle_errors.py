@@ -2,6 +2,7 @@ import logging
 from functools import wraps
 
 from grpc import ServicerContext, StatusCode
+from pydantic import ValidationError
 
 from src.core.exc import AccessError, ArgumentError, InternalError, NotFoundError
 
@@ -20,7 +21,7 @@ def handle_errors(func):
             res = await func(*args, **kwargs)
             return res
 
-        except ArgumentError as e:
+        except (ArgumentError, ValidationError) as e:
             logging.info(f"{func.__name__}: {e}")
 
             await context.abort(StatusCode.INVALID_ARGUMENT, e.__str__())

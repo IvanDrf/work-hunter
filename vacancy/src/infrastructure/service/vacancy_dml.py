@@ -2,13 +2,13 @@ from asyncio import create_task
 from datetime import datetime, timedelta, timezone
 
 from src.core.exc import AccessError, ArgumentError, NotFoundError
-from src.domain.models.vacancy import VacancyStatus
+from src.domain.models.vacancy import VacancyORM, VacancyStatus
 from src.domain.rules.user import is_user_admin, is_user_employer, is_user_vacancy_author
 from src.domain.rules.vacancy import is_vacancy_id_valid
 from src.domain.schemas import UserInfo, VacancyCreateSchema, VacancyResponseSchema, VacancyUpdateSchema
-from src.domain.types.types import UNSET_VALUE, UnsetValue
+from src.domain.types import UNSET_VALUE, UnsetValue
 from src.infrastructure.service.base_vacancy import BaseVacancyService
-from src.infrastructure.service.dependencies import ICache, ITagRepo, IUnitOfWork, IVacancyRepo
+from src.infrastructure.service.dependencies import ICache, ITagRepo, IUnitOfWork, IVacancyRepo, IValidationServiceClient
 from src.infrastructure.service.dto.vacancy_dto import (
     create_vacancy_dto,
     vacancy_orm_to_response_dto,
@@ -22,6 +22,7 @@ class VacancyDMLService(BaseVacancyService):
         tag_repo: ITagRepo,
         uof: IUnitOfWork,
         cache: ICache,
+        validation_client: IValidationServiceClient,
         vacancy_ttl: timedelta,
         cache_timeout: float,
     ) -> None:
@@ -29,12 +30,16 @@ class VacancyDMLService(BaseVacancyService):
 
         self.vacancy_repo: IVacancyRepo = vacancy_repo
         self.tag_repo: ITagRepo = tag_repo
-
         self.uof_factory: IUnitOfWork = uof
+
+        self.validation_client: IValidationServiceClient = validation_client
 
     async def create_vacancy(self, vacancy: VacancyCreateSchema, user_info: UserInfo) -> VacancyResponseSchema:
         if not vacancy.author_name:
             raise ArgumentError("author name can't be empty")
+
+        if vacancy.city is None and vacancy.metro is not None:
+            raise ArgumentError(f"city is empty, but metro doesn't, metro={vacancy.metro}")
 
         if not user_info.verificated:
             raise AccessError("user is not verificated, can't create vacancy")
@@ -46,14 +51,17 @@ class VacancyDMLService(BaseVacancyService):
         vacancy_status = VacancyStatus.MODERATING
         vacancyORM = create_vacancy_dto(vacancy, user_info, vacancy_create_date, vacancy_status)
 
+        if vacancy.city is not None and vacancy.metro is not None:
+            vacancyORM.is_metro_valid = await self.validation_client.is_metro_valid(vacancy.city, vacancy.metro)
+
         async with self.uof_factory as uof:
             tags = await self.tag_repo.add_tags(uof, vacancy.tags)
             await self.vacancy_repo.create_vacancy(uof, vacancyORM, tags)
 
-        vacancySchema = vacancy_orm_to_response_dto(vacancyORM)
-        create_task(self._save_vacancy_in_cache_by_id(vacancySchema))
+        vacancy_schema = vacancy_orm_to_response_dto(vacancyORM)
+        create_task(self._save_vacancy_in_cache_by_id(vacancy_schema))
 
-        return vacancySchema
+        return vacancy_schema
 
     async def set_vacancy_status(
         self,
@@ -119,6 +127,8 @@ class VacancyDMLService(BaseVacancyService):
             if not fields:
                 return vacancy_orm_to_response_dto(vacancy)
 
+            await self.__update_vacancy_is_metro_valid(vacancy, fields)
+
             vacancy = await self.vacancy_repo.update_vacancy(uof, vacancy.vacancy_id, fields)
         return vacancy_orm_to_response_dto(vacancy)
 
@@ -129,6 +139,22 @@ class VacancyDMLService(BaseVacancyService):
                 raise NotFoundError(f"can't find vacancy with {vacancy_id=}")
 
             await self.vacancy_repo.delete_vacancy(uof, vacancy_id)
+
+    async def __update_vacancy_is_metro_valid(self, vacancy: VacancyORM, fields: dict) -> None:
+        city = fields.get("city", UNSET_VALUE)
+        if city is UNSET_VALUE:
+            city = vacancy.city
+
+        metro = fields.get("metro", UNSET_VALUE)
+        if metro is UNSET_VALUE:
+            metro = vacancy.metro
+
+        if city is None or metro is None:
+            vacancy.is_metro_valid = False
+            return
+
+        if city is not UNSET_VALUE and metro is not UNSET_VALUE:
+            vacancy.is_metro_valid = await self.validation_client.is_metro_valid(city, metro)
 
 
 def create_fields_for_update(vacancy_update_schema: VacancyUpdateSchema) -> dict:

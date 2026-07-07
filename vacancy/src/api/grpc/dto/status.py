@@ -1,7 +1,7 @@
 from pkg.vacancy_api.vacancy_pb2 import VacancyStatus as PKGVacancyStatus
 
 from src.core.exc import ArgumentError
-from src.domain.types.enums import VacancyStatus
+from src.domain.types import VacancyStatus
 
 
 def vacancy_status_dto(request) -> VacancyStatus:
