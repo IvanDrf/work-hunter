@@ -4,9 +4,9 @@ from fastapi import FastAPI
 from prometheus_fastapi_instrumentator.instrumentation import PrometheusFastApiInstrumentator
 from uvicorn import run
 
-from src.api.dependencies import init_metro_service
+from src.api.dependencies import init_validation_service
 from src.api.health import health_router
-from src.api.metro import metro_router
+from src.api.validation import validation_router
 from src.app.fabric import Fabric
 from src.core.config import Config
 from src.core.logger import setup_logger
@@ -17,19 +17,19 @@ async def lifespan(_: FastAPI):
     fabric = Fabric(config)
     setup_logger(config.logger_level)
 
-    metro_service = fabric.new_service(await fabric.new_repo())
-    init_metro_service(metro_service)
+    validation_service = await fabric.new_service()
+    init_validation_service(validation_service)
 
     yield
 
-    await metro_service.close()
+    await validation_service.close()
 
 
 config = Config()
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(health_router)
-app.include_router(metro_router)
+app.include_router(validation_router)
 
 PrometheusFastApiInstrumentator().instrument(app).expose(app)
 
