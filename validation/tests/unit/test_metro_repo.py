@@ -1,3 +1,5 @@
+from typing import Iterable
+
 from hypothesis import given
 from hypothesis import strategies as st
 from pytest import mark
@@ -6,7 +8,7 @@ from src.infrastructure.repo import MetroRedisRepo
 
 
 @mark.asyncio
-async def test_metro_redis_repo(metro_repo: MetroRedisRepo, cities_and_metro_json: tuple[str, list[str]]) -> None:
+async def test_metro_redis_repo(metro_repo: MetroRedisRepo, cities_and_metro_json: Iterable[tuple[str, list[str]]]) -> None:
     for city, stations in cities_and_metro_json:
         city = city.lower()
         for station in stations:
@@ -17,5 +19,5 @@ async def test_metro_redis_repo(metro_repo: MetroRedisRepo, cities_and_metro_jso
 
 @mark.asyncio
 @given(city=st.text(), metro=st.text())
-async def test_metro_redis_not_exists(metro_repo: MetroRedisRepo, city: str, metro: str) -> None:
+async def test_metro_redis_repo_not_exists(metro_repo: MetroRedisRepo, city: str, metro: str) -> None:
     assert await metro_repo.is_metro_exists(city, metro) is False

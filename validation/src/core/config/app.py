@@ -9,6 +9,7 @@ class AppConfig(BaseConfig):
     app_port: int = Field(default=8080, validation_alias="APP_PORT")
 
     metro_json: str = Field(default="metro.json", validation_alias="METRO_JSON")
+    cities_json: str = Field(default="cities.json", validation_alias="CITIES_JSON")
 
     api_key: str = Field(default="", validation_alias="API_KEY")
 

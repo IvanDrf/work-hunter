@@ -2,6 +2,7 @@ version: '3.9'
 
 services:
   test_database: 
+    container_name: validation_test_database
     image: redis:8.6-alpine
     restart: always
     ports:
