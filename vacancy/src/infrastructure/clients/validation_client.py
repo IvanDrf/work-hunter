@@ -40,20 +40,42 @@ class ValidationClient:
     def validate_metro_url(self) -> str:
         return f"{self.url}/api/metro"
 
+    @cached_property
+    def validate_city_url(self) -> str:
+        return f"{self.url}/api/city"
+
     async def is_metro_valid(self, city: str, metro: str) -> bool:
         async with AsyncClient(timeout=5) as client:
             try:
-                return await self._send_request_to_validation_service(client, city, metro)
+                return await self._send_request_to_validation_service(
+                    client=client,
+                    url=self.validate_metro_url,
+                    json={"city": city, "metro": metro},
+                )
+
             except (RetryError, ConnectError) as e:
                 logging.error(f"can't validate metro after all attempts, details={e}")
                 return False
 
+    async def is_city_valid(self, city: str) -> bool:
+        async with AsyncClient(timeout=5) as client:
+            try:
+                return await self._send_request_to_validation_service(
+                    client=client,
+                    url=self.validate_city_url,
+                    json={"city": city},
+                )
+
+            except (RetryError, ConnectError) as e:
+                logging.error(f"can't validate city after all attempts, details={e}")
+                return False
+
     @max_retries(max_retries=3, base_delay=0.2)
-    async def _send_request_to_validation_service(self, client: AsyncClient, city: str, metro: str) -> bool:
+    async def _send_request_to_validation_service(self, client: AsyncClient, url: str, json: dict) -> bool:
         response = await client.post(
-            url=self.validate_metro_url,
+            url=url,
             headers={"Content-type": "application/json", "api-key": self.api_key},
-            json={"city": city, "metro": metro},
+            json=json,
         )
 
         if response.status_code == codes.NO_CONTENT:
@@ -68,10 +90,10 @@ class ValidationClient:
 
         match code:
             case codes.UNPROCESSABLE_ENTITY:
-                logging.critical(f"invalid request body in validation service, details={message}")
+                logging.critical(f"invalid request body in validation service, details={message}, {json=}")
 
             case codes.FORBIDDEN:
-                logging.critical(f"invalid api-key, can't validate metro, details={message}")
+                logging.critical(f"invalid api-key, can't validate, details={message}")
 
             case codes.UNAUTHORIZED:
                 logging.critical(f"api-key wasn't send in request, details={message}")

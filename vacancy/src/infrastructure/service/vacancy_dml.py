@@ -1,4 +1,4 @@
-from asyncio import create_task
+from asyncio import create_task, gather
 from datetime import datetime, timedelta, timezone
 
 from src.core.exc import AccessError, ArgumentError, NotFoundError
@@ -51,8 +51,7 @@ class VacancyDMLService(BaseVacancyService):
         vacancy_status = VacancyStatus.MODERATING
         vacancyORM = create_vacancy_dto(vacancy, user_info, vacancy_create_date, vacancy_status)
 
-        if vacancy.city is not None and vacancy.metro is not None:
-            vacancyORM.is_metro_valid = await self.validation_client.is_metro_valid(vacancy.city, vacancy.metro)
+        vacancyORM.is_city_valid, vacancyORM.is_metro_valid = await self.__validate_city_and_metro(vacancy)
 
         async with self.uof_factory as uof:
             tags = await self.tag_repo.add_tags(uof, vacancy.tags)
@@ -155,6 +154,23 @@ class VacancyDMLService(BaseVacancyService):
 
         if city is not UNSET_VALUE and metro is not UNSET_VALUE:
             vacancy.is_metro_valid = await self.validation_client.is_metro_valid(city, metro)
+
+    async def __validate_city_and_metro(self, vacancy: VacancyCreateSchema) -> tuple[bool, bool]:
+        is_city_valid = False
+        is_metro_valid = False
+
+        if vacancy.city is not None and vacancy.metro is not None:
+            is_city_valid, is_metro_valid = await gather(
+                *[
+                    self.validation_client.is_city_valid(vacancy.city),
+                    self.validation_client.is_metro_valid(vacancy.city, vacancy.metro),
+                ]
+            )
+        elif vacancy.city is not None:
+            is_city_valid = await self.validation_client.is_city_valid(vacancy.city)
+            return is_city_valid, is_metro_valid
+
+        return is_city_valid, is_metro_valid
 
 
 def create_fields_for_update(vacancy_update_schema: VacancyUpdateSchema) -> dict:
