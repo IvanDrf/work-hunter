@@ -50,7 +50,7 @@ def repo_timeout() -> float:
 def metro_dict_repo(cities_and_metro: dict[str, set[str]]):
     class MetroDictRepo:
         def __init__(self) -> None:
-            self.storage: dict[str, set[str]] = {city: stations for city, stations in cities_and_metro.items()}
+            self.storage: dict[str, set[str]] = {city.lower(): stations for city, stations in cities_and_metro.items()}
 
         async def is_metro_exists(self, city: str, metro: str) -> bool:
             return city in self.storage and metro in self.storage[city]
@@ -65,7 +65,7 @@ def metro_dict_repo(cities_and_metro: dict[str, set[str]]):
 def city_dict_repo(cities: set[str]):
     class CityDictRepo:
         def __init__(self) -> None:
-            self.storage: set[str] = cities
+            self.storage: set[str] = {city.lower() for city in cities}
 
         async def is_city_exists(self, city: str) -> bool:
             return city in self.storage
@@ -109,10 +109,10 @@ def city_slow_dict_repo(cities: set[str], repo_timeout: float):
 
 
 @fixture(scope="package")
-def metro_service(metro_dict_repo, city_dict_repo, repo_timeout: float) -> ValidationService:
+def validation_service(metro_dict_repo, city_dict_repo, repo_timeout: float) -> ValidationService:
     return ValidationService(metro_repo=metro_dict_repo, city_repo=city_dict_repo, repo_timeout=repo_timeout)
 
 
 @fixture(scope="package")
-def metro_slow_service(metro_slow_dict_repo, city_slow_dict_repo, repo_timeout: float) -> ValidationService:
+def validation_slow_service(metro_slow_dict_repo, city_slow_dict_repo, repo_timeout: float) -> ValidationService:
     return ValidationService(metro_repo=metro_slow_dict_repo, city_repo=city_slow_dict_repo, repo_timeout=repo_timeout)
