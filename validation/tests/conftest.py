@@ -20,3 +20,17 @@ def cities_and_metro_json():
                     yield (city_name, metro_stations)
 
         yield data_yield()
+
+
+@fixture(scope="function")
+def cities_json():
+    CITIES_FILE = "cities.json"
+
+    with open(CITIES_FILE, "r", encoding="utf-8") as cities_file:
+        cities = items(cities_file, "cities.item")
+
+        def data_yield():
+            for city in cities:
+                yield city
+
+        yield data_yield()

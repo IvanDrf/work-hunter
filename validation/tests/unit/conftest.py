@@ -5,7 +5,7 @@ from pytest import fixture
 from pytest_asyncio import fixture as async_fixture
 
 from src.core.config import Config
-from src.infrastructure.repo import MetroRedisRepo, load_cities_and_metro
+from src.infrastructure.repo import CityRedisRepo, MetroRedisRepo, load_cities, load_cities_and_metro
 from src.infrastructure.service import ValidationService
 
 
@@ -16,6 +16,15 @@ async def metro_repo() -> MetroRedisRepo:
     await load_cities_and_metro(Config(), redis)
 
     return MetroRedisRepo(redis)
+
+
+@async_fixture(scope="session")
+async def city_repo() -> CityRedisRepo:
+    redis = FakeRedis()
+
+    await load_cities(Config(), redis)
+
+    return CityRedisRepo(redis)
 
 
 @fixture(scope="package")
