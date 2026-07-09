@@ -1,17 +1,13 @@
 import datetime
-from collections.abc import Iterable as _Iterable
-from collections.abc import Mapping as _Mapping
-from typing import ClassVar as _ClassVar
-from typing import Optional as _Optional
-from typing import Union as _Union
 
-from google.protobuf import descriptor as _descriptor
-from google.protobuf import message as _message
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
+from ..common import common_pb2 as _common_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
-
-from ..common import common_pb2 as _common_pb2
+from google.protobuf import descriptor as _descriptor
+from google.protobuf import message as _message
+from collections.abc import Iterable as _Iterable, Mapping as _Mapping
+from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
@@ -96,6 +92,7 @@ class VacancyInfo(_message.Message):
         "currency",
         "city",
         "metro",
+        "is_city_valid",
         "is_metro_valid",
         "remote_type",
         "time_type",
@@ -123,6 +120,7 @@ class VacancyInfo(_message.Message):
     CURRENCY_FIELD_NUMBER: _ClassVar[int]
     CITY_FIELD_NUMBER: _ClassVar[int]
     METRO_FIELD_NUMBER: _ClassVar[int]
+    IS_CITY_VALID_FIELD_NUMBER: _ClassVar[int]
     IS_METRO_VALID_FIELD_NUMBER: _ClassVar[int]
     REMOTE_TYPE_FIELD_NUMBER: _ClassVar[int]
     TIME_TYPE_FIELD_NUMBER: _ClassVar[int]
@@ -149,6 +147,7 @@ class VacancyInfo(_message.Message):
     currency: Currency
     city: str
     metro: str
+    is_city_valid: bool
     is_metro_valid: bool
     remote_type: RemoteType
     time_type: TimeType
@@ -177,7 +176,8 @@ class VacancyInfo(_message.Message):
         currency: _Optional[_Union[Currency, str]] = ...,
         city: _Optional[str] = ...,
         metro: _Optional[str] = ...,
-        is_metro_valid: bool = ...,
+        is_city_valid: _Optional[bool] = ...,
+        is_metro_valid: _Optional[bool] = ...,
         remote_type: _Optional[_Union[RemoteType, str]] = ...,
         time_type: _Optional[_Union[TimeType, str]] = ...,
         experience_min: _Optional[int] = ...,
@@ -333,7 +333,7 @@ class UpdateVacancyRequest(_message.Message):
         experience_min: _Optional[int] = ...,
         experience_max: _Optional[int] = ...,
         tags: _Optional[_Iterable[str]] = ...,
-        update_tags: bool = ...,
+        update_tags: _Optional[bool] = ...,
         user_info: _Optional[_Union[_common_pb2.UserInfo, _Mapping]] = ...,
     ) -> None: ...
 

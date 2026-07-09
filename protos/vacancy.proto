@@ -103,6 +103,7 @@ message VacancyInfo {
 
     optional string city = 9;
     optional string metro = 10;
+    bool is_city_valid = 27;
     bool is_metro_valid = 26;
 
     RemoteType remote_type = 11;
