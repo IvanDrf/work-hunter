@@ -64,6 +64,17 @@ services:
       retries: 10
       start_period: 15s
 
+  prometheus:
+    image: prom/prometheus:v3
+    container_name: vacancy_prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "${PROMETHEUS_PORT}:9090"
+    networks:
+      - vacancy_network
+
+
 
   vacancy_app:
     build:
@@ -72,6 +83,7 @@ services:
     container_name: vacancy_app
     ports:
       - "${APP_PORT}:50052"
+      - "${METRICS_PORT}:5665"
     depends_on:
       database:
         condition: service_healthy
@@ -92,6 +104,7 @@ volumes:
 
 networks:
   vacancy_network:
+    name: vacancy_network
     driver: bridge
   
   shared_network:

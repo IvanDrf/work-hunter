@@ -23,12 +23,26 @@ services:
     image: prom/prometheus:v3
     container_name: validation_prometheus
     volumes:
-      - ./prometheus.yaml:/etc/prometheus/prometheus.yml
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
-      - "9090:9090"
+      - "${PROMETHEUS_PORT}:9090"
     networks:
       - validation_network
-    
+
+  grafana:
+    image: grafana/grafana:nightly-slim
+    container_name: validation_grafana
+    environment:
+      - "GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}"
+      - "GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+    ports:
+      - "${GRAFANA_PORT}:3000"
+    networks:
+      - validation_network
+
   validation_app:
     container_name: validation_app
     build: .
@@ -44,6 +58,7 @@ services:
 
 volumes:
   redis_data:
+  grafana-storage:
 
 networks:
   shared_network:
@@ -51,3 +66,4 @@ networks:
     name: shared_network
   validation_network:
     driver: bridge
+    name: validation_network

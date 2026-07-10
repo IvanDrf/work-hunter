@@ -9,6 +9,7 @@ class AppConfig(BaseConfig):
     app_shutdown_time: float = Field(default=2, validation_alias="APP_SHUTDOWN_TIME")
 
     logger_level: str = Field(default="INFO", validation_alias="LOGGER_LEVEL")
+    metrics_port: int = Field(default=5665, validation_alias="METRICS_PORT")
 
     @property
     def address(self) -> str:

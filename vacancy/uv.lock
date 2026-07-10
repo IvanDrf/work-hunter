@@ -589,6 +589,15 @@ wheels = [
 ]
 
 [[package]]
+name = "prometheus-client"
+version = "0.25.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/1b/fb/d9aa83ffe43ce1f19e557c0971d04b90561b0cfd50762aafb01968285553/prometheus_client-0.25.0.tar.gz", hash = "sha256:5e373b75c31afb3c86f1a52fa1ad470c9aace18082d39ec0d2f918d11cc9ba28", size = 86035, upload-time = "2026-04-09T19:53:42.359Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8d/9b/d4b1e644385499c8346fa9b622a3f030dce14cd6ef8a1871c221a17a67e7/prometheus_client-0.25.0-py3-none-any.whl", hash = "sha256:d5aec89e349a6ec230805d0df882f3807f74fd6c1a2fa86864e3c2279059fed1", size = 64154, upload-time = "2026-04-09T19:53:41.324Z" },
+]
+
+[[package]]
 name = "propcache"
 version = "0.5.2"
 source = { registry = "https://pypi.org/simple" }
@@ -736,6 +745,20 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/97/77/21b0ea2e1a73aa5fa9222b2a6b8ba325c43c3a8d54272839c991f2345656/psycopg2_binary-2.9.11-cp314-cp314-musllinux_1_2_riscv64.whl", hash = "sha256:32770a4d666fbdafab017086655bcddab791d7cb260a16679cc5a7338b64343b", size = 3044737, upload-time = "2025-10-30T02:55:35.69Z" },
     { url = "https://files.pythonhosted.org/packages/67/69/f36abe5f118c1dca6d3726ceae164b9356985805480731ac6712a63f24f0/psycopg2_binary-2.9.11-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:c3cb3a676873d7506825221045bd70e0427c905b9c8ee8d6acd70cfcbd6e576d", size = 3347643, upload-time = "2025-10-10T11:13:53.499Z" },
     { url = "https://files.pythonhosted.org/packages/e1/36/9c0c326fe3a4227953dfb29f5d0c8ae3b8eb8c1cd2967aa569f50cb3c61f/psycopg2_binary-2.9.11-cp314-cp314-win_amd64.whl", hash = "sha256:4012c9c954dfaccd28f94e84ab9f94e12df76b4afb22331b1f0d3154893a6316", size = 2803913, upload-time = "2025-10-10T11:13:57.058Z" },
+]
+
+[[package]]
+name = "py-async-grpc-prometheus"
+version = "0.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "grpcio" },
+    { name = "prometheus-client" },
+    { name = "setuptools" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ec/d0/b2450efae0cce981c49432c83148e62b60f6f1973e6439a2c5be8b9398be/py_async_grpc_prometheus-0.2.0.tar.gz", hash = "sha256:37dd7cb5d8b48ebba34a184977dd4b6c505f335e9fe316e5f3b6ee3dc0f37b67", size = 13009, upload-time = "2024-11-26T15:37:34.123Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/df/d3/85b795b73bdb87c3d95fb95f51f4ad00c015ce61ca1a2ad090ba4d48c7c5/py_async_grpc_prometheus-0.2.0-py3-none-any.whl", hash = "sha256:007f8211e8a3c3a7492ed59eac80fcb163fe35c2e35aa282b1e7ed482bad5a25", size = 13418, upload-time = "2024-11-26T15:37:32.46Z" },
 ]
 
 [[package]]
@@ -1054,6 +1077,7 @@ dependencies = [
     { name = "platformdirs" },
     { name = "protobuf" },
     { name = "psycopg2-binary" },
+    { name = "py-async-grpc-prometheus" },
     { name = "pydantic" },
     { name = "pydantic-core" },
     { name = "pydantic-settings" },
@@ -1097,6 +1121,7 @@ requires-dist = [
     { name = "platformdirs", specifier = "==4.9.6" },
     { name = "protobuf", specifier = "==7.35.0" },
     { name = "psycopg2-binary", specifier = "==2.9.11" },
+    { name = "py-async-grpc-prometheus", specifier = ">=0.2.0" },
     { name = "pydantic", specifier = "==2.13.4" },
     { name = "pydantic-core", specifier = "==2.46.4" },
     { name = "pydantic-settings", specifier = "==2.14.1" },
