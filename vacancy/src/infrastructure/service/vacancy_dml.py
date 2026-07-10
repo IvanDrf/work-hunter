@@ -51,7 +51,7 @@ class VacancyDMLService(BaseVacancyService):
         vacancy_status = VacancyStatus.MODERATING
         vacancyORM = create_vacancy_dto(vacancy, user_info, vacancy_create_date, vacancy_status)
 
-        vacancyORM.is_city_valid, vacancyORM.is_metro_valid = await self.__validate_city_and_metro(vacancy)
+        vacancyORM.is_city_valid, vacancyORM.is_metro_valid = await self.__validate_city_and_metro(vacancy.city, vacancy.metro)
 
         async with self.uof_factory as uof:
             tags = await self.tag_repo.add_tags(uof, vacancy.tags)
@@ -126,7 +126,7 @@ class VacancyDMLService(BaseVacancyService):
             if not fields:
                 return vacancy_orm_to_response_dto(vacancy)
 
-            await self.__update_vacancy_is_metro_valid(vacancy, fields)
+            await self.__update_vacancy_is_metro_and_city_valid(vacancy, fields)
 
             vacancy = await self.vacancy_repo.update_vacancy(uof, vacancy.vacancy_id, fields)
         return vacancy_orm_to_response_dto(vacancy)
@@ -139,7 +139,7 @@ class VacancyDMLService(BaseVacancyService):
 
             await self.vacancy_repo.delete_vacancy(uof, vacancy_id)
 
-    async def __update_vacancy_is_metro_valid(self, vacancy: VacancyORM, fields: dict) -> None:
+    async def __update_vacancy_is_metro_and_city_valid(self, vacancy: VacancyORM, fields: dict) -> None:
         city = fields.get("city", UNSET_VALUE)
         if city is UNSET_VALUE:
             city = vacancy.city
@@ -148,26 +148,25 @@ class VacancyDMLService(BaseVacancyService):
         if metro is UNSET_VALUE:
             metro = vacancy.metro
 
-        if city is None or metro is None:
-            vacancy.is_metro_valid = False
+        if city == vacancy.city and metro == vacancy.metro:
             return
 
         if city is not UNSET_VALUE and metro is not UNSET_VALUE:
-            vacancy.is_metro_valid = await self.validation_client.is_metro_valid(city, metro)
+            vacancy.is_city_valid, vacancy.is_metro_valid = await self.__validate_city_and_metro(city, metro)
 
-    async def __validate_city_and_metro(self, vacancy: VacancyCreateSchema) -> tuple[bool, bool]:
+    async def __validate_city_and_metro(self, city: str | None, metro: str | None) -> tuple[bool, bool]:
         is_city_valid = False
         is_metro_valid = False
 
-        if vacancy.city is not None and vacancy.metro is not None:
+        if city is not None and metro is not None:
             is_city_valid, is_metro_valid = await gather(
                 *[
-                    self.validation_client.is_city_valid(vacancy.city),
-                    self.validation_client.is_metro_valid(vacancy.city, vacancy.metro),
+                    self.validation_client.is_city_valid(city),
+                    self.validation_client.is_metro_valid(city, metro),
                 ]
             )
-        elif vacancy.city is not None:
-            is_city_valid = await self.validation_client.is_city_valid(vacancy.city)
+        elif city is not None:
+            is_city_valid = await self.validation_client.is_city_valid(city)
             return is_city_valid, is_metro_valid
 
         return is_city_valid, is_metro_valid
