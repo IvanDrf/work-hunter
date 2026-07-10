@@ -37,6 +37,7 @@ class VacancySchema(BaseModel, SalaryValidatorMixin, ExperienceValidatorMixin):
 
     city: str | None = Field(default=None, max_length=MAX_CITY_LENGTH)
     metro: str | None = Field(default=None, max_length=MAX_METRO_LENGTH)
+    is_city_valid: bool = False
     is_metro_valid: bool = False
 
     remote_type: RemoteType = RemoteType.ANY

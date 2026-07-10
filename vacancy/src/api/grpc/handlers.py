@@ -39,6 +39,9 @@ class VacancyHandlers(VacancyServicer):
         self.vacancy_service: IVacancyService = vacancy_service
         super().__init__()
 
+    async def stop(self) -> None:
+        await self.vacancy_service.stop()
+
     async def Health(self, request: Empty, context: ServicerContext) -> ServiceStatus:
         return ServiceStatus(status=Status.AVAILABLE)
 

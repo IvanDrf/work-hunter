@@ -32,6 +32,7 @@ class VacancyORM(Base):
 
     city: Mapped[str | None] = mapped_column(VARCHAR(150), nullable=True)
     metro: Mapped[str | None] = mapped_column(VARCHAR(100), nullable=True)
+    is_city_valid: Mapped[bool] = mapped_column(BOOLEAN, default=False)
     is_metro_valid: Mapped[bool] = mapped_column(BOOLEAN, default=False)
 
     remote_type: Mapped[RemoteType] = mapped_column(Enum(RemoteType), nullable=False)

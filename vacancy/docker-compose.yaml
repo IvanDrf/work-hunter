@@ -12,7 +12,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
 
     ports:
-      - "${POSTGRES_PORT}:5432"
+      - "${POSTGRES_OUTPUT_PORT}:5432"
     volumes: 
       - pgdata:/var/lib/postgresql/data
 
@@ -30,7 +30,7 @@ services:
     restart: always
 
     ports:
-      - "${REDIS_PORT}:6379"
+      - "${REDIS_OUTPUT_PORT}:6379"
 
     volumes:
       - redis_data:/data
@@ -48,7 +48,7 @@ services:
     image: rabbitmq:4.3.0
     container_name: vacancy_broker
     ports:
-      - "${RABBITMQ_PORT}:5672"
+      - "${RABBITMQ_OUTPUT_PORT}:5672"
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
@@ -65,7 +65,7 @@ services:
       start_period: 15s
 
 
-  app:
+  vacancy_app:
     build:
       context: ..
       dockerfile: vacancy/Dockerfile
@@ -95,7 +95,8 @@ networks:
     driver: bridge
   
   shared_network:
-    driver: bridge
     external: true
+    name: shared_network
+    driver: bridge
 
 

@@ -31,6 +31,7 @@ class VacancyCurrency(Protocol):
 class VacancyAdditional(Protocol):
     city: str | None
     metro: str | None
+    is_city_valid: bool
     is_metro_valid: bool
 
 
@@ -95,6 +96,9 @@ def assert_additional(vacancy, schema: VacancyAdditional) -> None:
 
     if hasattr(vacancy, "is_metro_valid"):
         assert vacancy.is_metro_valid is schema.is_metro_valid
+
+    if hasattr(vacancy, "is_city_valid"):
+        assert vacancy.is_city_valid is schema.is_city_valid
 
 
 def assert_remote_and_time(vacancy, schema: VacancyRemoteAndTime) -> None:

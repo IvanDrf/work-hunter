@@ -1,8 +1,9 @@
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
 
 class UnitOfWork:
-    def __init__(self, session_maker: async_sessionmaker[AsyncSession]) -> None:
+    def __init__(self, engine: AsyncEngine, session_maker: async_sessionmaker[AsyncSession]) -> None:
+        self.engine: AsyncEngine = engine
         self.session_maker: async_sessionmaker[AsyncSession] = session_maker
 
     async def __aenter__(self) -> "UnitOfWork":
@@ -23,3 +24,7 @@ class UnitOfWork:
 
     async def flush(self) -> None:
         await self.session.flush()
+
+    async def stop(self) -> None:
+        await self.session.close_all()
+        await self.engine.dispose()

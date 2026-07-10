@@ -46,6 +46,7 @@ class VacancyAdditional:
     city: str | None
     metro: str | None
     is_metro_valid: bool
+    is_city_valid: bool
     remote_type: PKGRemoteType
     time_type: PKGTimeType
 
@@ -131,9 +132,18 @@ def vacancy_additional_valid(draw) -> VacancyAdditional:
 
     remote = draw(st.sampled_from([PKGRemoteType.ANY, PKGRemoteType.HYBRID, PKGRemoteType.OFFICE, PKGRemoteType.REMOTE]))
     time_type = draw(st.sampled_from([PKGTimeType.FULL, PKGTimeType.PART, PKGTimeType.PART]))
-    is_metro_valid = draw(st.booleans())
 
-    return VacancyAdditional(city=city, metro=metro, remote_type=remote, time_type=time_type, is_metro_valid=is_metro_valid)
+    is_metro_valid = draw(st.booleans())
+    is_city_valid = draw(st.booleans())
+
+    return VacancyAdditional(
+        city=city,
+        metro=metro,
+        remote_type=remote,
+        time_type=time_type,
+        is_metro_valid=is_metro_valid,
+        is_city_valid=is_city_valid,
+    )
 
 
 @st.composite

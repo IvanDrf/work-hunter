@@ -6,7 +6,7 @@ services:
     restart: always
     image: redis:8.6
     ports:
-      - "${REDIS_PORT}:6379"
+      - "${REDIS_OUTPUT_PORT}:6379"
     volumes:
       - redis_data:/data
     networks:
@@ -29,7 +29,7 @@ services:
     networks:
       - validation_network
     
-  app:
+  validation_app:
     container_name: validation_app
     build: .
     ports:
@@ -48,5 +48,6 @@ volumes:
 networks:
   shared_network:
     driver: bridge
+    name: shared_network
   validation_network:
     driver: bridge
