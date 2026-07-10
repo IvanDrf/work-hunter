@@ -40,3 +40,31 @@ def handle_errors(func):
             await context.abort(code=StatusCode.ALREADY_EXISTS, details=str(e))
 
     return wrapper
+
+
+MIN_LIMIT = 1
+MAX_LIMIT = 50
+
+MIN_OFFSET = 0
+
+
+def validate_limit_offset(func):
+    @wraps(func)
+    async def wrapper(*args, **kwargs):
+        request = args[1] or kwargs["request"]
+
+        if not hasattr(request, "limit"):
+            raise RuntimeError(f"request doesn't has limit in body, {request=}")
+
+        if not hasattr(request, "offset"):
+            raise RuntimeError(f"request doesn't has offset in body {request=}")
+
+        if not (MIN_LIMIT <= request.limit <= MAX_LIMIT):
+            raise ArgumentError(f"invalid limit value in request, limit={request.limit}, but must be in {MIN_LIMIT}-{MAX_LIMIT}")
+
+        if not request.offset >= MIN_OFFSET:
+            raise ArgumentError(f"invalid offset value in request must be greater than {MIN_OFFSET}, but offset={request.offset}")
+
+        return await func(*args, **kwargs)
+
+    return wrapper
