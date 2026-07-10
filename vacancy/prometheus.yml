@@ -1,0 +1,7 @@
+scrape_configs:
+  - job_name: "vacancy_grpc_service"
+    scrape_interval: 5s
+    static_configs:
+      - targets: ["vacancy_app:5665"]
+
+    metrics_path: "/metrics"
