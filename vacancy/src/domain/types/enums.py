@@ -4,7 +4,8 @@ from enum import Enum
 class OrderBy(Enum):
     CREATED_AT = "created_at desc"
     VIEWS = "views desc"
-    APPLICATIONS_COUNT = "applications_count desc"
+    APPLICATIONS_ASC = "applications_count asc"
+    APPLICATIONS_DESC = "applications_count desc"
 
 
 class UserRole(Enum):

@@ -3,7 +3,7 @@ from typing import Final
 from pydantic import ValidationInfo, field_validator
 
 from src.core.exc import ArgumentError
-from src.domain.types.types import UNSET_VALUE, Money, UnsetValue, Year
+from src.domain.types import UNSET_VALUE, Money, UnsetValue, Year
 
 MIN_MONEY: Final[Money] = 0
 MAX_MONEY: Final[Money] = 1_000_000_000

@@ -8,8 +8,7 @@ from pkg.vacancy_api.vacancy_pb2 import RemoteType as PKGRemoteType
 from pkg.vacancy_api.vacancy_pb2 import TimeType as PKGTimeType
 
 from src.domain.schemas import VacancyCreateSchema
-from src.domain.types.enums import Currency, RemoteType, TimeType
-from src.domain.types.types import Money, Year
+from src.domain.types import Currency, Money, RemoteType, TimeType, Year
 
 
 class VacancyMain(Protocol):
@@ -32,6 +31,8 @@ class VacancyCurrency(Protocol):
 class VacancyAdditional(Protocol):
     city: str | None
     metro: str | None
+    is_city_valid: bool
+    is_metro_valid: bool
 
 
 class VacancyRemoteAndTime(Protocol):
@@ -93,6 +94,12 @@ def assert_additional(vacancy, schema: VacancyAdditional) -> None:
     else:
         assert vacancy.metro == schema.metro
 
+    if hasattr(vacancy, "is_metro_valid"):
+        assert vacancy.is_metro_valid is schema.is_metro_valid
+
+    if hasattr(vacancy, "is_city_valid"):
+        assert vacancy.is_city_valid is schema.is_city_valid
+
 
 def assert_remote_and_time(vacancy, schema: VacancyRemoteAndTime) -> None:
     remotes = {
@@ -125,7 +132,7 @@ def assert_exp(vacancy, schema: VacancyExp) -> None:
 
 
 def assert_author(vacancy: CreateVacancyRequest, schema: VacancyCreateSchema) -> None:
-    assert vacancy.user_info.username == schema.author_name
+    assert vacancy.user_info.company_name == schema.author_name
     assert vacancy.user_info.user_id == str(schema.author_id)
 
 

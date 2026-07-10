@@ -23,6 +23,9 @@ class UnsetValue(metaclass=SingleTon):
     def __gt__(self, other):
         return False
 
+    def __contains__(self, item):
+        return False
+
     @classmethod
     def __get_pydantic_core_schema__(cls, source_type: Any, handler: Any) -> CoreSchema:
         return core_schema.is_instance_schema(cls)

@@ -22,7 +22,13 @@ from src.api.grpc.dto.order_by import order_by_dto
 from src.api.grpc.dto.status import vacancy_status_dto
 from src.api.grpc.dto.user_info import user_info_dto, user_info_none_dto
 from src.api.grpc.dto.vacancy import vacancy_create_dto, vacancy_response_dto, vacancy_update_dto
-from src.api.grpc.rules.params import MAX_TAGS_AMOUNT, MIN_TAGS_AMOUNT, is_tags_amount_valid, validate_limit_offset
+from src.api.grpc.rules.params import (
+    MAX_TAGS_AMOUNT,
+    MIN_TAGS_AMOUNT,
+    is_tags_amount_valid,
+    is_tags_values_valid,
+    validate_limit_offset,
+)
 from src.api.grpc.rules.user_info import get_user_info
 from src.core.exc import AccessError, ArgumentError, NotFoundError
 from src.utils.handle_errors import handle_errors
@@ -33,11 +39,20 @@ class VacancyHandlers(VacancyServicer):
         self.vacancy_service: IVacancyService = vacancy_service
         super().__init__()
 
+    async def stop(self) -> None:
+        await self.vacancy_service.stop()
+
     async def Health(self, request: Empty, context: ServicerContext) -> ServiceStatus:
         return ServiceStatus(status=Status.AVAILABLE)
 
     @handle_errors
     async def CreateVacancy(self, request: CreateVacancyRequest, context: ServicerContext) -> VacancyInfo:
+        if not is_tags_amount_valid(request.tags):
+            raise ArgumentError(f"tags amount must be in range ({MIN_TAGS_AMOUNT}, {MAX_TAGS_AMOUNT}), but {len(request.tags)=}")
+
+        if not is_tags_values_valid(request.tags):
+            raise ArgumentError("empty tag is not allowed in tags")
+
         vacancy_schema = vacancy_create_dto(request)
         user_info_schema = user_info_dto(request.user_info)
 
@@ -61,6 +76,9 @@ class VacancyHandlers(VacancyServicer):
 
         if not is_tags_amount_valid(request.tags):
             raise ArgumentError(f"tags amount must be in range ({MIN_TAGS_AMOUNT}, {MAX_TAGS_AMOUNT}), but {len(request.tags)=}")
+
+        if not is_tags_values_valid(request.tags):
+            raise ArgumentError("empty tag is not allowed in tags")
 
         user_info = get_user_info(request)
 
@@ -104,6 +122,12 @@ class VacancyHandlers(VacancyServicer):
     async def UpdateVacancy(self, request: UpdateVacancyRequest, context: ServicerContext) -> VacancyInfo:
         user_info = user_info_dto(request.user_info)
         vacancy_schema = vacancy_update_dto(request)
+
+        if not is_tags_amount_valid(vacancy_schema.tags):
+            raise ArgumentError(f"tags amount must be in range ({MIN_TAGS_AMOUNT}, {MAX_TAGS_AMOUNT}), but {len(request.tags)=}")
+
+        if not is_tags_values_valid(vacancy_schema.tags):
+            raise ArgumentError("empty tag is not allowed in tags")
 
         vacancy = await self.vacancy_service.update_vacancy(vacancy_schema, user_info)
         return vacancy_response_dto(vacancy)

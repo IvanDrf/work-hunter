@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log/slog"
 	"net/url"
@@ -36,16 +35,7 @@ func (s *UserService) CreateProfile(ctx context.Context, req *dto.CreateUserRequ
 		return nil, err
 	}
 
-	user := models.NewUser(uuid, req.Username, req.Email, req.FirstName, req.LastName, req.PhoneNumber)
-	_, err = s.repo.GetUserByID(ctx, uuid)
-	if err == nil {
-		log.Error("user already exist")
-
-		return nil, &models.Error{
-			Message: "user already exist",
-			Code:    models.ErrCodeUserAlreadyExists,
-		}
-	}
+	user := models.NewUser(uuid, req.Email, req.FirstName, req.LastName, req.CompanyName, req.Verificated)
 	log.Debug("user model created successfully", slog.String("id", user.ID.String()))
 
 	if err := s.repo.CreateUser(ctx, user); err != nil {
@@ -54,7 +44,7 @@ func (s *UserService) CreateProfile(ctx context.Context, req *dto.CreateUserRequ
 	}
 	log.Info("user created successfully", slog.String("id", user.ID.String()))
 
-	return modelToResp(user, log)
+	return modelToResp(user), nil
 }
 
 func (s *UserService) GetProfile(ctx context.Context, id string) (*dto.UserResponse, error) {
@@ -73,20 +63,20 @@ func (s *UserService) GetProfile(ctx context.Context, id string) (*dto.UserRespo
 	}
 	log.Info("user found successfully", slog.String("id", user.ID.String()))
 
-	return modelToResp(user, log)
+	return modelToResp(user), nil
 }
 
-func (s *UserService) GetProfileByUsername(ctx context.Context, username string) (*dto.UserResponse, error) {
+func (s *UserService) GetProfileByEmail(ctx context.Context, email string) (*dto.UserResponse, error) {
 	log := s.log.With(slog.String("scope", "infrastructure/service/GetProfileByUsername"))
 
-	user, err := s.repo.GetUserByUsername(ctx, username)
+	user, err := s.repo.GetUserByEmail(ctx, email)
 	if err != nil {
 		log.Error("failed to get user by username", slog.String("error", err.Error()))
 		return nil, err
 	}
 	log.Info("user found successfully", slog.String("id", user.ID.String()))
 
-	return modelToResp(user, log)
+	return modelToResp(user), nil
 }
 
 func (s *UserService) UpdateProfile(ctx context.Context, req *dto.UpdateUserRequest) (*dto.UserResponse, error) {
@@ -104,14 +94,14 @@ func (s *UserService) UpdateProfile(ctx context.Context, req *dto.UpdateUserRequ
 	}
 	log.Debug("user found successfully", slog.String("id", user.ID.String()))
 
-	user.UpdateUser(req.FirstName, req.LastName, req.PhoneNumber, req.AvatarURL, req.Metadata)
+	user.UpdateUser(req.FirstName, req.LastName, req.CompanyName, req.Verificated)
 	if err := s.repo.UpdateUser(ctx, user); err != nil {
 		log.Error("failed to update user", slog.String("error", err.Error()))
 		return nil, err
 	}
 	log.Info("user updated successfully", slog.String("id", user.ID.String()))
 
-	return modelToResp(user, log)
+	return modelToResp(user), nil
 }
 
 func (s *UserService) DeleteProfile(ctx context.Context, id string) error {
@@ -148,8 +138,8 @@ func (s *UserService) ListUsers(ctx context.Context, req *dto.ListUsersRequest) 
 	log := s.log.With(slog.String("scope", "infrastructure/service/ListUsers"))
 
 	enabledFields := map[string]struct{}{
-		"id": {}, "username": {}, "email": {}, "first_name": {}, "last_name": {},
-		"created_at": {}, "updated_at": {},
+		"id": {}, "email": {}, "first_name": {}, "last_name": {}, "company_name": {},
+		"created_at": {}, "updated_at": {}, "verificated": {},
 	}
 
 	params := make(map[string]string)
@@ -169,14 +159,14 @@ func (s *UserService) ListUsers(ctx context.Context, req *dto.ListUsersRequest) 
 
 	params["offset"] = strconv.Itoa(int(req.Offset))
 
-	if req.SortBy == "" {
+	if req.SortBy != "" {
 		params["order_by"] = req.SortBy
 	}
 
 	values, err := url.ParseQuery(req.SearchQuery)
 	if err != nil {
 		log.Error("failed to parse query", slog.String("error", err.Error()))
-		return nil, &models.Error{
+		return nil, models.Error{
 			Message: fmt.Sprintf("failed to parse search query: %v", err),
 			Code:    models.ErrCodeInvalidRequest,
 		}
@@ -186,7 +176,7 @@ func (s *UserService) ListUsers(ctx context.Context, req *dto.ListUsersRequest) 
 		_, ok := enabledFields[key]
 		if !ok {
 			log.Error("cannot use this field", slog.String("field", key))
-			return nil, &models.Error{
+			return nil, models.Error{
 				Message: fmt.Sprintf("cannot use this field: %s", key),
 				Code:    models.ErrCodeInvalidRequest,
 			}
@@ -214,10 +204,7 @@ func (s *UserService) ListUsers(ctx context.Context, req *dto.ListUsersRequest) 
 
 	usersResp := make([]*dto.UserResponse, 0, len(users))
 	for _, val := range users {
-		userResp, err := modelToResp(val, log)
-		if err != nil {
-			return nil, err
-		}
+		userResp := modelToResp(val)
 
 		usersResp = append(usersResp, userResp)
 	}
@@ -249,7 +236,7 @@ func (s *UserService) UpdateUserStatus(ctx context.Context, req *dto.UpdateUserS
 	}
 	log.Debug("user found successfully", slog.String("id", user.ID.String()))
 
-	return modelToResp(user, log)
+	return modelToResp(user), nil
 }
 
 func (s *UserService) Close() {
@@ -261,7 +248,7 @@ func parseUUID(id string, log *slog.Logger) (uuid.UUID, error) {
 	uuid, err := uuid.Parse(id)
 	if err != nil {
 		log.Error("failed to parse uuid from string", slog.String("error", err.Error()))
-		return uuid, &models.Error{
+		return uuid, models.Error{
 			Message: fmt.Sprintf("failed to parse uuid from string: %v", err),
 			Code:    models.ErrCodeInvalidRequest,
 		}
@@ -270,29 +257,26 @@ func parseUUID(id string, log *slog.Logger) (uuid.UUID, error) {
 	return uuid, nil
 }
 
-func modelToResp(user *models.User, log *slog.Logger) (*dto.UserResponse, error) {
-	metadata := make(map[string]string)
-	if err := json.Unmarshal(user.Metadata, &metadata); err != nil {
-		log.Error("failed to unmarshal json data", slog.String("error", err.Error()))
-		return nil, &models.Error{
-			Message: fmt.Sprintf("failed to unmarshal json data: %v", err),
-			Code:    models.ErrCodeInternal,
-		}
-	}
-	log.Debug("user converted successfully", slog.String("id", user.ID.String()))
-
-	return &dto.UserResponse{
+func modelToResp(user *models.User) *dto.UserResponse {
+	resp := &dto.UserResponse{
 		ID:          user.ID.String(),
-		Username:    user.Username,
 		Email:       user.Email,
-		FirstName:   user.FirstName,
-		LastName:    user.LastName,
-		PhoneNumber: user.PhoneNumber,
-		AvatarURL:   user.AvatarURL,
 		Status:      string(user.Status),
 		Role:        string(user.Role),
 		CreatedAt:   user.CreatedAt,
 		UpdatedAt:   user.UpdatedAt,
-		Metadata:    metadata,
-	}, nil
+		Verificated: user.Verificated,
+	}
+
+	if user.FirstName != "" {
+		resp.FirstName = user.FirstName
+	}
+	if user.LastName != "" {
+		resp.LastName = user.LastName
+	}
+	if user.CompanyName != "" {
+		resp.CompanyName = user.CompanyName
+	}
+
+	return resp
 }

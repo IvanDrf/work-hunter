@@ -1,0 +1,50 @@
+version: '3.9'
+
+services:
+  database:
+    image: postgres:17.10
+    container_name: "applications_database"
+    restart: always
+
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DATABASE}
+
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+    networks:
+    - applications_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DATABASE}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: ..
+      dockerfile: applications/Dockerfile
+    container_name: applications_app
+
+    ports:
+      - "${APP_PORT}:50053"
+    depends_on:
+      database:
+        condition: service_healthy
+
+    networks:
+      - applications_network
+
+    restart: on-failure
+
+volumes:
+  pgdata:
+
+networks:
+  applications_network:
+    driver: bridge
+

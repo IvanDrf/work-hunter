@@ -4,7 +4,7 @@ from pytest import fixture
 
 from src.domain.models import VacancyORM
 from src.domain.schemas.user import UserInfo
-from src.domain.types.enums import UserRole, VacancyStatus
+from src.domain.types import UserRole, VacancyStatus
 
 
 @fixture(scope="package")
