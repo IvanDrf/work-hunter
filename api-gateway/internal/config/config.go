@@ -14,6 +14,7 @@ type Config struct {
 		Port int    `env:"APP_PORT"`
 
 		LoggerLevel string        `env:"LOGGER_LEVEL"`
+		LoggerFile  string        `env:"LOGGER_FILE"`
 		RequestTime time.Duration `env:"REQUEST_TIME"`
 	}
 
