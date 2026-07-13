@@ -7,6 +7,9 @@ type ErrCode string
 const (
 	ErrCodeInternal             ErrCode = "INTERNAL_ERROR"
 	ErrCodeUnsupportedMediaType ErrCode = "UNSUPPORTED_MEDIA"
+	ErrCodeUnprocessableEntity  ErrCode = "UNPROCESSABLE_ENTITY"
+	ErrCodeAlreadyExists        ErrCode = "USER_ALREADY_EXISTS"
+	ErrCodeInvalidArgument      ErrCode = "INVALID_ARGUMENT"
 )
 
 type Error struct {

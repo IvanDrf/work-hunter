@@ -7,7 +7,7 @@ import (
 )
 
 type AuthClient interface {
-	SendRegisterRequest(ctx context.Context, email string, password string, role models.UserRole) (string, string, error)
+	SendRegisterRequest(ctx context.Context, email string, password string, role models.UserRole) (*models.Tokens, error)
 
 	Close()
 }

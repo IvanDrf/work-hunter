@@ -9,13 +9,15 @@ import (
 )
 
 type Config struct {
-	APP struct {
+	App struct {
 		Host string `env:"APP_HOST"`
 		Port int    `env:"APP_PORT"`
 
 		LoggerLevel string        `env:"LOGGER_LEVEL"`
 		LoggerFile  string        `env:"LOGGER_FILE"`
 		RequestTime time.Duration `env:"REQUEST_TIME"`
+
+		Retries int `env:"RETRIES"`
 	}
 
 	Auth struct {

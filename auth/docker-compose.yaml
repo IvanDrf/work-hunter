@@ -70,12 +70,12 @@ services:
       retries: 3
 
 
-  app:
+  auth_app:
     build: .
     container_name: auth_app
     restart: always
     ports:
-      - "${APP_PORT}:50052"
+      - "${APP_PORT}:50051"
     depends_on:
       database:
         condition: service_healthy

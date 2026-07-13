@@ -13,15 +13,20 @@ import (
 )
 
 type authClient struct {
-	host string
-	port int
+	host    string
+	port    int
+	retries int
 
 	conn   *grpc.ClientConn
 	client auth_api.AuthClient
 }
 
-func NewAuthClient(host string, port int) *authClient {
-	c := &authClient{}
+func NewAuthClient(host string, port int, retries int) *authClient {
+	c := &authClient{
+		host:    host,
+		port:    port,
+		retries: retries,
+	}
 	c.connect()
 
 	return c
@@ -38,7 +43,7 @@ func (c *authClient) Address() string {
 func (c *authClient) connect() error {
 	log := slog.With(slog.String("client", "auth"))
 
-	conn, err := grpc.NewClient(fmt.Sprintf("%s:%d", c.host, c.port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(c.Address(), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Error("can't connect to auth service", slog.String("error", err.Error()))
 		return models.Error{
@@ -63,25 +68,29 @@ func (c *authClient) Close() {
 	log.Info("auth client is closed")
 }
 
-func (c *authClient) SendRegisterRequest(ctx context.Context, email string, password string, role models.UserRole) (string, string, error) {
+func (c *authClient) SendRegisterRequest(ctx context.Context, email string, password string, role models.UserRole) (*models.Tokens, error) {
 	log := slog.With(slog.String("client", "auth"))
 	log.InfoContext(ctx, "register request", slog.String("email", email))
 
-	if err := isConnected(c, c.connect); err != nil {
-		slog.ErrorContext(ctx, "can't register user, auth service is unavailable", slog.String("email", email), slog.String("error", err.Error()))
-		return "", "", err
-	}
-
-	resp, err := c.client.Register(ctx, &auth_api.User{
-		Email:    email,
-		Password: password,
-		Role:     common.UserRole(role),
+	resp, err := retry(ctx, c.retries, log, func() (any, error) {
+		resp, err := c.client.Register(ctx, &auth_api.User{
+			Email:    email,
+			Password: password,
+			Role:     common.UserRole(role),
+		})
+		if err != nil {
+			log.ErrorContext(ctx, "can't register new user, auth service returned error", slog.String("error", err.Error()))
+			return nil, err
+		}
+		slog.InfoContext(ctx, "successfully registred user", slog.String("email", email))
+		return &models.Tokens{
+			Access:  resp.Access,
+			Refresh: resp.Refresh,
+		}, nil
 	})
 	if err != nil {
-		slog.ErrorContext(ctx, "can't register user, auth service returned error", slog.String("email", email), slog.String("error", err.Error()))
-		return "", "", err
+		return nil, err
 	}
 
-	slog.InfoContext(ctx, "successfully registred user", slog.String("email", email))
-	return resp.Access, resp.Refresh, nil
+	return resp.(*models.Tokens), nil
 }
