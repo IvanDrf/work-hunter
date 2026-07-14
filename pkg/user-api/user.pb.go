@@ -7,15 +7,14 @@
 package user_api
 
 import (
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
-
-	common "github.com/IvanDrf/work-hunter/pkg/common"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
+	common "pkg/common"
+	reflect "reflect"
+	sync "sync"
+	unsafe "unsafe"
 )
 
 const (
@@ -540,21 +539,80 @@ func (x *UpdateUserStatusRequest) GetStatus() UserStatus {
 	return UserStatus_USER_STATUS_UNSPECIFIED
 }
 
+type UserFilter struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Status        *UserStatus            `protobuf:"varint,1,opt,name=status,proto3,enum=user.UserStatus,oneof" json:"status,omitempty"`
+	Role          *common.UserRole       `protobuf:"varint,2,opt,name=role,proto3,enum=common.UserRole,oneof" json:"role,omitempty"`
+	SearchQuery   *string                `protobuf:"bytes,3,opt,name=search_query,json=searchQuery,proto3,oneof" json:"search_query,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserFilter) Reset() {
+	*x = UserFilter{}
+	mi := &file_user_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserFilter) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserFilter) ProtoMessage() {}
+
+func (x *UserFilter) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserFilter.ProtoReflect.Descriptor instead.
+func (*UserFilter) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *UserFilter) GetStatus() UserStatus {
+	if x != nil && x.Status != nil {
+		return *x.Status
+	}
+	return UserStatus_USER_STATUS_UNSPECIFIED
+}
+
+func (x *UserFilter) GetRole() common.UserRole {
+	if x != nil && x.Role != nil {
+		return *x.Role
+	}
+	return common.UserRole(0)
+}
+
+func (x *UserFilter) GetSearchQuery() string {
+	if x != nil && x.SearchQuery != nil {
+		return *x.SearchQuery
+	}
+	return ""
+}
+
 type ListUsersRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	PageSize      int32                  `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
-	Status        UserStatus             `protobuf:"varint,2,opt,name=status,proto3,enum=user.UserStatus" json:"status,omitempty"`
-	Role          common.UserRole        `protobuf:"varint,3,opt,name=role,proto3,enum=common.UserRole" json:"role,omitempty"`
-	SerchQuery    string                 `protobuf:"bytes,4,opt,name=serch_query,json=serchQuery,proto3" json:"serch_query,omitempty"`
-	SortBy        string                 `protobuf:"bytes,5,opt,name=sort_by,json=sortBy,proto3" json:"sort_by,omitempty"`
-	Offset        int32                  `protobuf:"varint,6,opt,name=offset,proto3" json:"offset,omitempty"`
+	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
+	PageSize      int32                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	Filter        *UserFilter            `protobuf:"bytes,3,opt,name=filter,proto3,oneof" json:"filter,omitempty"`
+	SortBy        *string                `protobuf:"bytes,4,opt,name=sort_by,json=sortBy,proto3,oneof" json:"sort_by,omitempty"`
+	SortDesc      *bool                  `protobuf:"varint,5,opt,name=sort_desc,json=sortDesc,proto3,oneof" json:"sort_desc,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ListUsersRequest) Reset() {
 	*x = ListUsersRequest{}
-	mi := &file_user_proto_msgTypes[7]
+	mi := &file_user_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -566,7 +624,7 @@ func (x *ListUsersRequest) String() string {
 func (*ListUsersRequest) ProtoMessage() {}
 
 func (x *ListUsersRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[7]
+	mi := &file_user_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -579,7 +637,14 @@ func (x *ListUsersRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListUsersRequest.ProtoReflect.Descriptor instead.
 func (*ListUsersRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{7}
+	return file_user_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *ListUsersRequest) GetPage() int32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
 }
 
 func (x *ListUsersRequest) GetPageSize() int32 {
@@ -589,52 +654,41 @@ func (x *ListUsersRequest) GetPageSize() int32 {
 	return 0
 }
 
-func (x *ListUsersRequest) GetStatus() UserStatus {
+func (x *ListUsersRequest) GetFilter() *UserFilter {
 	if x != nil {
-		return x.Status
+		return x.Filter
 	}
-	return UserStatus_USER_STATUS_UNSPECIFIED
-}
-
-func (x *ListUsersRequest) GetRole() common.UserRole {
-	if x != nil {
-		return x.Role
-	}
-	return common.UserRole(0)
-}
-
-func (x *ListUsersRequest) GetSerchQuery() string {
-	if x != nil {
-		return x.SerchQuery
-	}
-	return ""
+	return nil
 }
 
 func (x *ListUsersRequest) GetSortBy() string {
-	if x != nil {
-		return x.SortBy
+	if x != nil && x.SortBy != nil {
+		return *x.SortBy
 	}
 	return ""
 }
 
-func (x *ListUsersRequest) GetOffset() int32 {
-	if x != nil {
-		return x.Offset
+func (x *ListUsersRequest) GetSortDesc() bool {
+	if x != nil && x.SortDesc != nil {
+		return *x.SortDesc
 	}
-	return 0
+	return false
 }
 
 type ListUsersResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Users         []*UserProfile         `protobuf:"bytes,1,rep,name=users,proto3" json:"users,omitempty"`
 	TotalCount    int32                  `protobuf:"varint,2,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty"`
+	Page          int32                  `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`
+	PageSize      int32                  `protobuf:"varint,4,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	TotalPages    int32                  `protobuf:"varint,5,opt,name=total_pages,json=totalPages,proto3" json:"total_pages,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ListUsersResponse) Reset() {
 	*x = ListUsersResponse{}
-	mi := &file_user_proto_msgTypes[8]
+	mi := &file_user_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -646,7 +700,7 @@ func (x *ListUsersResponse) String() string {
 func (*ListUsersResponse) ProtoMessage() {}
 
 func (x *ListUsersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[8]
+	mi := &file_user_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -659,7 +713,7 @@ func (x *ListUsersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListUsersResponse.ProtoReflect.Descriptor instead.
 func (*ListUsersResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{8}
+	return file_user_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ListUsersResponse) GetUsers() []*UserProfile {
@@ -672,6 +726,27 @@ func (x *ListUsersResponse) GetUsers() []*UserProfile {
 func (x *ListUsersResponse) GetTotalCount() int32 {
 	if x != nil {
 		return x.TotalCount
+	}
+	return 0
+}
+
+func (x *ListUsersResponse) GetPage() int32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *ListUsersResponse) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+func (x *ListUsersResponse) GetTotalPages() int32 {
+	if x != nil {
+		return x.TotalPages
 	}
 	return 0
 }
@@ -732,19 +807,34 @@ const file_user_proto_rawDesc = "" +
 	"\x05email\x18\x01 \x01(\tR\x05email\"\\\n" +
 	"\x17UpdateUserStatusRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12(\n" +
-	"\x06status\x18\x02 \x01(\x0e2\x10.user.UserStatusR\x06status\"\xd1\x01\n" +
-	"\x10ListUsersRequest\x12\x1b\n" +
-	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12(\n" +
-	"\x06status\x18\x02 \x01(\x0e2\x10.user.UserStatusR\x06status\x12$\n" +
-	"\x04role\x18\x03 \x01(\x0e2\x10.common.UserRoleR\x04role\x12\x1f\n" +
-	"\vserch_query\x18\x04 \x01(\tR\n" +
-	"serchQuery\x12\x17\n" +
-	"\asort_by\x18\x05 \x01(\tR\x06sortBy\x12\x16\n" +
-	"\x06offset\x18\x06 \x01(\x05R\x06offset\"]\n" +
+	"\x06status\x18\x02 \x01(\x0e2\x10.user.UserStatusR\x06status\"\xb3\x01\n" +
+	"\n" +
+	"UserFilter\x12-\n" +
+	"\x06status\x18\x01 \x01(\x0e2\x10.user.UserStatusH\x00R\x06status\x88\x01\x01\x12)\n" +
+	"\x04role\x18\x02 \x01(\x0e2\x10.common.UserRoleH\x01R\x04role\x88\x01\x01\x12&\n" +
+	"\fsearch_query\x18\x03 \x01(\tH\x02R\vsearchQuery\x88\x01\x01B\t\n" +
+	"\a_statusB\a\n" +
+	"\x05_roleB\x0f\n" +
+	"\r_search_query\"\xd7\x01\n" +
+	"\x10ListUsersRequest\x12\x12\n" +
+	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x1b\n" +
+	"\tpage_size\x18\x02 \x01(\x05R\bpageSize\x12-\n" +
+	"\x06filter\x18\x03 \x01(\v2\x10.user.UserFilterH\x00R\x06filter\x88\x01\x01\x12\x1c\n" +
+	"\asort_by\x18\x04 \x01(\tH\x01R\x06sortBy\x88\x01\x01\x12 \n" +
+	"\tsort_desc\x18\x05 \x01(\bH\x02R\bsortDesc\x88\x01\x01B\t\n" +
+	"\a_filterB\n" +
+	"\n" +
+	"\b_sort_byB\f\n" +
+	"\n" +
+	"_sort_desc\"\xaf\x01\n" +
 	"\x11ListUsersResponse\x12'\n" +
 	"\x05users\x18\x01 \x03(\v2\x11.user.UserProfileR\x05users\x12\x1f\n" +
 	"\vtotal_count\x18\x02 \x01(\x05R\n" +
-	"totalCount*\x8d\x01\n" +
+	"totalCount\x12\x12\n" +
+	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x1b\n" +
+	"\tpage_size\x18\x04 \x01(\x05R\bpageSize\x12\x1f\n" +
+	"\vtotal_pages\x18\x05 \x01(\x05R\n" +
+	"totalPages*\x8d\x01\n" +
 	"\n" +
 	"UserStatus\x12\x1b\n" +
 	"\x17USER_STATUS_UNSPECIFIED\x10\x00\x12\x16\n" +
@@ -775,7 +865,7 @@ func file_user_proto_rawDescGZIP() []byte {
 }
 
 var file_user_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_user_proto_goTypes = []any{
 	(UserStatus)(0),                  // 0: user.UserStatus
 	(*UserProfile)(nil),              // 1: user.UserProfile
@@ -785,40 +875,42 @@ var file_user_proto_goTypes = []any{
 	(*DeleteProfileRequest)(nil),     // 5: user.DeleteProfileRequest
 	(*GetProfileByEmailRequest)(nil), // 6: user.GetProfileByEmailRequest
 	(*UpdateUserStatusRequest)(nil),  // 7: user.UpdateUserStatusRequest
-	(*ListUsersRequest)(nil),         // 8: user.ListUsersRequest
-	(*ListUsersResponse)(nil),        // 9: user.ListUsersResponse
-	(common.UserRole)(0),             // 10: common.UserRole
-	(*timestamppb.Timestamp)(nil),    // 11: google.protobuf.Timestamp
-	(*emptypb.Empty)(nil),            // 12: google.protobuf.Empty
+	(*UserFilter)(nil),               // 8: user.UserFilter
+	(*ListUsersRequest)(nil),         // 9: user.ListUsersRequest
+	(*ListUsersResponse)(nil),        // 10: user.ListUsersResponse
+	(common.UserRole)(0),             // 11: common.UserRole
+	(*timestamppb.Timestamp)(nil),    // 12: google.protobuf.Timestamp
+	(*emptypb.Empty)(nil),            // 13: google.protobuf.Empty
 }
 var file_user_proto_depIdxs = []int32{
 	0,  // 0: user.UserProfile.status:type_name -> user.UserStatus
-	10, // 1: user.UserProfile.role:type_name -> common.UserRole
-	11, // 2: user.UserProfile.created_at:type_name -> google.protobuf.Timestamp
-	11, // 3: user.UserProfile.updated_at:type_name -> google.protobuf.Timestamp
+	11, // 1: user.UserProfile.role:type_name -> common.UserRole
+	12, // 2: user.UserProfile.created_at:type_name -> google.protobuf.Timestamp
+	12, // 3: user.UserProfile.updated_at:type_name -> google.protobuf.Timestamp
 	0,  // 4: user.UpdateUserStatusRequest.status:type_name -> user.UserStatus
-	0,  // 5: user.ListUsersRequest.status:type_name -> user.UserStatus
-	10, // 6: user.ListUsersRequest.role:type_name -> common.UserRole
-	1,  // 7: user.ListUsersResponse.users:type_name -> user.UserProfile
-	2,  // 8: user.User.CreateProfile:input_type -> user.CreateProfileRequest
-	3,  // 9: user.User.GetProfile:input_type -> user.GetProfileRequest
-	6,  // 10: user.User.GetProfileByEmail:input_type -> user.GetProfileByEmailRequest
-	4,  // 11: user.User.UpdateProfile:input_type -> user.UpdateProfileRequest
-	5,  // 12: user.User.DeleteProfile:input_type -> user.DeleteProfileRequest
-	7,  // 13: user.User.UpdateUserStatus:input_type -> user.UpdateUserStatusRequest
-	8,  // 14: user.User.ListUsers:input_type -> user.ListUsersRequest
-	1,  // 15: user.User.CreateProfile:output_type -> user.UserProfile
-	1,  // 16: user.User.GetProfile:output_type -> user.UserProfile
-	1,  // 17: user.User.GetProfileByEmail:output_type -> user.UserProfile
-	1,  // 18: user.User.UpdateProfile:output_type -> user.UserProfile
-	12, // 19: user.User.DeleteProfile:output_type -> google.protobuf.Empty
-	1,  // 20: user.User.UpdateUserStatus:output_type -> user.UserProfile
-	9,  // 21: user.User.ListUsers:output_type -> user.ListUsersResponse
-	15, // [15:22] is the sub-list for method output_type
-	8,  // [8:15] is the sub-list for method input_type
-	8,  // [8:8] is the sub-list for extension type_name
-	8,  // [8:8] is the sub-list for extension extendee
-	0,  // [0:8] is the sub-list for field type_name
+	0,  // 5: user.UserFilter.status:type_name -> user.UserStatus
+	11, // 6: user.UserFilter.role:type_name -> common.UserRole
+	8,  // 7: user.ListUsersRequest.filter:type_name -> user.UserFilter
+	1,  // 8: user.ListUsersResponse.users:type_name -> user.UserProfile
+	2,  // 9: user.User.CreateProfile:input_type -> user.CreateProfileRequest
+	3,  // 10: user.User.GetProfile:input_type -> user.GetProfileRequest
+	6,  // 11: user.User.GetProfileByEmail:input_type -> user.GetProfileByEmailRequest
+	4,  // 12: user.User.UpdateProfile:input_type -> user.UpdateProfileRequest
+	5,  // 13: user.User.DeleteProfile:input_type -> user.DeleteProfileRequest
+	7,  // 14: user.User.UpdateUserStatus:input_type -> user.UpdateUserStatusRequest
+	9,  // 15: user.User.ListUsers:input_type -> user.ListUsersRequest
+	1,  // 16: user.User.CreateProfile:output_type -> user.UserProfile
+	1,  // 17: user.User.GetProfile:output_type -> user.UserProfile
+	1,  // 18: user.User.GetProfileByEmail:output_type -> user.UserProfile
+	1,  // 19: user.User.UpdateProfile:output_type -> user.UserProfile
+	13, // 20: user.User.DeleteProfile:output_type -> google.protobuf.Empty
+	1,  // 21: user.User.UpdateUserStatus:output_type -> user.UserProfile
+	10, // 22: user.User.ListUsers:output_type -> user.ListUsersResponse
+	16, // [16:23] is the sub-list for method output_type
+	9,  // [9:16] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_user_proto_init() }
@@ -829,13 +921,15 @@ func file_user_proto_init() {
 	file_user_proto_msgTypes[0].OneofWrappers = []any{}
 	file_user_proto_msgTypes[1].OneofWrappers = []any{}
 	file_user_proto_msgTypes[3].OneofWrappers = []any{}
+	file_user_proto_msgTypes[7].OneofWrappers = []any{}
+	file_user_proto_msgTypes[8].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_user_proto_rawDesc), len(file_user_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   9,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
