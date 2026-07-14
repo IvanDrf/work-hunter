@@ -9,16 +9,19 @@ import (
 )
 
 type server struct {
-	handlers *handlers
-	server   *http.Server
+	handlers   *handlers
+	middleware *authMiddleware
+
+	server *http.Server
 }
 
-func NewServer(host string, port int, handlers *handlers) *server {
+func NewServer(host string, port int, handlers *handlers, middleware *authMiddleware) *server {
 	return &server{
 		server: &http.Server{
 			Addr: fmt.Sprintf("%s:%d", host, port),
 		},
-		handlers: handlers,
+		handlers:   handlers,
+		middleware: middleware,
 	}
 }
 

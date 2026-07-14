@@ -14,10 +14,9 @@ import (
 
 func main() {
 	config := config.LoadFromENV()
+	auth := clients.NewAuthClient(config.Auth.Host, config.Auth.Port, config.App.Retries)
 
-	s := http.NewServer(config.App.Host, config.App.Port, http.NewHandlers(
-		clients.NewAuthClient(config.Auth.Host, config.Auth.Port, config.App.Retries), config.App.RequestTime,
-	))
+	s := http.NewServer(config.App.Host, config.App.Port, http.NewHandlers(auth, config.App.RequestTime), http.NewAuthMiddleware(auth, config.App.RequestTime))
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

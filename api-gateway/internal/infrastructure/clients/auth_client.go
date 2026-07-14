@@ -9,6 +9,7 @@ import (
 	"github.com/IvanDrf/work-hunter/api-gateway/internal/infrastructure/adapters"
 	auth_api "github.com/IvanDrf/work-hunter/pkg/auth-api"
 	"github.com/IvanDrf/work-hunter/pkg/common"
+	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -152,7 +153,7 @@ func (c *authClient) SendChangePasswordRequest(ctx context.Context, access strin
 }
 
 func (c *authClient) SendRefreshTokensRequest(ctx context.Context, refresh string) (*models.Tokens, error) {
-	log := slog.With(slog.String("client", "auth"), slog.String("request", "RefreshTokens"))
+	log := slog.With(slog.String("client", "auth"), slog.String("request", "SendRefreshTokensRequest"))
 	ctx = adapters.InsertLogger(ctx, log)
 
 	resp, err := retry(ctx, c.retries, func() (any, error) {
@@ -175,4 +176,39 @@ func (c *authClient) SendRefreshTokensRequest(ctx context.Context, refresh strin
 	}
 
 	return resp.(*models.Tokens), nil
+}
+
+func (c *authClient) SendIsTokenValidRequest(ctx context.Context, access string) (*models.TokenPayload, error) {
+	log := slog.With(slog.String("client", "auth"), slog.String("request", "SendIsTokenValidRequest"))
+	ctx = adapters.InsertLogger(ctx, log)
+
+	resp, err := retry(ctx, c.retries, func() (any, error) {
+		resp, err := c.client.IsTokenValid(ctx, &auth_api.AccessToken{
+			Access: access,
+		})
+		if err != nil {
+			log.ErrorContext(ctx, "can't check is access token valid, auth service returned error", slog.String("error", err.Error()))
+			return nil, err
+		}
+
+		id, err := uuid.Parse(resp.Id)
+		if err != nil {
+			return nil, models.Error{
+				Message: "invalid user_id in token, not uuid",
+				Code:    models.ErrCodeInvalidArgument,
+			}
+		}
+
+		return &models.TokenPayload{
+			ID:          id,
+			Verificated: resp.Verificated,
+			Role:        models.UserRole(resp.Role),
+		}, nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.(*models.TokenPayload), nil
 }

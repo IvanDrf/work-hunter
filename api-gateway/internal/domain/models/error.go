@@ -11,6 +11,7 @@ const (
 	ErrCodeAlreadyExists        ErrCode = "USER_ALREADY_EXISTS"
 	ErrCodeInvalidArgument      ErrCode = "INVALID_ARGUMENT"
 	ErrCodeInvalidCookie        ErrCode = "INVALID_COOKIE"
+	ErrCodeAccess               ErrCode = "ACCESS_ERROR"
 )
 
 type Error struct {

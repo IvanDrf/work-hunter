@@ -46,6 +46,9 @@ func handleResponseError(w http.ResponseWriter, err error) {
 
 		case models.ErrCodeInvalidCookie:
 			w.WriteHeader(http.StatusBadRequest)
+
+		case models.ErrCodeAccess:
+			w.WriteHeader(http.StatusForbidden)
 		}
 
 		json.NewEncoder(w).Encode(e)
