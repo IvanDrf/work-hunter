@@ -22,40 +22,26 @@ type authClient struct {
 }
 
 func NewAuthClient(host string, port int, retries int) *authClient {
-	c := &authClient{
+	client, conn := connect(host, port)
+	return &authClient{
 		host:    host,
 		port:    port,
 		retries: retries,
+
+		client: client,
+		conn:   conn,
 	}
-	c.connect()
-
-	return c
 }
 
-func (c *authClient) Conn() *grpc.ClientConn {
-	return c.conn
-}
-
-func (c *authClient) Address() string {
-	return fmt.Sprintf("%s:%d", c.host, c.port)
-}
-
-func (c *authClient) connect() error {
+func connect(host string, port int) (auth_api.AuthClient, *grpc.ClientConn) {
 	log := slog.With(slog.String("client", "auth"))
-
-	conn, err := grpc.NewClient(c.Address(), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(fmt.Sprintf("%s:%d", host, port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Error("can't connect to auth service", slog.String("error", err.Error()))
-		return models.Error{
-			Message: "can't connect to auth servuce, auth is unavailable",
-			Code:    models.ErrCodeInternal,
-		}
+		return nil, nil
 	}
 
-	c.client = auth_api.NewAuthClient(conn)
-	c.conn = conn
-
-	return nil
+	return auth_api.NewAuthClient(conn), conn
 }
 
 func (c *authClient) Close() {
@@ -66,6 +52,26 @@ func (c *authClient) Close() {
 	}
 
 	log.Info("auth client is closed")
+}
+
+func (c *authClient) Health(ctx context.Context) {
+	log := slog.With(slog.String("client", "auth"))
+
+	resp, err := retry(ctx, c.retries, log, func() (any, error) {
+		resp, err := c.client.Health(ctx, nil)
+		if err != nil {
+			log.ErrorContext(ctx, "can't check auth service health, auth service returned error", slog.String("error", err.Error()))
+			return nil, err
+		}
+
+		return resp, nil
+	})
+
+	if err != nil {
+		log.ErrorContext(ctx, "auth service is not available now", slog.String("error", err.Error()))
+	} else {
+		log.InfoContext(ctx, "auth service is available now", slog.Any("resp", resp))
+	}
 }
 
 func (c *authClient) SendRegisterRequest(ctx context.Context, email string, password string, role models.UserRole) (*models.Tokens, error) {

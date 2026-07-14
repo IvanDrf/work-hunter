@@ -24,6 +24,14 @@ func NewHandlers(authClient ports.AuthClient, requestTime time.Duration) *handle
 	}
 }
 
+func (h *handlers) close() {
+	h.authClient.Close()
+}
+
+func (h *handlers) checkClientsHealth(ctx context.Context) {
+	h.authClient.Health(ctx)
+}
+
 func (h *handlers) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), h.requestTime)
 	defer cancel()
