@@ -90,16 +90,24 @@ message UpdateUserStatusRequest {
     UserStatus status = 2; // New profile status
 }
 
+message UserFilter {
+    optional UserStatus status = 1;
+    optional common.UserRole role = 2;
+    optional string search_query = 3;  
+}
+
 message ListUsersRequest {
-    int32 page_size = 1;
-    UserStatus status = 2;
-    common.UserRole role = 3;
-    string serch_query = 4;
-    string sort_by = 5;
-    int32 offset = 6;
+    int32 page = 1; 
+    int32 page_size = 2;  
+    optional UserFilter filter = 3;
+    optional string sort_by = 4;  
+    optional bool sort_desc = 5;  
 }
 
 message ListUsersResponse {
     repeated UserProfile users = 1;
     int32 total_count = 2;
+    int32 page = 3;
+    int32 page_size = 4;
+    int32 total_pages = 5;
 }
