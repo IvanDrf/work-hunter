@@ -143,11 +143,36 @@ func (c *authClient) SendChangePasswordRequest(ctx context.Context, access strin
 		if err != nil {
 			log.ErrorContext(ctx, "can't change password for user, auth service returned error", slog.String("error", err.Error()))
 			return nil, err
-
 		}
 
 		return nil, nil
 	})
 
 	return err
+}
+
+func (c *authClient) SendRefreshTokensRequest(ctx context.Context, refresh string) (*models.Tokens, error) {
+	log := slog.With(slog.String("client", "auth"), slog.String("request", "RefreshTokens"))
+	ctx = adapters.InsertLogger(ctx, log)
+
+	resp, err := retry(ctx, c.retries, func() (any, error) {
+		resp, err := c.client.RefreshTokens(ctx, &auth_api.RefreshToken{
+			Refresh: refresh,
+		})
+		if err != nil {
+			log.ErrorContext(ctx, "can't change password for user, auth service returned error", slog.String("error", err.Error()))
+			return nil, err
+		}
+
+		return &models.Tokens{
+			Access:  resp.Access,
+			Refresh: resp.Refresh,
+		}, nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.(*models.Tokens), nil
 }

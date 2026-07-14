@@ -25,6 +25,8 @@ func validateHeaders(r *http.Request) (int, error) {
 
 func handleResponseError(w http.ResponseWriter, err error) {
 	var e models.Error
+	w.Header().Add("Content-type", "applications/json")
+
 	if errors.As(err, &e) {
 		switch e.Code {
 		case models.ErrCodeAlreadyExists:
@@ -41,6 +43,9 @@ func handleResponseError(w http.ResponseWriter, err error) {
 
 		case models.ErrCodeUnsupportedMediaType:
 			w.WriteHeader(http.StatusUnsupportedMediaType)
+
+		case models.ErrCodeInvalidCookie:
+			w.WriteHeader(http.StatusBadRequest)
 		}
 
 		json.NewEncoder(w).Encode(e)
@@ -80,6 +85,7 @@ func getCookie(ctx context.Context, w http.ResponseWriter, r *http.Request, name
 
 	log.ErrorContext(ctx, "invalid cookie", slog.String("error", e.Message))
 
+	w.Header().Add("Content-type", "applications/json")
 	w.WriteHeader(http.StatusBadRequest)
 	json.NewEncoder(w).Encode(e)
 	return nil, e
@@ -97,12 +103,14 @@ func validateModel(ctx context.Context, w http.ResponseWriter, model Validator, 
 	log := adapters.GetLogger(ctx)
 
 	log.InfoContext(ctx, errorMessage, slog.String("error", errorMessage))
-	w.WriteHeader(http.StatusUnprocessableEntity)
 
 	err := models.Error{
 		Message: errorMessage,
 		Code:    models.ErrCodeUnprocessableEntity,
 	}
+
+	w.Header().Add("Content-type", "applications/json")
+	w.WriteHeader(http.StatusUnprocessableEntity)
 	json.NewEncoder(w).Encode(err)
 
 	return err
