@@ -6,7 +6,6 @@ import (
 	"log"
 	"log/slog"
 	"net/http"
-	"time"
 )
 
 type server struct {
@@ -27,28 +26,24 @@ func (s *server) registerRoutes() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("POST /api/register", s.handlers.RegisterUser)
+	mux.HandleFunc("POST /api/login", s.handlers.LoginUser)
 
 	s.server.Handler = mux
 }
 
-func (s *server) Start() {
+func (s *server) Start(ctx context.Context) {
 	l := slog.With(slog.String("server", "http"))
 
 	s.registerRoutes()
-	s.checkServicesHealth()
+	go s.checkServicesHealth(ctx)
 
 	l.Info("Starting server", slog.String("addr", s.server.Addr))
-	if err := s.server.ListenAndServe(); err != nil {
+	if err := s.server.ListenAndServe(); err != http.ErrServerClosed {
 		log.Fatalf("can't start http server, error=%s", err)
 	}
 }
 
-func (s *server) checkServicesHealth() {
-	const healthCheckTime = time.Second
-
-	ctx, cancel := context.WithTimeout(context.Background(), healthCheckTime)
-	defer cancel()
-
+func (s *server) checkServicesHealth(ctx context.Context) {
 	s.handlers.checkClientsHealth(ctx)
 }
 

@@ -1,6 +1,12 @@
 package main
 
 import (
+	"context"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
 	"github.com/IvanDrf/work-hunter/api-gateway/internal/config"
 	"github.com/IvanDrf/work-hunter/api-gateway/internal/infrastructure/clients"
 	"github.com/IvanDrf/work-hunter/api-gateway/internal/interfaces/http"
@@ -13,6 +19,18 @@ func main() {
 		clients.NewAuthClient(config.Auth.Host, config.Auth.Port, config.App.Retries), config.App.RequestTime,
 	))
 
-	s.Start()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
+	go s.Start(ctx)
+
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT)
+	<-stop
+	cancel()
+
+	c, can := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	defer can()
+
+	s.Close(c)
 }

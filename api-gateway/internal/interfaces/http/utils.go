@@ -1,9 +1,11 @@
 package http
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
 
 	"github.com/IvanDrf/work-hunter/api-gateway/internal/domain/models"
@@ -56,5 +58,23 @@ func setCookie(name string, value string) *http.Cookie {
 		Secure:   true,
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
+	}
+}
+
+func validateUser(ctx context.Context, w http.ResponseWriter, user *models.User, log *slog.Logger) error {
+	if user.IsUserValid() {
+		return nil
+	}
+
+	log.InfoContext(ctx, "invalid user content in request", slog.String("error", "email or password is empty"))
+	w.WriteHeader(http.StatusUnprocessableEntity)
+	json.NewEncoder(w).Encode(models.Error{
+		Message: "invalid body request, email or password is empty",
+		Code:    models.ErrCodeUnprocessableEntity,
+	})
+
+	return models.Error{
+		Message: "invalid user content in request body",
+		Code:    models.ErrCodeInvalidArgument,
 	}
 }

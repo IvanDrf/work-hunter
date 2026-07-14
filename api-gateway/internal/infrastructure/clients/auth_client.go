@@ -75,8 +75,7 @@ func (c *authClient) Health(ctx context.Context) {
 }
 
 func (c *authClient) SendRegisterRequest(ctx context.Context, email string, password string, role models.UserRole) (*models.Tokens, error) {
-	log := slog.With(slog.String("client", "auth"))
-	log.InfoContext(ctx, "register request", slog.String("email", email))
+	log := slog.With(slog.String("client", "auth"), slog.String("request", "SendRegisterRequest"), slog.String("email", email))
 
 	resp, err := retry(ctx, c.retries, log, func() (any, error) {
 		resp, err := c.client.Register(ctx, &auth_api.User{
@@ -88,12 +87,39 @@ func (c *authClient) SendRegisterRequest(ctx context.Context, email string, pass
 			log.ErrorContext(ctx, "can't register new user, auth service returned error", slog.String("error", err.Error()))
 			return nil, err
 		}
-		slog.InfoContext(ctx, "successfully registred user", slog.String("email", email))
+		log.InfoContext(ctx, "successfully registred user")
 		return &models.Tokens{
 			Access:  resp.Access,
 			Refresh: resp.Refresh,
 		}, nil
 	})
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.(*models.Tokens), nil
+}
+
+func (c *authClient) SendLoginRequest(ctx context.Context, email string, password string) (*models.Tokens, error) {
+	log := slog.With(slog.String("client", "auth"), slog.String("request", "SendLoginRequest"), slog.String("email", email))
+
+	resp, err := retry(ctx, c.retries, log, func() (any, error) {
+		resp, err := c.client.Login(ctx, &auth_api.User{
+			Email:    email,
+			Password: password,
+		})
+		if err != nil {
+			log.ErrorContext(ctx, "can't login user, auth service returned error", slog.String("error", err.Error()))
+			return nil, err
+		}
+
+		log.InfoContext(ctx, "successfully login user")
+		return &models.Tokens{
+			Access:  resp.Access,
+			Refresh: resp.Refresh,
+		}, nil
+	})
+
 	if err != nil {
 		return nil, err
 	}
