@@ -3,9 +3,8 @@ package handlers_test
 import (
 	"testing"
 
-	auth_api "github.com/IvanDrf/work-hunter/pkg/auth-api"
+	"github.com/IvanDrf/work-hunter/pkg/common"
 	"github.com/stretchr/testify/assert"
-	"google.golang.org/grpc/codes"
 )
 
 func TestHealth(t *testing.T) {
@@ -13,8 +12,8 @@ func TestHealth(t *testing.T) {
 
 	handlers := newHandlers(nil)
 
-	resp, err := handlers.Health(t.Context(), &auth_api.Empty{})
+	resp, err := handlers.Health(t.Context(), &common.Empty{})
 	assert.Nil(t, err)
 	assert.NotNil(t, resp)
-	assert.Equal(t, resp.Code, int32(codes.OK))
+	assert.Equal(t, resp.Status, common.Status_AVAILABLE)
 }
