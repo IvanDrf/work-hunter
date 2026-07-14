@@ -10,6 +10,7 @@ const (
 	ErrCodeUnprocessableEntity  ErrCode = "UNPROCESSABLE_ENTITY"
 	ErrCodeAlreadyExists        ErrCode = "USER_ALREADY_EXISTS"
 	ErrCodeInvalidArgument      ErrCode = "INVALID_ARGUMENT"
+	ErrCodeInvalidCookie        ErrCode = "INVALID_COOKIE"
 )
 
 type Error struct {

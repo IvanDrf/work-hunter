@@ -7,6 +7,6 @@ type User struct {
 	Role UserRole `json:"role"`
 }
 
-func (u *User) IsUserValid() bool {
+func (u *User) IsValid() bool {
 	return u != nil && u.Email != "" && u.Password != ""
 }

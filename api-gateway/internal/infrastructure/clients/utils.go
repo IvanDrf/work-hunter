@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/IvanDrf/work-hunter/api-gateway/internal/domain/models"
+	"github.com/IvanDrf/work-hunter/api-gateway/internal/infrastructure/adapters"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -41,7 +42,7 @@ func handleResponseError(err error) error {
 
 const baseDelay = time.Duration(0.2 * float64(time.Second))
 
-func retry(ctx context.Context, retries int, log *slog.Logger, fn func() (any, error)) (any, error) {
+func retry(ctx context.Context, retries int, fn func() (any, error)) (any, error) {
 	var (
 		err   error
 		res   any
@@ -52,6 +53,8 @@ func retry(ctx context.Context, retries int, log *slog.Logger, fn func() (any, e
 		codes.Internal:    true,
 		codes.Unavailable: true,
 	}
+
+	log := adapters.GetLogger(ctx)
 
 	for attempt := range retries + 1 {
 		if res, err = fn(); err != nil && retryCodes[status.Code(err)] {

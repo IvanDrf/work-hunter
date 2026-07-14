@@ -22,15 +22,6 @@ func NewServer(host string, port int, handlers *handlers) *server {
 	}
 }
 
-func (s *server) registerRoutes() {
-	mux := http.NewServeMux()
-
-	mux.HandleFunc("POST /api/register", s.handlers.RegisterUser)
-	mux.HandleFunc("POST /api/login", s.handlers.LoginUser)
-
-	s.server.Handler = mux
-}
-
 func (s *server) Start(ctx context.Context) {
 	l := slog.With(slog.String("server", "http"))
 

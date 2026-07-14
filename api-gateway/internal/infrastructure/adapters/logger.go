@@ -1,6 +1,7 @@
 package adapters
 
 import (
+	"context"
 	"log"
 	"log/slog"
 	"os"
@@ -43,4 +44,14 @@ func selectLevel(level string) slog.Leveler {
 
 	log.Fatalf("invalid logger level, level=%s", level)
 	return slog.LevelDebug
+}
+
+const loggerKey = "logger"
+
+func InsertLogger(ctx context.Context, log *slog.Logger) context.Context {
+	return context.WithValue(ctx, loggerKey, log)
+}
+
+func GetLogger(ctx context.Context) *slog.Logger {
+	return ctx.Value(loggerKey).(*slog.Logger)
 }

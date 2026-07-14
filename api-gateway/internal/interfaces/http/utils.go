@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/IvanDrf/work-hunter/api-gateway/internal/domain/models"
+	"github.com/IvanDrf/work-hunter/api-gateway/internal/infrastructure/adapters"
 )
 
 func validateHeaders(r *http.Request) (int, error) {
@@ -61,20 +62,48 @@ func setCookie(name string, value string) *http.Cookie {
 	}
 }
 
-func validateUser(ctx context.Context, w http.ResponseWriter, user *models.User, log *slog.Logger) error {
-	if user.IsUserValid() {
+func getCookie(ctx context.Context, w http.ResponseWriter, r *http.Request, name string) (*http.Cookie, error) {
+	log := adapters.GetLogger(ctx)
+
+	cookie, err := r.Cookie(name)
+	e := models.Error{
+		Code: models.ErrCodeInvalidCookie,
+	}
+
+	if err != nil {
+		e.Message = err.Error()
+	} else if cookie.Valid() != nil {
+		e.Message = cookie.Valid().Error()
+	} else {
+		return cookie, nil
+	}
+
+	log.ErrorContext(ctx, "invalid cookie", slog.String("error", e.Message))
+
+	w.WriteHeader(http.StatusBadRequest)
+	json.NewEncoder(w).Encode(e)
+	return nil, e
+}
+
+type Validator interface {
+	IsValid() bool
+}
+
+func validateModel(ctx context.Context, w http.ResponseWriter, model Validator, errorMessage string) error {
+	if model.IsValid() {
 		return nil
 	}
 
-	log.InfoContext(ctx, "invalid user content in request", slog.String("error", "email or password is empty"))
-	w.WriteHeader(http.StatusUnprocessableEntity)
-	json.NewEncoder(w).Encode(models.Error{
-		Message: "invalid body request, email or password is empty",
-		Code:    models.ErrCodeUnprocessableEntity,
-	})
+	log := adapters.GetLogger(ctx)
 
-	return models.Error{
-		Message: "invalid user content in request body",
-		Code:    models.ErrCodeInvalidArgument,
+	log.InfoContext(ctx, errorMessage, slog.String("error", errorMessage))
+	w.WriteHeader(http.StatusUnprocessableEntity)
+
+	err := models.Error{
+		Message: errorMessage,
+		Code:    models.ErrCodeUnprocessableEntity,
 	}
+	json.NewEncoder(w).Encode(err)
+
+	return err
 }

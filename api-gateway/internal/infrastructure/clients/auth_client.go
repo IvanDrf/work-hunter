@@ -6,6 +6,7 @@ import (
 	"log/slog"
 
 	"github.com/IvanDrf/work-hunter/api-gateway/internal/domain/models"
+	"github.com/IvanDrf/work-hunter/api-gateway/internal/infrastructure/adapters"
 	auth_api "github.com/IvanDrf/work-hunter/pkg/auth-api"
 	"github.com/IvanDrf/work-hunter/pkg/common"
 	"google.golang.org/grpc"
@@ -56,8 +57,9 @@ func (c *authClient) Close() {
 
 func (c *authClient) Health(ctx context.Context) {
 	log := slog.With(slog.String("client", "auth"))
+	ctx = adapters.InsertLogger(ctx, log)
 
-	resp, err := retry(ctx, c.retries, log, func() (any, error) {
+	resp, err := retry(ctx, c.retries, func() (any, error) {
 		resp, err := c.client.Health(ctx, nil)
 		if err != nil {
 			log.ErrorContext(ctx, "can't check auth service health, auth service returned error", slog.String("error", err.Error()))
@@ -76,8 +78,9 @@ func (c *authClient) Health(ctx context.Context) {
 
 func (c *authClient) SendRegisterRequest(ctx context.Context, email string, password string, role models.UserRole) (*models.Tokens, error) {
 	log := slog.With(slog.String("client", "auth"), slog.String("request", "SendRegisterRequest"), slog.String("email", email))
+	ctx = adapters.InsertLogger(ctx, log)
 
-	resp, err := retry(ctx, c.retries, log, func() (any, error) {
+	resp, err := retry(ctx, c.retries, func() (any, error) {
 		resp, err := c.client.Register(ctx, &auth_api.User{
 			Email:    email,
 			Password: password,
@@ -102,8 +105,9 @@ func (c *authClient) SendRegisterRequest(ctx context.Context, email string, pass
 
 func (c *authClient) SendLoginRequest(ctx context.Context, email string, password string) (*models.Tokens, error) {
 	log := slog.With(slog.String("client", "auth"), slog.String("request", "SendLoginRequest"), slog.String("email", email))
+	ctx = adapters.InsertLogger(ctx, log)
 
-	resp, err := retry(ctx, c.retries, log, func() (any, error) {
+	resp, err := retry(ctx, c.retries, func() (any, error) {
 		resp, err := c.client.Login(ctx, &auth_api.User{
 			Email:    email,
 			Password: password,
@@ -125,4 +129,25 @@ func (c *authClient) SendLoginRequest(ctx context.Context, email string, passwor
 	}
 
 	return resp.(*models.Tokens), nil
+}
+func (c *authClient) SendChangePasswordRequest(ctx context.Context, access string, old string, new string) error {
+	log := slog.With(slog.String("client", "auth"), slog.String("request", "SendChangePasswordRequest"))
+	ctx = adapters.InsertLogger(ctx, log)
+
+	_, err := retry(ctx, c.retries, func() (any, error) {
+		_, err := c.client.ChangePassword(ctx, &auth_api.ChangePasswordRequest{
+			Access: access,
+			Old:    old,
+			New:    new,
+		})
+		if err != nil {
+			log.ErrorContext(ctx, "can't change password for user, auth service returned error", slog.String("error", err.Error()))
+			return nil, err
+
+		}
+
+		return nil, nil
+	})
+
+	return err
 }
