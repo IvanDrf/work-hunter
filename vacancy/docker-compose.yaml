@@ -12,7 +12,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
 
     ports:
-      - "${POSTGRES_PORT}:5432"
+      - "${POSTGRES_OUTPUT_PORT}:5432"
     volumes: 
       - pgdata:/var/lib/postgresql/data
 
@@ -30,7 +30,7 @@ services:
     restart: always
 
     ports:
-      - "${REDIS_PORT}:6379"
+      - "${REDIS_OUTPUT_PORT}:6379"
 
     volumes:
       - redis_data:/data
@@ -44,30 +44,72 @@ services:
       retries: 5
       start_period: 5s
 
-  app:
+  broker:
+    image: rabbitmq:4.3.0
+    container_name: vacancy_broker
+    ports:
+      - "${RABBITMQ_OUTPUT_PORT}:5672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - vacancy_network
+      - shared_network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_port_connectivity"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  prometheus:
+    image: prom/prometheus:v3
+    container_name: vacancy_prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "${PROMETHEUS_PORT}:9090"
+    networks:
+      - vacancy_network
+
+
+
+  vacancy_app:
     build:
       context: ..
       dockerfile: vacancy/Dockerfile
     container_name: vacancy_app
-    restart: always
     ports:
       - "${APP_PORT}:50052"
+      - "${METRICS_PORT}:5665"
     depends_on:
       database:
         condition: service_healthy
       cache:
         condition: service_healthy
+      broker:
+        condition: service_healthy
       
     networks:
       - vacancy_network
+      - shared_network
     restart: on-failure
 
 volumes:
   pgdata:
   redis_data:
+  rabbitmq_data:
 
 networks:
   vacancy_network:
+    name: vacancy_network
+    driver: bridge
+  
+  shared_network:
+    external: true
+    name: shared_network
     driver: bridge
 
 

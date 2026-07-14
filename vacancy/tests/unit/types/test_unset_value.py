@@ -1,7 +1,7 @@
 from hypothesis import given
 from hypothesis import strategies as st
 
-from src.domain.types.types import UNSET_VALUE, UnsetValue
+from src.domain.types import UNSET_VALUE, UnsetValue
 
 
 @given(nums=st.lists(st.integers(-20_000, 20_000), min_size=10, max_size=30))

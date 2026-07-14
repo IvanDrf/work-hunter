@@ -3,10 +3,10 @@ from asyncio import create_task, gather
 from datetime import timedelta
 
 from src.core.exc import AccessError, ArgumentError, InternalError
-from src.domain.rules.user import is_user_admin, is_user_employer
+from src.domain.rules.user import is_user_admin, is_user_employee, is_user_employer
 from src.domain.rules.vacancy import has_right_to_vacancy, is_vacancy_id_valid
 from src.domain.schemas import UserInfo, VacancyResponseSchema
-from src.domain.types.enums import OrderBy, UserRole, VacancyStatus
+from src.domain.types import OrderBy, VacancyStatus
 from src.infrastructure.service.base_vacancy import BaseVacancyService
 from src.infrastructure.service.dependencies import ICache, IUnitOfWork, IVacancyRepo
 from src.infrastructure.service.dto.vacancy_dto import vacancy_orm_to_response_dto
@@ -143,7 +143,7 @@ class VacancySearchService(BaseVacancyService):
         if vacancy.status != VacancyStatus.PUBLISHED:
             return
 
-        if user_info is not None and (user_info.user_role != UserRole.EMPLOYEE or user_info.user_id == vacancy.author_id):
+        if user_info is not None and (not is_user_employee(user_info) or user_info.user_id == vacancy.author_id):
             return
 
         async with self.uof_factory as uof:

@@ -12,7 +12,8 @@ require (
 require github.com/lib/pq v1.10.9
 
 require (
-	github.com/IvanDrf/work-hunter/pkg/user-api v0.0.0-20260401110126-ac223fd7dc2f
+	github.com/IvanDrf/work-hunter/pkg/common v0.0.0-20260611120708-a46d5979968d
+	github.com/IvanDrf/work-hunter/pkg/user-api v0.0.0-20260612123409-fd623ca2da12
 	github.com/jmoiron/sqlx v1.4.0
 	google.golang.org/grpc v1.80.0
 	google.golang.org/protobuf v1.36.11

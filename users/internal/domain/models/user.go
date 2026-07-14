@@ -1,7 +1,6 @@
 package models
 
 import (
-	"encoding/json"
 	"time"
 
 	"github.com/IvanDrf/work-hunter/users/internal/domain/rules"
@@ -10,58 +9,54 @@ import (
 
 type User struct {
 	ID          uuid.UUID `db:"id" json:"id"`
-	Username    string    `db:"username"`
 	Email       string    `db:"email"`
 	FirstName   string    `db:"first_name"`
 	LastName    string    `db:"last_name" json:"last_name"`
-	PhoneNumber string    `db:"phone_number" json:"phone_number"`
-	AvatarURL   string    `db:"avatar_url" json:"avatar_url"`
+	CompanyName string    `db:"company_name"`
 
 	Status rules.UserStatus `db:"status"`
 	Role   rules.UserRole   `db:"role"`
 
-	Metadata json.RawMessage `db:"metadata"`
+	Verificated bool `db:"verificated"`
 
 	CreatedAt time.Time `db:"created_at"`
 	UpdatedAt time.Time `db:"updated_at"`
 }
 
-func NewUser(id uuid.UUID, username, email, firstName, lastName, phoneNumber string) *User {
-	now := time.Now()
-	return &User{
+func NewUser(id uuid.UUID, email string, firstName, lastName, companyName string, verificated bool) *User {
+	u := User{
 		ID:          id,
-		Username:    username,
 		Email:       email,
 		FirstName:   firstName,
 		LastName:    lastName,
-		PhoneNumber: phoneNumber,
+		CompanyName: companyName,
 
 		Status: rules.UserStatusActive,
-		Role:   rules.UserRoleUser,
+		Role:   rules.UserRoleEmployee,
 
-		Metadata: []byte("{}"),
-
-		CreatedAt: now,
-		UpdatedAt: now,
+		Verificated: verificated,
 	}
+
+	if companyName != "" {
+		u.Role = rules.UserRoleEmployer
+	}
+
+	return &u
 }
 
-func (u *User) UpdateUser(firstName, lastName, phoneNumber, avatarURL string, metadata json.RawMessage) {
+func (u *User) UpdateUser(firstName, lastName, companyName string, verificated bool) {
 	if firstName != "" {
 		u.FirstName = firstName
 	}
 	if lastName != "" {
 		u.LastName = lastName
 	}
-	if phoneNumber != "" {
-		u.PhoneNumber = phoneNumber
-	}
-	if avatarURL != "" {
-		u.AvatarURL = avatarURL
-	}
-	if metadata != nil {
-		u.Metadata = metadata
+	if companyName != "" {
+		u.CompanyName = companyName
 	}
 
-	u.UpdatedAt = time.Now()
+	if !u.Verificated {
+		u.Verificated = verificated
+	}
+
 }

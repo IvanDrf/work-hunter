@@ -11,5 +11,9 @@ def is_user_employer(user_info: UserInfo) -> bool:
     return user_info.user_role == UserRole.EMPLOYER
 
 
+def is_user_employee(user_info: UserInfo) -> bool:
+    return user_info.user_role == UserRole.EMPLOYEE
+
+
 def is_user_vacancy_author(author_id: UUID, user_id: UUID) -> bool:
     return author_id == user_id

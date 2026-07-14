@@ -21,8 +21,7 @@ from src.domain.schemas.vacancy import (
     MIN_TAGS_AMOUNT,
     MIN_TITLE_LENGTH,
 )
-from src.domain.types.enums import VacancyStatus
-from src.domain.types.types import Money, Year
+from src.domain.types import Money, VacancyStatus, Year
 
 
 @dataclass(frozen=True)
@@ -46,6 +45,8 @@ class VacancySalary:
 class VacancyAdditional:
     city: str | None
     metro: str | None
+    is_metro_valid: bool
+    is_city_valid: bool
     remote_type: PKGRemoteType
     time_type: PKGTimeType
 
@@ -132,7 +133,17 @@ def vacancy_additional_valid(draw) -> VacancyAdditional:
     remote = draw(st.sampled_from([PKGRemoteType.ANY, PKGRemoteType.HYBRID, PKGRemoteType.OFFICE, PKGRemoteType.REMOTE]))
     time_type = draw(st.sampled_from([PKGTimeType.FULL, PKGTimeType.PART, PKGTimeType.PART]))
 
-    return VacancyAdditional(city=city, metro=metro, remote_type=remote, time_type=time_type)
+    is_metro_valid = draw(st.booleans())
+    is_city_valid = draw(st.booleans())
+
+    return VacancyAdditional(
+        city=city,
+        metro=metro,
+        remote_type=remote,
+        time_type=time_type,
+        is_metro_valid=is_metro_valid,
+        is_city_valid=is_city_valid,
+    )
 
 
 @st.composite

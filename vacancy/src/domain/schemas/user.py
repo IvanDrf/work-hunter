@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from uuid import UUID
 
-from src.domain.types.enums import UserRole
+from src.domain.types import UserRole
 
 
 @dataclass(slots=True, frozen=True, kw_only=True)

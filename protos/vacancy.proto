@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package vacancy;
 
+option go_package = "pkg/vacancy_api";
+
 import "google/protobuf/timestamp.proto";
 import "common.proto";
 
@@ -79,7 +81,8 @@ enum ResponseStatus {
 enum OrderBy {
     DATE = 0;
     VIEWS = 1;
-    APPLICATIONS = 2;
+    APPLICATIONS_ASC = 2;
+    APPLICATIONS_DESC=3;
 }
 
 message Response {
@@ -102,6 +105,8 @@ message VacancyInfo {
 
     optional string city = 9;
     optional string metro = 10;
+    bool is_city_valid = 27;
+    bool is_metro_valid = 26;
 
     RemoteType remote_type = 11;
     TimeType time_type = 12;
@@ -174,6 +179,7 @@ message UpdateVacancyRequest {
     optional uint32 experience_max = 14;
 
     repeated string tags = 24; // vacancies tags: golang, javascript, manager
+    bool update_tags = 26;
 
     common.UserInfo user_info = 25;
 }

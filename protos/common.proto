@@ -20,8 +20,20 @@ message UserInfo {
 message FullUserInfo {
     UserRole role = 1;
     string user_id = 2;
-    string username = 3;
+    string company_name = 3;
     bool verificated = 4;
+}
+
+enum ResponseStatus {
+    SUCCESS = 0;
+    FAILED = 1;
+    NOT_FOUND = 2;
+    FORBIDDEN = 3;
+}
+
+message Response {
+    ResponseStatus status = 1;
+    string details = 2;
 }
 
 message Empty {

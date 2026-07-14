@@ -3,8 +3,8 @@ from hypothesis import strategies as st
 from pkg.common.common_pb2 import FullUserInfo as PKGFullUserInfo
 from pkg.vacancy_api.vacancy_pb2 import CreateVacancyRequest
 
-from src.api.dto.vacancy import vacancy_create_dto
-from src.domain.types.enums import Currency
+from src.api.grpc.dto.vacancy import vacancy_create_dto
+from src.domain.types import Currency
 from tests.unit.dto.asserts import (
     assert_additional,
     assert_author,
@@ -68,7 +68,7 @@ def _create_request(req: VacancyInfo) -> CreateVacancyRequest:
             role=req.author.role,
             user_id=str(req.author.author_id),
             verificated=req.author.verificated,
-            username=req.author.author_name,
+            company_name=req.author.author_name,
         ),
     )
 
@@ -85,6 +85,6 @@ def _create_request_no_optional_fields(req: VacancyInfo) -> CreateVacancyRequest
             role=req.author.role,
             user_id=str(req.author.author_id),
             verificated=req.author.verificated,
-            username=req.author.author_name,
+            company_name=req.author.author_name,
         ),
     )
