@@ -4,8 +4,8 @@ github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161 h1:L/gRVlceqvL25
 github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161/go.mod h1:xomTg63KZ2rFqZQzSB4Vz2SUXa1BpHTVz9L5PTmPC4E=
 github.com/IvanDrf/work-hunter/pkg/common v0.0.0-20260611120708-a46d5979968d h1:4z7EXIwTlNV57AR9VVLw+N5FhaXj4lJIRBM8h2FhXWs=
 github.com/IvanDrf/work-hunter/pkg/common v0.0.0-20260611120708-a46d5979968d/go.mod h1:z6NaDjAIy4urS4mVrNt0MV9e8wngU9LvPJ0lJm5DXFY=
-github.com/IvanDrf/work-hunter/pkg/user-api v0.0.0-20260612123409-fd623ca2da12 h1:X+hpG19dU2XNUqzTglIYgmsR2nr7DrWP+Ohh7in2W64=
-github.com/IvanDrf/work-hunter/pkg/user-api v0.0.0-20260612123409-fd623ca2da12/go.mod h1:ohtacBYsHydI0rxao3rNpQiVqs9Z6BXq/KGKwCqLC/c=
+github.com/IvanDrf/work-hunter/pkg/user-api v0.0.0-20260715074652-0590c2144997 h1:8z7iX7VpJfjZj/TRh8rQRrubv5BKmCymNiTCcnrowyQ=
+github.com/IvanDrf/work-hunter/pkg/user-api v0.0.0-20260715074652-0590c2144997/go.mod h1:ohtacBYsHydI0rxao3rNpQiVqs9Z6BXq/KGKwCqLC/c=
 github.com/Microsoft/go-winio v0.6.2 h1:F2VQgta7ecxGYO8k3ZZz3RS8fVIXVxONVUPlNERoyfY=
 github.com/Microsoft/go-winio v0.6.2/go.mod h1:yd8OoFMLzJbo9gZq8j5qaps8bJ9aShtEA8Ipt1oGCvU=
 github.com/cespare/xxhash/v2 v2.3.0 h1:UL815xU9SqsFlibzuggzjXhog7bL6oX9BbNZnL2UFvs=

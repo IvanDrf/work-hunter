@@ -5,27 +5,17 @@ import (
 	"errors"
 	"log/slog"
 
-	"github.com/IvanDrf/work-hunter/pkg/common"
 	user_api "github.com/IvanDrf/work-hunter/pkg/user-api"
 	"github.com/IvanDrf/work-hunter/users/internal/domain/models"
-	"github.com/IvanDrf/work-hunter/users/internal/interfaces/grpc/dto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 func (h *Handler) ListUsers(ctx context.Context, req *user_api.ListUsersRequest) (*user_api.ListUsersResponse, error) {
-	log := h.log.With(slog.String("scope", "intarfaces/grpc/handlers/ListUsers"))
-	log.Info("ListUsers got request")
+	log := h.log.With(slog.String("scope", "handler/ListUsers"))
+	log.Info("ListUsers called")
 
-	resp, err := h.UserService.ListUsers(ctx, &dto.ListUsersRequest{
-		PageSize:    req.PageSize,
-		Status:      user_api.UserStatus_name[int32(req.Status)],
-		Role:        common.UserRole_name[int32(req.Role)],
-		SearchQuery: req.SerchQuery,
-		SortBy:      req.SortBy,
-		// TODO: regenerate pb files
-		Offset: 0,
-	})
+	resp, err := h.UserService.ListUsers(ctx, convertListReqToDto(req))
 
 	if err != nil {
 		var e models.Error
@@ -39,10 +29,10 @@ func (h *Handler) ListUsers(ctx context.Context, req *user_api.ListUsersRequest)
 				return nil, status.Error(codes.InvalidArgument, e.Message)
 			}
 		}
-		log.Error("Unhandled system error during profile listing", slog.String("error", err.Error()))
+		log.Error("unhandled error", slog.String("error", err.Error()))
 		return nil, status.Error(codes.Internal, "internal server error")
 	}
 
-	log.Info("List users successfully response")
+	// Конвертация ответа
 	return convertListDtoToListResp(resp), nil
 }
