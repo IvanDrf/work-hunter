@@ -1,0 +1,16 @@
+version: '3.9'
+
+services:
+  api_gateway:
+    build: .
+    container_name: api_gateway_app
+    restart: always
+    ports:
+      - "${APP_PORT}:8000"
+    networks:
+      - shared_network
+    
+networks:
+  shared_network:
+    name: shared_network
+    driver: bridge

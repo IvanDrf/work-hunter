@@ -2,7 +2,7 @@ package http
 
 import "net/http"
 
-func (s *server) registerRoutes() {
+func (s *Server) registerRoutes() {
 	mux := http.NewServeMux()
 
 	s.registerHealthRoute(mux)
@@ -11,11 +11,11 @@ func (s *server) registerRoutes() {
 	s.server.Handler = mux
 }
 
-func (s *server) registerHealthRoute(mux *http.ServeMux) {
+func (s *Server) registerHealthRoute(mux *http.ServeMux) {
 	mux.HandleFunc("GET /health", s.handlers.Health)
 }
 
-func (s *server) registerAuthRoutes(mux *http.ServeMux) {
+func (s *Server) registerAuthRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /api/auth/user/register", s.handlers.RegisterUser)
 	mux.HandleFunc("POST /api/auth/user/login", s.handlers.LoginUser)
 	mux.HandleFunc("POST /api/auth/user/password", s.handlers.ChangeUserPassword)

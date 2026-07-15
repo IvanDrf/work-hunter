@@ -10,7 +10,7 @@ import (
 	"github.com/IvanDrf/work-hunter/api-gateway/internal/infrastructure/adapters"
 )
 
-func (h *handlers) RegisterUser(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), h.requestTime)
 	defer cancel()
 
@@ -56,7 +56,7 @@ func (h *handlers) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (h *handlers) LoginUser(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) LoginUser(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), h.requestTime)
 	defer cancel()
 
@@ -101,7 +101,7 @@ func (h *handlers) LoginUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (h *handlers) ChangeUserPassword(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) ChangeUserPassword(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), h.requestTime)
 	defer cancel()
 
@@ -147,7 +147,7 @@ func (h *handlers) ChangeUserPassword(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (h *handlers) RefreshTokens(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) RefreshTokens(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), h.requestTime)
 	defer cancel()
 
@@ -175,7 +175,7 @@ func (h *handlers) RefreshTokens(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (h *handlers) DeleteUser(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), h.requestTime)
 	defer cancel()
 

@@ -8,15 +8,15 @@ import (
 	"net/http"
 )
 
-type server struct {
-	handlers   *handlers
-	middleware *authMiddleware
+type Server struct {
+	handlers   *Handlers
+	middleware *AuthMiddleware
 
 	server *http.Server
 }
 
-func NewServer(host string, port int, handlers *handlers, middleware *authMiddleware) *server {
-	return &server{
+func NewServer(host string, port int, handlers *Handlers, middleware *AuthMiddleware) *Server {
+	return &Server{
 		server: &http.Server{
 			Addr: fmt.Sprintf("%s:%d", host, port),
 		},
@@ -25,7 +25,7 @@ func NewServer(host string, port int, handlers *handlers, middleware *authMiddle
 	}
 }
 
-func (s *server) Start(ctx context.Context) {
+func (s *Server) Start(ctx context.Context) {
 	l := slog.With(slog.String("server", "http"))
 
 	s.registerRoutes()
@@ -37,11 +37,11 @@ func (s *server) Start(ctx context.Context) {
 	}
 }
 
-func (s *server) checkServicesHealth(ctx context.Context) {
+func (s *Server) checkServicesHealth(ctx context.Context) {
 	s.handlers.checkClientsHealth(ctx)
 }
 
-func (s *server) Close(ctx context.Context) {
+func (s *Server) Close(ctx context.Context) {
 	slog.InfoContext(ctx, "Stopping http server on", slog.String("address", s.server.Addr))
 
 	s.server.Shutdown(ctx)

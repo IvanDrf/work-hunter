@@ -10,24 +10,24 @@ import (
 	"github.com/IvanDrf/work-hunter/api-gateway/internal/domain/ports"
 )
 
-type handlers struct {
+type Handlers struct {
 	authClient ports.AuthClient
 
 	requestTime time.Duration
 }
 
-func NewHandlers(authClient ports.AuthClient, requestTime time.Duration) *handlers {
-	return &handlers{
+func NewHandlers(authClient ports.AuthClient, requestTime time.Duration) *Handlers {
+	return &Handlers{
 		authClient:  authClient,
 		requestTime: requestTime,
 	}
 }
 
-func (h *handlers) close() {
+func (h *Handlers) close() {
 	h.authClient.Close()
 }
 
-func (h *handlers) checkClientsHealth(ctx context.Context) {
+func (h *Handlers) checkClientsHealth(ctx context.Context) {
 	defer slog.InfoContext(ctx, "stoppping clients health check")
 	ticker := time.NewTicker(10 * time.Second)
 	defer ticker.Stop()
@@ -42,7 +42,7 @@ func (h *handlers) checkClientsHealth(ctx context.Context) {
 	}
 }
 
-func (h *handlers) Health(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) Health(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-type", "application/json")
 
 	w.WriteHeader(http.StatusOK)

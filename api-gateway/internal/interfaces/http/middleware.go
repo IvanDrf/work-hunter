@@ -11,19 +11,19 @@ import (
 	"github.com/IvanDrf/work-hunter/api-gateway/internal/infrastructure/adapters"
 )
 
-type authMiddleware struct {
+type AuthMiddleware struct {
 	authClient  ports.AuthClient
 	requestTime time.Duration
 }
 
-func NewAuthMiddleware(authClient ports.AuthClient, requestTime time.Duration) *authMiddleware {
-	return &authMiddleware{
+func NewAuthMiddleware(authClient ports.AuthClient, requestTime time.Duration) *AuthMiddleware {
+	return &AuthMiddleware{
 		authClient:  authClient,
 		requestTime: requestTime,
 	}
 }
 
-func (m *authMiddleware) RegistredMiddleware(next http.HandlerFunc) http.HandlerFunc {
+func (m *AuthMiddleware) RegistredMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithTimeout(r.Context(), m.requestTime)
 		defer cancel()
@@ -48,7 +48,7 @@ func (m *authMiddleware) RegistredMiddleware(next http.HandlerFunc) http.Handler
 	}
 }
 
-func (m *authMiddleware) AdminMiddleware(next http.HandlerFunc) http.HandlerFunc {
+func (m *AuthMiddleware) AdminMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithTimeout(r.Context(), m.requestTime)
 		defer cancel()

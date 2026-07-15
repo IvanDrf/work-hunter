@@ -97,11 +97,11 @@ func getCookie(ctx context.Context, w http.ResponseWriter, r *http.Request, name
 	return nil, e
 }
 
-type Validator interface {
+type validator interface {
 	IsValid() bool
 }
 
-func validateModel(ctx context.Context, w http.ResponseWriter, model Validator, errorMessage string) error {
+func validateModel(ctx context.Context, w http.ResponseWriter, model validator, errorMessage string) error {
 	if model.IsValid() {
 		return nil
 	}
