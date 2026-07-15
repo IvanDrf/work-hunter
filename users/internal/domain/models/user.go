@@ -23,6 +23,16 @@ type User struct {
 	UpdatedAt time.Time `db:"updated_at"`
 }
 
+type ListUsersParams struct {
+	Page        int
+	PageSize    int
+	Status      string
+	Role        string
+	SearchQuery string
+	SortBy      string
+	SortDesc    bool
+}
+
 func NewUser(id uuid.UUID, email string, firstName, lastName, companyName string, verificated bool) *User {
 	u := User{
 		ID:          id,

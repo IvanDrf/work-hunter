@@ -14,7 +14,7 @@ type UserRepository interface {
 	GetUserByEmail(ctx context.Context, email string) (*models.User, error)
 	UpdateUser(ctx context.Context, updatedUser *models.User) error
 	DeleteUser(ctx context.Context, id uuid.UUID, permanent bool) error
-	ListUsers(ctx context.Context, params map[string]string) ([]*models.User, int32, error)
+	ListUsers(ctx context.Context, params *models.ListUsersParams) ([]*models.User, int32, error)
 	UpdateUserStatus(ctx context.Context, id uuid.UUID, status rules.UserStatus) error
 	Close()
 }
