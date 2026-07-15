@@ -232,3 +232,22 @@ func (c *authClient) SendDeleteUserRequest(ctx context.Context, access string, p
 
 	return err
 }
+
+func (c *authClient) SendVerificationEmailRequest(ctx context.Context, access string) error {
+	log := slog.With(slog.String("client", "auth"), slog.String("request", "SendVerificationEmailRequest"))
+	ctx = adapters.InsertLogger(ctx, log)
+
+	_, err := retry(ctx, c.retries, func() (any, error) {
+		_, err := c.client.SendVerificationEmail(ctx, &auth_api.AccessToken{
+			Access: access,
+		})
+		if err != nil {
+			log.ErrorContext(ctx, "can't send verification email, auth service returned error", slog.String("error", err.Error()))
+			return nil, err
+		}
+
+		return nil, nil
+	})
+
+	return err
+}

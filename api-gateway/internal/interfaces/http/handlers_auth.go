@@ -218,3 +218,26 @@ func (h *Handlers) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusNoContent)
 }
+
+func (h *Handlers) SendVerificationEmail(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), h.requestTime)
+	defer cancel()
+
+	log := slog.With(slog.String("handlers", "send-verfication-email"))
+	log.InfoContext(ctx, "request")
+
+	ctx = adapters.InsertLogger(ctx, log)
+
+	access, err := getCookie(ctx, w, r, "access")
+	if err != nil {
+		log.InfoContext(ctx, "invalid cookie in request", slog.String("error", err.Error()))
+		return
+	}
+
+	if err := h.authClient.SendVerificationEmailRequest(ctx, access.Value); err != nil {
+		handleResponseError(w, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
