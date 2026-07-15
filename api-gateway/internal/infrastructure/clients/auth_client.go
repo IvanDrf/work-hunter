@@ -251,3 +251,29 @@ func (c *authClient) SendVerificationEmailRequest(ctx context.Context, access st
 
 	return err
 }
+
+func (c *authClient) SendVerifyEmailRequest(ctx context.Context, token string) (*models.Tokens, error) {
+	log := slog.With(slog.String("client", "auth"), slog.String("request", "SendVerifyEmailRequest"))
+	ctx = adapters.InsertLogger(ctx, log)
+
+	resp, err := retry(ctx, c.retries, func() (any, error) {
+		resp, err := c.client.VerifyEmail(ctx, &auth_api.VerifToken{
+			Token: token,
+		})
+		if err != nil {
+			log.ErrorContext(ctx, "can't send verify user email, auth service returned error", slog.String("error", err.Error()))
+			return nil, err
+		}
+
+		return &models.Tokens{
+			Access:  resp.Access,
+			Refresh: resp.Refresh,
+		}, nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.(*models.Tokens), nil
+}

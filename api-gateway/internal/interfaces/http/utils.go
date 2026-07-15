@@ -62,7 +62,7 @@ func handleResponseError(w http.ResponseWriter, err error) {
 	}
 }
 
-func setCookie(name string, value string) *http.Cookie {
+func createCookie(name string, value string) *http.Cookie {
 	return &http.Cookie{
 		Name:     name,
 		Value:    value,

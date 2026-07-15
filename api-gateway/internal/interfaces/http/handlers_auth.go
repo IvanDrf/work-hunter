@@ -28,8 +28,8 @@ func (h *Handlers) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	user := &models.User{}
 	if err := json.NewDecoder(r.Body).Decode(user); err != nil {
 		log.InfoContext(ctx, "can't parse requests's body", slog.String("error", err.Error()))
+		w.Header().Add("Content-type", "application/json")
 		w.WriteHeader(http.StatusUnprocessableEntity)
-		w.Header().Add("Content-type", "applications/json")
 		json.NewEncoder(w).Encode(models.Error{
 			Message: "invalid body request",
 			Code:    models.ErrCodeUnprocessableEntity,
@@ -49,7 +49,7 @@ func (h *Handlers) RegisterUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	access, refresh := setCookie("access", tokens.Access), setCookie("refresh", tokens.Refresh)
+	access, refresh := createCookie("access", tokens.Access), createCookie("refresh", tokens.Refresh)
 	http.SetCookie(w, access)
 	http.SetCookie(w, refresh)
 
@@ -74,6 +74,7 @@ func (h *Handlers) LoginUser(w http.ResponseWriter, r *http.Request) {
 	user := &models.User{}
 	if err := json.NewDecoder(r.Body).Decode(user); err != nil {
 		log.InfoContext(ctx, "can't parse requests's body", slog.String("error", err.Error()))
+		w.Header().Add("Content-type", "application/json")
 		w.WriteHeader(http.StatusUnprocessableEntity)
 		json.NewEncoder(w).Encode(models.Error{
 			Message: "invalid body request",
@@ -94,7 +95,7 @@ func (h *Handlers) LoginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	access, refresh := setCookie("access", tokens.Access), setCookie("refresh", tokens.Refresh)
+	access, refresh := createCookie("access", tokens.Access), createCookie("refresh", tokens.Refresh)
 	http.SetCookie(w, access)
 	http.SetCookie(w, refresh)
 
@@ -119,6 +120,7 @@ func (h *Handlers) ChangeUserPassword(w http.ResponseWriter, r *http.Request) {
 	password := &models.Password{}
 	if err := json.NewDecoder(r.Body).Decode(password); err != nil {
 		log.InfoContext(ctx, "can't parse requests's body", slog.String("error", err.Error()))
+		w.Header().Add("Content-type", "application/json")
 		w.WriteHeader(http.StatusUnprocessableEntity)
 		json.NewEncoder(w).Encode(models.Error{
 			Message: "invalid body request",
@@ -168,7 +170,7 @@ func (h *Handlers) RefreshTokens(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	access, refresh := setCookie("access", tokens.Access), setCookie("refresh", tokens.Refresh)
+	access, refresh := createCookie("access", tokens.Access), createCookie("refresh", tokens.Refresh)
 	http.SetCookie(w, access)
 	http.SetCookie(w, refresh)
 
@@ -196,6 +198,7 @@ func (h *Handlers) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 	if err := json.NewDecoder(r.Body).Decode(password); err != nil {
 		log.InfoContext(ctx, "can't parse requests's body", slog.String("error", err.Error()))
+		w.Header().Add("Content-type", "application/json")
 		w.WriteHeader(http.StatusUnprocessableEntity)
 		json.NewEncoder(w).Encode(models.Error{
 			Message: "invalid body request",
@@ -238,6 +241,39 @@ func (h *Handlers) SendVerificationEmail(w http.ResponseWriter, r *http.Request)
 		handleResponseError(w, err)
 		return
 	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (h *Handlers) VerifyEmail(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), h.requestTime)
+	defer cancel()
+
+	log := slog.With(slog.String("handlers", "send-verfication-email"))
+	log.InfoContext(ctx, "request")
+
+	ctx = adapters.InsertLogger(ctx, log)
+
+	token := r.URL.Query().Get("token")
+	if token == "" {
+		w.Header().Add("Content-type", "application/json")
+		w.WriteHeader(http.StatusNotAcceptable)
+		json.NewEncoder(w).Encode(models.Error{
+			Message: "verification token required",
+			Code:    models.ErrCodeInvalidArgument,
+		})
+		return
+	}
+
+	tokens, err := h.authClient.SendVerifyEmailRequest(ctx, token)
+	if err != nil {
+		handleResponseError(w, err)
+		return
+	}
+
+	access, refresh := createCookie("access", tokens.Access), createCookie("refresh", tokens.Refresh)
+	http.SetCookie(w, access)
+	http.SetCookie(w, refresh)
 
 	w.WriteHeader(http.StatusNoContent)
 }
