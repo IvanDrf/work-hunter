@@ -12,6 +12,7 @@ const (
 	ErrCodeInvalidArgument      ErrCode = "INVALID_ARGUMENT"
 	ErrCodeInvalidCookie        ErrCode = "INVALID_COOKIE"
 	ErrCodeAccess               ErrCode = "ACCESS_ERROR"
+	ErrCodeNotFound             ErrCode = "NOT_FOUND"
 )
 
 type Error struct {

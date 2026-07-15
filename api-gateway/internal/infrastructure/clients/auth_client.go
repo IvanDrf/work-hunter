@@ -212,3 +212,23 @@ func (c *authClient) SendIsTokenValidRequest(ctx context.Context, access string)
 
 	return resp.(*models.TokenPayload), nil
 }
+
+func (c *authClient) SendDeleteUserRequest(ctx context.Context, access string, password string) error {
+	log := slog.With(slog.String("client", "auth"), slog.String("request", "DeleteUser"))
+	ctx = adapters.InsertLogger(ctx, log)
+
+	_, err := retry(ctx, c.retries, func() (any, error) {
+		_, err := c.client.DeleteUser(ctx, &auth_api.DeleteUserRequest{
+			Access:   access,
+			Password: password,
+		})
+		if err != nil {
+			log.ErrorContext(ctx, "can't delete user, auth service returned error", slog.String("error", err.Error()))
+			return nil, err
+		}
+
+		return nil, nil
+	})
+
+	return err
+}

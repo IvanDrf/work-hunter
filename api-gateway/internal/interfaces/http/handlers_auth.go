@@ -174,3 +174,47 @@ func (h *handlers) RefreshTokens(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusNoContent)
 }
+
+func (h *handlers) DeleteUser(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), h.requestTime)
+	defer cancel()
+
+	log := slog.With(slog.String("handlers", "delete-user"))
+	log.InfoContext(ctx, "request")
+
+	ctx = adapters.InsertLogger(ctx, log)
+
+	if status, err := validateHeaders(r); err != nil {
+		w.WriteHeader(status)
+		json.NewEncoder(w).Encode(err)
+		return
+	}
+
+	password := &struct {
+		Password string `json:"password"`
+	}{}
+
+	if err := json.NewDecoder(r.Body).Decode(password); err != nil {
+		log.InfoContext(ctx, "can't parse requests's body", slog.String("error", err.Error()))
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		json.NewEncoder(w).Encode(models.Error{
+			Message: "invalid body request",
+			Code:    models.ErrCodeUnprocessableEntity,
+		})
+		return
+	}
+	defer r.Body.Close()
+
+	access, err := getCookie(ctx, w, r, "access")
+	if err != nil {
+		log.InfoContext(ctx, "invalid cookie in request", slog.String("error", err.Error()))
+		return
+	}
+
+	if err := h.authClient.SendDeleteUserRequest(ctx, access.Value, password.Password); err != nil {
+		handleResponseError(w, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}

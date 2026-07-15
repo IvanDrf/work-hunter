@@ -49,6 +49,9 @@ func handleResponseError(w http.ResponseWriter, err error) {
 
 		case models.ErrCodeAccess:
 			w.WriteHeader(http.StatusForbidden)
+
+		case models.ErrCodeNotFound:
+			w.WriteHeader(http.StatusNotFound)
 		}
 
 		json.NewEncoder(w).Encode(e)

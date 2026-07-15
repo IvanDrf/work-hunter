@@ -14,6 +14,7 @@ type AuthClient interface {
 	SendChangePasswordRequest(ctx context.Context, access string, old string, new string) error
 	SendRefreshTokensRequest(ctx context.Context, refresh string) (*models.Tokens, error)
 	SendIsTokenValidRequest(ctx context.Context, access string) (*models.TokenPayload, error)
+	SendDeleteUserRequest(ctx context.Context, access string, password string) error
 
 	Close()
 }

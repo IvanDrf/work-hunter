@@ -13,28 +13,37 @@ import (
 )
 
 func handleResponseError(err error) error {
+	st, _ := status.FromError(err)
+	st.Message()
+
 	switch status.Code(err) {
 	case codes.AlreadyExists:
 		return models.Error{
-			Message: fmt.Sprintf("already exists, error=%s", err),
+			Message: fmt.Sprintf("already exists, error=%s", st.Message()),
 			Code:    models.ErrCodeAlreadyExists,
 		}
 
 	case codes.Internal, codes.Unavailable:
 		return models.Error{
-			Message: fmt.Sprintf("internal error, error=%s", err),
+			Message: fmt.Sprintf("internal error, error=%s", st.Message()),
 			Code:    models.ErrCodeInternal,
 		}
 
 	case codes.InvalidArgument:
 		return models.Error{
-			Message: fmt.Sprintf("invalid argument, error=%s", err),
+			Message: fmt.Sprintf("invalid argument, error=%s", st.Message()),
 			Code:    models.ErrCodeInvalidArgument,
+		}
+
+	case codes.NotFound:
+		return models.Error{
+			Message: fmt.Sprintf("not found, error=%s", st.Message()),
+			Code:    models.ErrCodeNotFound,
 		}
 
 	default:
 		return models.Error{
-			Message: fmt.Sprintf("unexpected error=%s", err),
+			Message: fmt.Sprintf("unexpected error=%s", st.Message()),
 			Code:    models.ErrCodeInternal,
 		}
 	}
