@@ -14,10 +14,8 @@ func connect() (*postgres.UserRepository, sqlmock.Sqlmock) {
 		log.Fatal(err)
 	}
 
-	// Создаем sqlx.DB из sql.DB
 	sqlxDB := sqlx.NewDb(db, "postgres")
 
-	// Создаем PostgresConnection с мок-базой
 	conn := &postgres.PostgresConnection{
 		DB: sqlxDB,
 	}

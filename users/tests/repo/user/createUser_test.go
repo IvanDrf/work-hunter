@@ -43,7 +43,6 @@ func TestCreateUser_DuplicateEmail(t *testing.T) {
 
 	user := fixtures.CreateSingleUser()
 
-	// Создаем PQ ошибку с кодом уникальности
 	pqErr := &pq.Error{
 		Code:    "23505",
 		Message: "duplicate key value violates unique constraint",

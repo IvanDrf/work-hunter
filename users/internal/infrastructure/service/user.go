@@ -135,12 +135,11 @@ func (s *UserService) DeleteProfile(ctx context.Context, id string) error {
 func (s *UserService) ListUsers(ctx context.Context, req *dto.ListUsersRequest) (*dto.ListUsersResponse, error) {
 	log := s.log.With(slog.String("scope", "service/ListUsers"))
 
-	// Валидация
 	if req.Page < 1 {
 		req.Page = 1
 	}
 	if req.PageSize < 1 || req.PageSize > 100 {
-		req.PageSize = 10
+		req.PageSize = 100
 	}
 
 	repoParams := models.ListUsersParams{

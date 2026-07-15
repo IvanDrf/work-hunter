@@ -60,7 +60,7 @@ func TestUpdateUser_NoRowsAffected(t *testing.T) {
 		WillReturnResult(sqlmock.NewResult(0, 0))
 
 	err := repo.UpdateUser(t.Context(), user)
-	assert.NoError(t, err) // Обновление несуществующего пользователя не вызывает ошибку
+	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
