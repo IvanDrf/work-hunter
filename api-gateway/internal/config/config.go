@@ -13,11 +13,14 @@ type Config struct {
 		Host string `env:"APP_HOST"`
 		Port int    `env:"APP_PORT"`
 
-		LoggerLevel string        `env:"LOGGER_LEVEL"`
-		LoggerFile  string        `env:"LOGGER_FILE"`
-		RequestTime time.Duration `env:"REQUEST_TIME"`
+		LoggerLevel string `env:"LOGGER_LEVEL"`
+		LoggerFile  string `env:"LOGGER_FILE"`
 
-		Retries int `env:"RETRIES"`
+		RequestTime time.Duration `env:"REQUEST_TIME"`
+		Retries     int           `env:"RETRIES"`
+
+		ShutdownTime    time.Duration `env:"SHUTDOWN_TIME"`
+		HealthCheckTime time.Duration `env:"HEALTH_CHECK_TIME"`
 	}
 
 	Auth struct {

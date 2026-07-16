@@ -28,10 +28,10 @@ func (h *Handlers) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	user := &models.User{}
 	if err := json.NewDecoder(r.Body).Decode(user); err != nil {
 		log.InfoContext(ctx, "can't parse requests's body", slog.String("error", err.Error()))
-		w.Header().Add("Content-type", "application/json")
+		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusUnprocessableEntity)
 		json.NewEncoder(w).Encode(models.Error{
-			Message: "invalid body request",
+			Message: invalidBodyRequestMessage,
 			Code:    models.ErrCodeUnprocessableEntity,
 		})
 		return
@@ -49,7 +49,7 @@ func (h *Handlers) RegisterUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	access, refresh := createCookie("access", tokens.Access), createCookie("refresh", tokens.Refresh)
+	access, refresh := createCookie(Access, tokens.Access), createCookie(Refresh, tokens.Refresh)
 	http.SetCookie(w, access)
 	http.SetCookie(w, refresh)
 
@@ -74,10 +74,10 @@ func (h *Handlers) LoginUser(w http.ResponseWriter, r *http.Request) {
 	user := &models.User{}
 	if err := json.NewDecoder(r.Body).Decode(user); err != nil {
 		log.InfoContext(ctx, "can't parse requests's body", slog.String("error", err.Error()))
-		w.Header().Add("Content-type", "application/json")
+		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusUnprocessableEntity)
 		json.NewEncoder(w).Encode(models.Error{
-			Message: "invalid body request",
+			Message: invalidBodyRequestMessage,
 			Code:    models.ErrCodeUnprocessableEntity,
 		})
 		return
@@ -95,7 +95,7 @@ func (h *Handlers) LoginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	access, refresh := createCookie("access", tokens.Access), createCookie("refresh", tokens.Refresh)
+	access, refresh := createCookie(Access, tokens.Access), createCookie(Refresh, tokens.Refresh)
 	http.SetCookie(w, access)
 	http.SetCookie(w, refresh)
 
@@ -120,10 +120,10 @@ func (h *Handlers) ChangeUserPassword(w http.ResponseWriter, r *http.Request) {
 	password := &models.Password{}
 	if err := json.NewDecoder(r.Body).Decode(password); err != nil {
 		log.InfoContext(ctx, "can't parse requests's body", slog.String("error", err.Error()))
-		w.Header().Add("Content-type", "application/json")
+		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusUnprocessableEntity)
 		json.NewEncoder(w).Encode(models.Error{
-			Message: "invalid body request",
+			Message: invalidBodyRequestMessage,
 			Code:    models.ErrCodeUnprocessableEntity,
 		})
 		return
@@ -135,7 +135,7 @@ func (h *Handlers) ChangeUserPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	access, err := getCookie(ctx, w, r, "access")
+	access, err := getCookie(ctx, w, r, Access)
 	if err != nil {
 		log.InfoContext(ctx, "invalid cookie in request", slog.String("error", err.Error()))
 		return
@@ -158,7 +158,7 @@ func (h *Handlers) RefreshTokens(w http.ResponseWriter, r *http.Request) {
 
 	ctx = adapters.InsertLogger(ctx, log)
 
-	refresh, err := getCookie(ctx, w, r, "refresh")
+	refresh, err := getCookie(ctx, w, r, Refresh)
 	if err != nil {
 		log.InfoContext(ctx, "invalid cookie in request", slog.String("error", err.Error()))
 		return
@@ -170,7 +170,7 @@ func (h *Handlers) RefreshTokens(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	access, refresh := createCookie("access", tokens.Access), createCookie("refresh", tokens.Refresh)
+	access, refresh := createCookie(Access, tokens.Access), createCookie(Refresh, tokens.Refresh)
 	http.SetCookie(w, access)
 	http.SetCookie(w, refresh)
 
@@ -198,17 +198,17 @@ func (h *Handlers) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 	if err := json.NewDecoder(r.Body).Decode(password); err != nil {
 		log.InfoContext(ctx, "can't parse requests's body", slog.String("error", err.Error()))
-		w.Header().Add("Content-type", "application/json")
+		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusUnprocessableEntity)
 		json.NewEncoder(w).Encode(models.Error{
-			Message: "invalid body request",
+			Message: invalidBodyRequestMessage,
 			Code:    models.ErrCodeUnprocessableEntity,
 		})
 		return
 	}
 	defer r.Body.Close()
 
-	access, err := getCookie(ctx, w, r, "access")
+	access, err := getCookie(ctx, w, r, Access)
 	if err != nil {
 		log.InfoContext(ctx, "invalid cookie in request", slog.String("error", err.Error()))
 		return
@@ -226,12 +226,12 @@ func (h *Handlers) SendVerificationEmail(w http.ResponseWriter, r *http.Request)
 	ctx, cancel := context.WithTimeout(r.Context(), h.requestTime)
 	defer cancel()
 
-	log := slog.With(slog.String("handlers", "send-verfication-email"))
+	log := slog.With(slog.String("handlers", "send-verification-email"))
 	log.InfoContext(ctx, "request")
 
 	ctx = adapters.InsertLogger(ctx, log)
 
-	access, err := getCookie(ctx, w, r, "access")
+	access, err := getCookie(ctx, w, r, Access)
 	if err != nil {
 		log.InfoContext(ctx, "invalid cookie in request", slog.String("error", err.Error()))
 		return
@@ -249,14 +249,14 @@ func (h *Handlers) VerifyEmail(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), h.requestTime)
 	defer cancel()
 
-	log := slog.With(slog.String("handlers", "send-verfication-email"))
+	log := slog.With(slog.String("handlers", "verify-email"))
 	log.InfoContext(ctx, "request")
 
 	ctx = adapters.InsertLogger(ctx, log)
 
 	token := r.URL.Query().Get("token")
 	if token == "" {
-		w.Header().Add("Content-type", "application/json")
+		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusNotAcceptable)
 		json.NewEncoder(w).Encode(models.Error{
 			Message: "verification token required",
@@ -271,7 +271,7 @@ func (h *Handlers) VerifyEmail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	access, refresh := createCookie("access", tokens.Access), createCookie("refresh", tokens.Refresh)
+	access, refresh := createCookie(Access, tokens.Access), createCookie(Refresh, tokens.Refresh)
 	http.SetCookie(w, access)
 	http.SetCookie(w, refresh)
 

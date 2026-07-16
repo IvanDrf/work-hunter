@@ -23,6 +23,10 @@ func NewAuthMiddleware(authClient ports.AuthClient, requestTime time.Duration) *
 	}
 }
 
+type payload string
+
+const payloadKey payload = "payload"
+
 func (m *AuthMiddleware) RegistredMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithTimeout(r.Context(), m.requestTime)
@@ -43,7 +47,7 @@ func (m *AuthMiddleware) RegistredMiddleware(next http.HandlerFunc) http.Handler
 			return
 		}
 
-		ctx = context.WithValue(ctx, "payload", payload)
+		ctx = context.WithValue(ctx, payloadKey, payload)
 		next(w, r.WithContext(ctx))
 	}
 }
@@ -75,7 +79,7 @@ func (m *AuthMiddleware) AdminMiddleware(next http.HandlerFunc) http.HandlerFunc
 			})
 		}
 
-		ctx = context.WithValue(ctx, "payload", payload)
+		ctx = context.WithValue(ctx, payloadKey, payload)
 		next(w, r.WithContext(ctx))
 	}
 }

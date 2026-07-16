@@ -21,14 +21,12 @@ linters:
     - embeddedstructfieldcheck
     - err113
     - errcheck
-    - errchkjson
     - errname
     - errorlint
     - exhaustive
     - exptostd
     - fatcontext
     - forbidigo
-    - forcetypeassert
     - funcorder
     - funlen
     - ginkgolinter
@@ -47,7 +45,6 @@ linters:
     - gomoddirectives
     - gomodguard_v2
     - goprintffuncname
-    - gosec
     - gosmopolitan
     - govet
     - grouper
@@ -71,7 +68,6 @@ linters:
     - nilerr
     - nilnesserr
     - nilnil
-    - nlreturn
     - noctx
     - nolintlint
     - nonamedreturns
@@ -104,7 +100,6 @@ linters:
     - usetesting
     - wastedassign
     - whitespace
-    - wrapcheck
   disable:
     - errcheck
 

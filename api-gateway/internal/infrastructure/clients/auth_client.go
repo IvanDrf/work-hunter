@@ -93,8 +93,8 @@ func (c *authClient) SendRegisterRequest(ctx context.Context, email string, pass
 		}
 		log.InfoContext(ctx, "successfully registred user")
 		return &models.Tokens{
-			Access:  resp.Access,
-			Refresh: resp.Refresh,
+			Access:  resp.GetAccess(),
+			Refresh: resp.GetRefresh(),
 		}, nil
 	})
 	if err != nil {
@@ -120,8 +120,8 @@ func (c *authClient) SendLoginRequest(ctx context.Context, email string, passwor
 
 		log.InfoContext(ctx, "successfully login user")
 		return &models.Tokens{
-			Access:  resp.Access,
-			Refresh: resp.Refresh,
+			Access:  resp.GetAccess(),
+			Refresh: resp.GetRefresh(),
 		}, nil
 	})
 
@@ -131,22 +131,22 @@ func (c *authClient) SendLoginRequest(ctx context.Context, email string, passwor
 
 	return resp.(*models.Tokens), nil
 }
-func (c *authClient) SendChangePasswordRequest(ctx context.Context, access string, old string, new string) error {
+func (c *authClient) SendChangePasswordRequest(ctx context.Context, access string, oldPassword string, newPassword string) error {
 	log := slog.With(slog.String("client", "auth"), slog.String("request", "SendChangePasswordRequest"))
 	ctx = adapters.InsertLogger(ctx, log)
 
 	_, err := retry(ctx, c.retries, func() (any, error) {
-		_, err := c.client.ChangePassword(ctx, &auth_api.ChangePasswordRequest{
+		resp, err := c.client.ChangePassword(ctx, &auth_api.ChangePasswordRequest{
 			Access: access,
-			Old:    old,
-			New:    new,
+			Old:    oldPassword,
+			New:    newPassword,
 		})
 		if err != nil {
 			log.ErrorContext(ctx, "can't change password for user, auth service returned error", slog.String("error", err.Error()))
 			return nil, err
 		}
 
-		return nil, nil
+		return resp, nil
 	})
 
 	return err
@@ -166,8 +166,8 @@ func (c *authClient) SendRefreshTokensRequest(ctx context.Context, refresh strin
 		}
 
 		return &models.Tokens{
-			Access:  resp.Access,
-			Refresh: resp.Refresh,
+			Access:  resp.GetAccess(),
+			Refresh: resp.GetRefresh(),
 		}, nil
 	})
 
@@ -191,7 +191,7 @@ func (c *authClient) SendIsTokenValidRequest(ctx context.Context, access string)
 			return nil, err
 		}
 
-		id, err := uuid.Parse(resp.Id)
+		id, err := uuid.Parse(resp.GetId())
 		if err != nil {
 			return nil, models.Error{
 				Message: "invalid user_id in token, not uuid",
@@ -201,8 +201,8 @@ func (c *authClient) SendIsTokenValidRequest(ctx context.Context, access string)
 
 		return &models.TokenPayload{
 			ID:          id,
-			Verificated: resp.Verificated,
-			Role:        models.UserRole(resp.Role),
+			Verificated: resp.GetVerificated(),
+			Role:        models.UserRole(resp.GetRole()),
 		}, nil
 	})
 
@@ -218,7 +218,7 @@ func (c *authClient) SendDeleteUserRequest(ctx context.Context, access string, p
 	ctx = adapters.InsertLogger(ctx, log)
 
 	_, err := retry(ctx, c.retries, func() (any, error) {
-		_, err := c.client.DeleteUser(ctx, &auth_api.DeleteUserRequest{
+		resp, err := c.client.DeleteUser(ctx, &auth_api.DeleteUserRequest{
 			Access:   access,
 			Password: password,
 		})
@@ -227,7 +227,7 @@ func (c *authClient) SendDeleteUserRequest(ctx context.Context, access string, p
 			return nil, err
 		}
 
-		return nil, nil
+		return resp, nil
 	})
 
 	return err
@@ -238,7 +238,7 @@ func (c *authClient) SendVerificationEmailRequest(ctx context.Context, access st
 	ctx = adapters.InsertLogger(ctx, log)
 
 	_, err := retry(ctx, c.retries, func() (any, error) {
-		_, err := c.client.SendVerificationEmail(ctx, &auth_api.AccessToken{
+		resp, err := c.client.SendVerificationEmail(ctx, &auth_api.AccessToken{
 			Access: access,
 		})
 		if err != nil {
@@ -246,7 +246,7 @@ func (c *authClient) SendVerificationEmailRequest(ctx context.Context, access st
 			return nil, err
 		}
 
-		return nil, nil
+		return resp, nil
 	})
 
 	return err
@@ -266,8 +266,8 @@ func (c *authClient) SendVerifyEmailRequest(ctx context.Context, token string) (
 		}
 
 		return &models.Tokens{
-			Access:  resp.Access,
-			Refresh: resp.Refresh,
+			Access:  resp.GetAccess(),
+			Refresh: resp.GetRefresh(),
 		}, nil
 	})
 

@@ -46,7 +46,9 @@ func selectLevel(level string) slog.Leveler {
 	return slog.LevelDebug
 }
 
-const loggerKey = "logger"
+type LoggerKey string
+
+const loggerKey LoggerKey = "logger"
 
 func InsertLogger(ctx context.Context, log *slog.Logger) context.Context {
 	return context.WithValue(ctx, loggerKey, log)

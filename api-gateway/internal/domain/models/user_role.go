@@ -1,6 +1,6 @@
 package models
 
-type UserRole int
+type UserRole int32
 
 const (
 	UNSPECIFIED UserRole = 0

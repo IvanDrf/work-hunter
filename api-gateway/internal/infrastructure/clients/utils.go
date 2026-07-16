@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"strings"
 	"time"
 
 	"github.com/IvanDrf/work-hunter/api-gateway/internal/domain/models"
@@ -13,39 +14,49 @@ import (
 )
 
 func handleResponseError(err error) error {
-	st, _ := status.FromError(err)
-	st.Message()
+	if err == nil {
+		return nil
+	}
 
-	switch status.Code(err) {
-	case codes.AlreadyExists:
+	st, ok := status.FromError(err)
+	if !ok {
 		return models.Error{
-			Message: fmt.Sprintf("already exists, error=%s", st.Message()),
-			Code:    models.ErrCodeAlreadyExists,
-		}
-
-	case codes.Internal, codes.Unavailable:
-		return models.Error{
-			Message: fmt.Sprintf("internal error, error=%s", st.Message()),
+			Message: fmt.Sprintf("unexpected error: %v", err),
 			Code:    models.ErrCodeInternal,
 		}
+	}
 
-	case codes.InvalidArgument:
-		return models.Error{
-			Message: fmt.Sprintf("invalid argument, error=%s", st.Message()),
-			Code:    models.ErrCodeInvalidArgument,
-		}
+	code := status.Code(err)
+	msg := st.Message()
 
-	case codes.NotFound:
-		return models.Error{
-			Message: fmt.Sprintf("not found, error=%s", st.Message()),
-			Code:    models.ErrCodeNotFound,
-		}
+	groups := map[codes.Code]models.ErrCode{
+		codes.AlreadyExists:      models.ErrCodeAlreadyExists,
+		codes.InvalidArgument:    models.ErrCodeInvalidArgument,
+		codes.OutOfRange:         models.ErrCodeInvalidArgument,
+		codes.NotFound:           models.ErrCodeNotFound,
+		codes.Unauthenticated:    models.ErrCodeAccess,
+		codes.PermissionDenied:   models.ErrCodeAccess,
+		codes.Canceled:           models.ErrCodeCanceled,
+		codes.DeadlineExceeded:   models.ErrCodeDeadlineExceeded,
+		codes.ResourceExhausted:  models.ErrCodeResourceExhausted,
+		codes.FailedPrecondition: models.ErrCodeFailedPrecondition,
+		codes.Aborted:            models.ErrCodeAborted,
+		codes.Internal:           models.ErrCodeInternal,
+		codes.Unavailable:        models.ErrCodeInternal,
+		codes.Unknown:            models.ErrCodeInternal,
+		codes.Unimplemented:      models.ErrCodeInternal,
+		codes.DataLoss:           models.ErrCodeInternal,
+	}
 
-	default:
-		return models.Error{
-			Message: fmt.Sprintf("unexpected error=%s", st.Message()),
-			Code:    models.ErrCodeInternal,
-		}
+	errCode, exists := groups[code]
+	label := "unexpected"
+	if exists {
+		label = strings.ReplaceAll(strings.ToLower(string(errCode)), "_", " ")
+	}
+
+	return models.Error{
+		Message: fmt.Sprintf("%s: %s", label, msg),
+		Code:    errCode,
 	}
 }
 

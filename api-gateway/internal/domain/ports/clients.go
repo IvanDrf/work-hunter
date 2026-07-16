@@ -11,7 +11,7 @@ type AuthClient interface {
 
 	SendRegisterRequest(ctx context.Context, email string, password string, role models.UserRole) (*models.Tokens, error)
 	SendLoginRequest(ctx context.Context, email string, password string) (*models.Tokens, error)
-	SendChangePasswordRequest(ctx context.Context, access string, old string, new string) error
+	SendChangePasswordRequest(ctx context.Context, access string, oldPassword string, newPassword string) error
 	SendDeleteUserRequest(ctx context.Context, access string, password string) error
 
 	SendVerificationEmailRequest(ctx context.Context, access string) error
