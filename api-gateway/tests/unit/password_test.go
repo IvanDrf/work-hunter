@@ -1,4 +1,4 @@
-package unit
+package unit_test
 
 import (
 	"testing"
@@ -29,5 +29,4 @@ func TestIsPasswordValid(t *testing.T) {
 	for _, user := range validPasswords {
 		assert.True(t, user.IsValid())
 	}
-
 }

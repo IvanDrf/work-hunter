@@ -1,4 +1,4 @@
-package unit
+package unit_test
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// IsUserValid checks only if email or password is empty, email validation is executing in auth service
+// IsUserValid checks only if email or password is empty, email validation is executing in auth service.
 func TestIsUserValid(t *testing.T) {
 	t.Parallel()
 
