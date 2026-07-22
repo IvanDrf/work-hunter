@@ -34,7 +34,7 @@ func (r *UserRepository) CreateUser(ctx context.Context, user *models.User) erro
 		:status, :role, :verificated
 	)`
 
-	_, err := r.DB.NamedExecContext(ctx, query, user)
+	_, err := r.db.NamedExecContext(ctx, query, user)
 	if err != nil {
 		if isUniqueViolation(err) {
 			return models.Error{
@@ -58,7 +58,7 @@ func (r *UserRepository) GetUserByID(ctx context.Context, id uuid.UUID) (*models
 	`
 
 	var user models.User
-	err := r.DB.GetContext(ctx, &user, query, id)
+	err := r.db.GetContext(ctx, &user, query, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, models.Error{
@@ -83,7 +83,7 @@ func (r *UserRepository) GetUserByEmail(ctx context.Context, email string) (*mod
 	`
 
 	var user models.User
-	err := r.DB.GetContext(ctx, &user, query, email)
+	err := r.db.GetContext(ctx, &user, query, email)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, models.Error{
@@ -111,7 +111,7 @@ func (r *UserRepository) UpdateUser(ctx context.Context, updatedUser *models.Use
 	WHERE id = :id AND status != 'deleted'
 	`
 
-	_, err := r.DB.NamedExecContext(ctx, query, updatedUser)
+	_, err := r.db.NamedExecContext(ctx, query, updatedUser)
 	if err != nil {
 		return models.Error{
 			Message: fmt.Sprintf("failed to update user: %v", err),
@@ -135,7 +135,7 @@ func (r *UserRepository) DeleteUser(ctx context.Context, id uuid.UUID, permanent
 		`
 	}
 
-	_, err := r.DB.ExecContext(ctx, query, id)
+	_, err := r.db.ExecContext(ctx, query, id)
 
 	if err != nil {
 		return models.Error{
@@ -206,7 +206,7 @@ func (r *UserRepository) ListUsers(ctx context.Context, params *models.ListUsers
 
 	countQuery := "SELECT COUNT(*) " + baseQuery + whereClause
 	var totalCount int32
-	if err := r.DB.GetContext(ctx, &totalCount, countQuery, args[:len(args)-2]...); err != nil {
+	if err := r.db.GetContext(ctx, &totalCount, countQuery, args[:len(args)-2]...); err != nil {
 		return nil, 0, fmt.Errorf("failed to count users: %w", err)
 	}
 
@@ -216,7 +216,7 @@ func (r *UserRepository) ListUsers(ctx context.Context, params *models.ListUsers
 
 	query := "SELECT * " + baseQuery + whereClause + orderClause + paginationClause
 	var users []*models.User
-	if err := r.DB.SelectContext(ctx, &users, query, args...); err != nil {
+	if err := r.db.SelectContext(ctx, &users, query, args...); err != nil {
 		return nil, 0, fmt.Errorf("failed to list users: %w", err)
 	}
 
@@ -230,7 +230,7 @@ func (r *UserRepository) UpdateUserStatus(ctx context.Context, id uuid.UUID, sta
 	WHERE id = $2;
 	`
 
-	_, err := r.DB.ExecContext(ctx, query, status, id)
+	_, err := r.db.ExecContext(ctx, query, status, id)
 	if err != nil {
 		return models.Error{
 			Message: fmt.Sprintf("failed to update user status: %v", err),

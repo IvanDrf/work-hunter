@@ -11,7 +11,7 @@ import (
 )
 
 type PostgresConnection struct {
-	DB *sqlx.DB
+	db *sqlx.DB
 }
 
 // create connection to postgres database
@@ -33,14 +33,20 @@ func NewPostgresConnection(cfg config.DBConfig) (*PostgresConnection, error) {
 	}
 
 	return &PostgresConnection{
-		DB: db,
+		db: db,
 	}, nil
 }
 
+func NewPostgresConnectionTest(db *sqlx.DB) *PostgresConnection {
+	return &PostgresConnection{
+		db: db,
+	}
+}
+
 func (c *PostgresConnection) GetDB() *sqlx.DB {
-	return c.DB
+	return c.db
 }
 
 func (c *PostgresConnection) Close() {
-	c.DB.Close()
+	c.db.Close()
 }

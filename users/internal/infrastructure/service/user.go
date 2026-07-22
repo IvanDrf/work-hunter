@@ -13,6 +13,11 @@ import (
 	"github.com/google/uuid"
 )
 
+const (
+	maxPageSize = 100
+	minPageSize = 1
+)
+
 type UserService struct {
 	repo repository.UserRepository
 	log  *logger.Logger
@@ -138,8 +143,8 @@ func (s *UserService) ListUsers(ctx context.Context, req *dto.ListUsersRequest) 
 	if req.Page < 1 {
 		req.Page = 1
 	}
-	if req.PageSize < 1 || req.PageSize > 100 {
-		req.PageSize = 100
+	if req.PageSize < minPageSize || req.PageSize > maxPageSize {
+		req.PageSize = maxPageSize
 	}
 
 	repoParams := models.ListUsersParams{

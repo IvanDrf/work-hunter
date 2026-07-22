@@ -16,9 +16,7 @@ func connect() (*postgres.UserRepository, sqlmock.Sqlmock) {
 
 	sqlxDB := sqlx.NewDb(db, "postgres")
 
-	conn := &postgres.PostgresConnection{
-		DB: sqlxDB,
-	}
+	conn := postgres.NewPostgresConnectionTest(sqlxDB)
 
 	repo := postgres.NewUserRepository(conn)
 	return repo, mock
