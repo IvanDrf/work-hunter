@@ -9,6 +9,7 @@ import (
 	"github.com/IvanDrf/work-hunter/auth/tests/common"
 	"github.com/IvanDrf/work-hunter/auth/tests/service/fixtures"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestRefreshTokens(t *testing.T) {
@@ -28,11 +29,12 @@ func TestRefreshTokens(t *testing.T) {
 }
 
 func testRefreshValidTokens(t *testing.T, auth *service.AuthService, tokens []string) {
+	t.Helper()
 	t.Parallel()
 
 	for i, refresh := range tokens {
 		access, ref, err := auth.RefreshTokens(t.Context(), refresh)
-		assert.Nil(t, err)
+		require.NoError(t, err)
 
 		userID := common.TestTokenValidatation(t, access, ref, false)
 		assert.Equal(t, fixtures.UserIDs[i], userID)
@@ -40,11 +42,12 @@ func testRefreshValidTokens(t *testing.T, auth *service.AuthService, tokens []st
 }
 
 func testRefreshInvalidTokens(t *testing.T, auth *service.AuthService, tokens []string) {
+	t.Helper()
 	t.Parallel()
 
 	for _, refresh := range tokens {
 		access, ref, err := auth.RefreshTokens(t.Context(), refresh)
-		assert.NotNil(t, err)
+		require.Error(t, err)
 
 		var e models.Error
 		if errors.As(err, &e) {

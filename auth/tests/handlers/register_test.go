@@ -9,6 +9,7 @@ import (
 	"github.com/IvanDrf/work-hunter/auth/tests/handlers/fixtures"
 	auth_api "github.com/IvanDrf/work-hunter/pkg/auth-api"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -23,8 +24,8 @@ func TestRegisterHandler(t *testing.T) {
 	})
 
 	t.Run("Register already registred users", func(t *testing.T) {
-		// using the same handlers as Register users
-		//  cuz we need to check can we register already registred users
+		// using the same handlers as Register users.
+		//  cuz we need to check can we register already registred users.
 		testRegisterOldUsers(t, handlers)
 	})
 
@@ -44,47 +45,55 @@ func TestRegisterHandler(t *testing.T) {
 	})
 }
 
-// Test to register new users
+// Test to register new users.
 func testRegisterNewUsers(t *testing.T, handlers *handlers.Handler) {
+	t.Helper()
+
 	for _, req := range fixtures.Users {
 		resp, err := handlers.Register(t.Context(), req)
 
-		assert.Nil(t, err)
+		require.NoError(t, err)
 		assert.NotNil(t, resp)
-		// jwt tokens must be valid after successfull registration
-		common.TestTokenValidatation(t, resp.Access, resp.Refresh, false)
+		// jwt tokens must be valid after successful registration.
+		common.TestTokenValidatation(t, resp.GetAccess(), resp.GetRefresh(), false)
 	}
 }
 
-// Test to register users what already registred
+// Test to register users what already registred.
 func testRegisterOldUsers(t *testing.T, handlers *handlers.Handler) {
+	t.Helper()
+
 	for _, req := range fixtures.Users {
 		resp, err := handlers.Register(t.Context(), req)
 
+		require.Error(t, err)
 		assert.Nil(t, resp)
-		assert.NotNil(t, err)
 		assert.Contains(t, err.Error(), status.Error(codes.AlreadyExists, "").Error())
 	}
 }
 
-// Test to register users with invalid roles
+// Test to register users with invalid roles.
 func testRegisterInvalidRoleUsers(t *testing.T, handlers *handlers.Handler) {
+	t.Helper()
+
 	for _, req := range fixtures.InvalidRoleRequests {
 		resp, err := handlers.Register(t.Context(), req)
 
+		require.Error(t, err)
 		assert.Nil(t, resp)
-		assert.NotNil(t, err)
 		assert.Contains(t, err.Error(), status.Error(codes.InvalidArgument, "").Error())
 	}
 }
 
-// Test to register users with invalid passwords
+// Test to register users with invalid passwords.
 func testRegisterInvalidPasswordUsers(t *testing.T, handlers *handlers.Handler) {
+	t.Helper()
 	getErrorWithInvalidArgument(t, handlers, fixtures.InvalidPasswordRequests)
 }
 
-// Test to register users with invalid email
+// Test to register users with invalid email.
 func testRegisterInvalidEmailUsers(t *testing.T, handlers *handlers.Handler) {
+	t.Helper()
 	getErrorWithInvalidArgument(t, handlers, fixtures.InvalidEmailRequests)
 }
 
@@ -92,11 +101,13 @@ func testRegisterInvalidEmailUsers(t *testing.T, handlers *handlers.Handler) {
 //
 //	codes.InvalidArgument
 func getErrorWithInvalidArgument(t *testing.T, handlers *handlers.Handler, requests []*auth_api.User) {
+	t.Helper()
+
 	for _, req := range requests {
 		resp, err := handlers.Register(t.Context(), req)
 
+		require.Error(t, err)
 		assert.Nil(t, resp)
-		assert.NotNil(t, err)
 		assert.Contains(t, err.Error(), status.Error(codes.InvalidArgument, "").Error())
 	}
 }

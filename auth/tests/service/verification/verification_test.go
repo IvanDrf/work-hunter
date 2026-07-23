@@ -7,10 +7,10 @@ import (
 	"github.com/IvanDrf/work-hunter/auth/tests/service/fixtures"
 )
 
-// email producer queue size
+// email producer queue size.
 const size = 100
 
-// email producer queue
+// email producer queue.
 var Queue chan *models.EmailMessage = nil
 
 func newVerificationService() *service.VerificationService {

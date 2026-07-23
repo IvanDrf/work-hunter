@@ -32,16 +32,16 @@ type Tokens struct {
 	Refresh string
 }
 
-// Register users with handlers
+// Register users with handlers.
 func registerUsers(handlers *handlers.Handler, requests []*auth_api.User) map[string]*Tokens {
 	tokens := make(map[string]*Tokens, len(requests))
 
 	for _, req := range requests {
 		resp, _ := handlers.Register(context.TODO(), req)
 
-		tokens[req.Email] = &Tokens{
-			Access:  resp.Access,
-			Refresh: resp.Refresh,
+		tokens[req.GetEmail()] = &Tokens{
+			Access:  resp.GetAccess(),
+			Refresh: resp.GetRefresh(),
 		}
 	}
 
@@ -51,7 +51,7 @@ func registerUsers(handlers *handlers.Handler, requests []*auth_api.User) map[st
 func newHandlersWithVerifUsers(queue chan *models.EmailMessage) *handlers.Handler {
 	users := make(map[string]string, len(fixtures.Users))
 	for _, user := range fixtures.Users {
-		users[user.Email] = user.Password
+		users[user.GetEmail()] = user.GetPassword()
 	}
 
 	userRepo := mocks.NewFilledUserRepo(true, users)
