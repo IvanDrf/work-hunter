@@ -19,6 +19,12 @@ const (
 	ErrCodeInvalidJWT ErrorCode = "INVALID_JWT_TOKENS"
 )
 
+const (
+	CantCreateJWTMsg        = "can't create jwt token for user"
+	InvalidUserIDInTokenMsg = "invalid userID in jwt token"
+	InvalidJWTMsg           = "invalid jwt token"
+)
+
 type Error struct {
 	Message string    `json:"message"`
 	Code    ErrorCode `json:"code"`

@@ -1,10 +1,12 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"log/slog"
 	"net"
+	"time"
 
 	"github.com/IvanDrf/work-hunter/auth/internal/app/factory"
 	"github.com/IvanDrf/work-hunter/auth/internal/config"
@@ -35,15 +37,25 @@ func NewApp(cfg *config.Config) *App {
 }
 
 func (a *App) Run() {
-	l, err := net.Listen("tcp", fmt.Sprintf("%s:%d", a.cfg.AppHost, a.cfg.AppPort))
+	const connectionTime = 2 * time.Second
+	ctx, cancel := context.WithTimeout(context.Background(), connectionTime)
+	defer cancel()
+
+	config := &net.ListenConfig{}
+
+	l, err := config.Listen(ctx, "tcp", fmt.Sprintf("%s:%d", a.cfg.AppHost, a.cfg.AppPort))
 	if err != nil {
-		log.Fatalf("can't start AUTH service: %s", err)
+		cancel()
+		log.Printf("can't start AUTH service: %s", err)
+		return
 	}
 
 	slog.Info("Starting AUTH service", slog.String("host", a.cfg.AppHost), slog.Int("port", a.cfg.AppPort))
 
 	if err := a.server.Serve(l); err != nil {
-		log.Fatalf("can't start AUTH servie: %s", err)
+		cancel()
+		log.Printf("can't start AUTH servie: %s", err)
+		return
 	}
 }
 

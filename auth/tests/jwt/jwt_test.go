@@ -8,6 +8,7 @@ import (
 	"github.com/IvanDrf/work-hunter/auth/internal/infrastructure/jwt"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 const (
@@ -30,7 +31,8 @@ func TestCreateTokens(t *testing.T) {
 		Verificated: verificated,
 		Role:        role,
 	})
-	assert.Nil(t, err)
+
+	require.NoError(t, err)
 	assert.NotEmpty(t, access)
 	assert.NotEmpty(t, refresh)
 }
@@ -43,7 +45,7 @@ func TestGetTokenClaims(t *testing.T) {
 		Verificated: verificated,
 		Role:        role,
 	})
-	assert.Nil(t, err)
+	require.NoError(t, err)
 	assert.NotEmpty(t, access)
 	assert.NotEmpty(t, refresh)
 
@@ -52,7 +54,7 @@ func TestGetTokenClaims(t *testing.T) {
 
 	// check invalid token claims, payload should be nil
 	payload, err := jwter.GetPayload(invalid_token)
-	assert.NotNil(t, err)
+	require.Error(t, err)
 	assert.Nil(t, payload)
 }
 
@@ -60,9 +62,8 @@ func checkClaims(t *testing.T, token string) {
 	t.Helper()
 
 	payload, err := jwter.GetPayload(token)
-	assert.Nil(t, err)
 
-	assert.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, userID.String(), payload.UserID)
 	assert.Equal(t, verificated, payload.Verificated)
 	assert.Equal(t, role, payload.Role)

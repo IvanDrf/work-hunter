@@ -8,7 +8,7 @@ const (
 	EMPLOYER Role = "EMPLOYER"
 )
 
-var ROLES = map[string]Role{
+var ROLES = map[string]Role{ //nolint:gochecknoglobals
 	"ADMIN":    ADMIN,
 	"EMPLOYEE": EMPLOYEE,
 	"EMPLOYER": EMPLOYER,

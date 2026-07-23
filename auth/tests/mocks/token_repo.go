@@ -25,7 +25,7 @@ func NewTokenRepo() *tokenRepo {
 	}
 }
 
-// Returns new filled token repo with tokens for registres users from fixtures.Users
+// NewFilledTokenRepo returns new filled token repo with tokens for registres users from fixtures.Users.
 func NewFilledTokenRepo() *tokenRepo {
 	tokenRepo := NewTokenRepo()
 	i := 0
@@ -70,7 +70,6 @@ func (t *tokenRepo) DeleteToken(ctx context.Context, token string) error {
 		Code:    models.ErrCodeInternal,
 		Message: "can't delete token",
 	}
-
 }
 
 func (t *tokenRepo) Close() {

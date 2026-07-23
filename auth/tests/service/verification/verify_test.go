@@ -9,11 +9,10 @@ import (
 	"github.com/IvanDrf/work-hunter/auth/tests/common"
 	"github.com/IvanDrf/work-hunter/auth/tests/service/fixtures"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestVerifyEmailByToken(t *testing.T) {
-	// should not be parallel, because we use common Queue for SendVerificationEmail and VerifyEmailByToken
-
 	verif := newVerificationService()
 
 	// verify emails for registred users
@@ -24,19 +23,22 @@ func TestVerifyEmailByToken(t *testing.T) {
 	t.Run("Verify email by token with invalid tokens", func(t *testing.T) {
 		testVerifyEmailByTokenInvalidToken(t, verif)
 	})
-
 }
 
 func testVerifyEmailByToken(t *testing.T, verif *service.VerificationService) {
+	t.Helper()
+
 	for _, token := range fixtures.Tokens {
 		access, refresh, err := verif.VerifyEmailByToken(t.Context(), token)
-		assert.Nil(t, err)
+		require.NoError(t, err)
 
 		common.TestTokenValidatation(t, access, refresh, true) // jwt tokens should be valud and status = true verificated
 	}
 }
 
 func testVerifyEmailByTokenInvalidToken(t *testing.T, verif *service.VerificationService) {
+	t.Helper()
+
 	for _, token := range fixtures.UnusedTokens {
 		access, refresh, err := verif.VerifyEmailByToken(t.Context(), token)
 

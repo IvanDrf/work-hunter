@@ -14,5 +14,5 @@ type RabbitMQConfig struct {
 }
 
 func (r *RabbitMQConfig) RABBITMQ_DSN() string {
-	return fmt.Sprintf("amqp://%s:%s@%s:%d/", r.RabbitMQUsername, r.RabbitMQPassword, r.RabbitMQHost, r.RabbitMQPort)
+	return fmt.Sprintf("amqp://%s:%s@%s:%d/", r.RabbitMQUsername, r.RabbitMQPassword, r.RabbitMQHost, r.RabbitMQPort) //nolint:nosprintfhostport
 }
