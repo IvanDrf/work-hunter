@@ -15,8 +15,6 @@ import (
 )
 
 type authClient struct {
-	host    string
-	port    int
 	retries int
 
 	conn   *grpc.ClientConn
@@ -24,10 +22,8 @@ type authClient struct {
 }
 
 func NewAuthClient(host string, port int, retries int) *authClient {
-	client, conn := connect(host, port)
+	client, conn := connectToAuth(host, port)
 	return &authClient{
-		host:    host,
-		port:    port,
 		retries: retries,
 
 		client: client,
@@ -35,7 +31,7 @@ func NewAuthClient(host string, port int, retries int) *authClient {
 	}
 }
 
-func connect(host string, port int) (auth_api.AuthClient, *grpc.ClientConn) {
+func connectToAuth(host string, port int) (auth_api.AuthClient, *grpc.ClientConn) {
 	log := slog.With(slog.String("client", "auth"))
 	conn, err := grpc.NewClient(fmt.Sprintf("%s:%d", host, port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {

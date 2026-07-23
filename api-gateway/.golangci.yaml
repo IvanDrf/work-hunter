@@ -32,7 +32,6 @@ linters:
     - ginkgolinter
     - gocheckcompilerdirectives
     - gochecknoglobals
-    - gochecknoinits
     - gochecksumtype
     - gocognit
     - goconst
@@ -72,7 +71,6 @@ linters:
     - nolintlint
     - nonamedreturns
     - nosprintfhostport
-    - paralleltest
     - prealloc
     - predeclared
     - promlinter
@@ -108,11 +106,24 @@ linters:
       enable:
         - shadow
 
+    funlen:
+      lines: 80
+
     revive:
       rules:
         - name: exported
           disabled: true
 
+    tagliatelle:
+      case:
+        rules:
+          json: snake
+
+  exclusions:
+    rules:
+      - path: tests/
+        linters:
+          - gochecknoglobals
 issues:
   max-issues-per-linter: 0
   max-same-issues: 0

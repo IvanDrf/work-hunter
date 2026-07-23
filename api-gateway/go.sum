@@ -2,6 +2,8 @@ github.com/IvanDrf/work-hunter/pkg/auth-api v0.0.0-20260713061833-2a4ace53c655 h
 github.com/IvanDrf/work-hunter/pkg/auth-api v0.0.0-20260713061833-2a4ace53c655/go.mod h1:Pu6L56yGB7ayaTcpKnIgdHG8dW+X/XoJqXR7VYahB4I=
 github.com/IvanDrf/work-hunter/pkg/common v0.0.0-20260713061833-2a4ace53c655 h1:YxddvXZWEMYcXe68PCAipgIYxfNaGYySFie/GVRU8Zc=
 github.com/IvanDrf/work-hunter/pkg/common v0.0.0-20260713061833-2a4ace53c655/go.mod h1:z6NaDjAIy4urS4mVrNt0MV9e8wngU9LvPJ0lJm5DXFY=
+github.com/IvanDrf/work-hunter/pkg/vacancy_api v0.0.0-20260715091351-3e82704bd23a h1:Y+dLeOEVPvrPWobcuuWm4y51wfP7l3A1WcYZm39nt+s=
+github.com/IvanDrf/work-hunter/pkg/vacancy_api v0.0.0-20260715091351-3e82704bd23a/go.mod h1:v6eILbA/HMCMCVQGeBf9uuJdAz0+B3Hf9L3B2mIXQ9w=
 github.com/caarlos0/env/v11 v11.4.1 h1:fYwH0sWEsBSMPG7t4e/PEfTFzrWrpjyygXyUnWiSwEw=
 github.com/caarlos0/env/v11 v11.4.1/go.mod h1:qupehSf/Y0TUTsxKywqRt/vJjN5nz6vauiYEUUr8P4U=
 github.com/cespare/xxhash/v2 v2.3.0 h1:UL815xU9SqsFlibzuggzjXhog7bL6oX9BbNZnL2UFvs=

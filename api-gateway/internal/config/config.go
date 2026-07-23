@@ -35,7 +35,7 @@ type Config struct {
 
 	Vacancy struct {
 		Host string `env:"VACANCY_HOST"`
-		Port string `env:"VACANCY_PORT"`
+		Port int    `env:"VACANCY_PORT"`
 	}
 
 	Validation struct {

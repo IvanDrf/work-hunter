@@ -15,15 +15,17 @@ const (
 )
 
 type Handlers struct {
-	authClient ports.AuthClient
+	authClient    ports.AuthClient
+	vacancyClient ports.VacancyClient
 
 	requestTime time.Duration
 }
 
-func NewHandlers(authClient ports.AuthClient, requestTime time.Duration) *Handlers {
+func NewHandlers(authClient ports.AuthClient, vacancyClient ports.VacancyClient, requestTime time.Duration) *Handlers {
 	return &Handlers{
-		authClient:  authClient,
-		requestTime: requestTime,
+		authClient:    authClient,
+		vacancyClient: vacancyClient,
+		requestTime:   requestTime,
 	}
 }
 
@@ -49,6 +51,7 @@ func (h *Handlers) checkClientsHealth(ctx context.Context, healthCheckTime time.
 		select {
 		case <-ticker.C:
 			h.authClient.Health(ctx)
+			h.vacancyClient.Health(ctx)
 		case <-ctx.Done():
 			return
 		}

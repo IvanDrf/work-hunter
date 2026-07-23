@@ -22,3 +22,7 @@ type AuthClient interface {
 
 	Close()
 }
+
+type VacancyClient interface {
+	Health(ctx context.Context)
+}
