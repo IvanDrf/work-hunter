@@ -6,7 +6,7 @@ import (
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
 )
 
-// fixtures
+// fixtures.
 var (
 	content = map[string]string{
 		"first@gmaill.com": "12345Qwerty",

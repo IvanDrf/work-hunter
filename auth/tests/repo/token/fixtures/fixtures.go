@@ -2,7 +2,7 @@ package fixtures
 
 import "github.com/IvanDrf/work-hunter/auth/internal/domain/rules"
 
-// fixtures
+// fixtures.
 var (
 	Content = map[string]string{
 		"second@gmail.com": rules.GenerateToken(),

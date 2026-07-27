@@ -8,6 +8,7 @@ import (
 	"github.com/IvanDrf/work-hunter/auth/internal/infrastructure/persistence/postgres"
 	"github.com/IvanDrf/work-hunter/auth/tests/repo/user/fixtures"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func connect() (*postgres.UserRepo, sqlmock.Sqlmock) {
@@ -34,10 +35,10 @@ func TestCreateUser(t *testing.T) {
 			WillReturnResult(sqlmock.NewResult(0, 0))
 
 		err := repo.CreateUser(t.Context(), user)
-		assert.Nil(t, err)
+		require.NoError(t, err)
 	}
 
-	assert.Nil(t, mock.ExpectationsWereMet())
+	require.NoError(t, mock.ExpectationsWereMet())
 }
 
 func TestDeleteUser(t *testing.T) {
@@ -54,10 +55,10 @@ func TestDeleteUser(t *testing.T) {
 			WillReturnResult(sqlmock.NewResult(0, 1))
 
 		err := repo.DeleteUser(t.Context(), user.Email)
-		assert.Nil(t, err)
+		require.NoError(t, err)
 	}
 
-	assert.Nil(t, mock.ExpectationsWereMet())
+	require.NoError(t, mock.ExpectationsWereMet())
 }
 
 func TestFindUserByEmail(t *testing.T) {
@@ -77,7 +78,7 @@ func TestFindUserByEmail(t *testing.T) {
 
 		u, err := repo.FindUserByEmail(t.Context(), user.Email)
 
-		assert.Nil(t, err)
+		require.NoError(t, err)
 		assert.Equal(t, user.ID, u.ID)
 		assert.Equal(t, user.Email, u.Email)
 		assert.Equal(t, user.HashedPassword, u.HashedPassword)
@@ -85,7 +86,7 @@ func TestFindUserByEmail(t *testing.T) {
 		assert.Equal(t, user.Role, u.Role)
 	}
 
-	assert.Nil(t, mock.ExpectationsWereMet())
+	require.NoError(t, mock.ExpectationsWereMet())
 }
 
 func TestFindUserByID(t *testing.T) {
@@ -104,17 +105,17 @@ func TestFindUserByID(t *testing.T) {
 
 		u, err := repo.FindUserByID(t.Context(), user.ID)
 
-		assert.Nil(t, err)
+		require.NoError(t, err)
 		assert.Equal(t, user.ID, u.ID)
 		assert.Equal(t, user.Email, u.Email)
 		assert.Equal(t, user.HashedPassword, u.HashedPassword)
 		assert.Equal(t, user.Verificated, u.Verificated)
 		assert.Equal(t, user.Role, u.Role)
 
-		assert.Nil(t, mock.ExpectationsWereMet())
+		require.NoError(t, mock.ExpectationsWereMet())
 	}
 
-	assert.Nil(t, mock.ExpectationsWereMet())
+	require.NoError(t, mock.ExpectationsWereMet())
 }
 
 func TestVerifyEmail(t *testing.T) {
@@ -132,8 +133,8 @@ func TestVerifyEmail(t *testing.T) {
 
 		err := repo.VerifyEmail(t.Context(), user.Email)
 
-		assert.Nil(t, err)
+		require.NoError(t, err)
 	}
 
-	assert.Nil(t, mock.ExpectationsWereMet())
+	require.NoError(t, mock.ExpectationsWereMet())
 }

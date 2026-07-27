@@ -5,6 +5,7 @@ import (
 
 	"github.com/IvanDrf/work-hunter/pkg/common"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestHealth(t *testing.T) {
@@ -13,7 +14,7 @@ func TestHealth(t *testing.T) {
 	handlers := newHandlers(nil)
 
 	resp, err := handlers.Health(t.Context(), &common.Empty{})
-	assert.Nil(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, resp)
-	assert.Equal(t, resp.Status, common.Status_AVAILABLE)
+	assert.Equal(t, common.Status_AVAILABLE, resp.GetStatus())
 }

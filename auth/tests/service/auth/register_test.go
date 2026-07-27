@@ -9,11 +9,10 @@ import (
 	"github.com/IvanDrf/work-hunter/auth/tests/common"
 	"github.com/IvanDrf/work-hunter/auth/tests/service/fixtures"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestRegisterUser(t *testing.T) {
-	t.Parallel()
-
 	auth := newAuthService()
 
 	t.Run("Register new users", func(t *testing.T) {
@@ -23,13 +22,14 @@ func TestRegisterUser(t *testing.T) {
 	t.Run("Register old users", func(t *testing.T) {
 		testRegisterOldUsers(t, auth)
 	})
-
 }
 
 func testRegisterNewUsers(t *testing.T, auth *service.AuthService) {
+	t.Helper()
+
 	for email, password := range fixtures.Users {
 		access, refresh, err := auth.RegisterUser(t.Context(), email, password, string(models.EMPLOYEE))
-		assert.Nil(t, err)
+		require.NoError(t, err)
 		assert.NotEmpty(t, access)
 		assert.NotEmpty(t, refresh)
 
@@ -39,15 +39,16 @@ func testRegisterNewUsers(t *testing.T, auth *service.AuthService) {
 }
 
 func testRegisterOldUsers(t *testing.T, auth *service.AuthService) {
-	//users already registred, should be errors
+	t.Helper()
+
+	// users already registred, should be errors
 	for email, password := range fixtures.Users {
 		access, refresh, err := auth.RegisterUser(t.Context(), email, password, string(models.EMPLOYEE))
-		assert.NotNil(t, err)
+		require.Error(t, err)
 
 		var e models.Error
 		if errors.As(err, &e) {
 			assert.Equal(t, models.ErrCodeUserAlreadyExists, e.Code)
-
 		} else {
 			t.Fatal("should be models Error in auth service RegisterUser")
 		}
