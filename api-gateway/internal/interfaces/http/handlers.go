@@ -55,6 +55,7 @@ func (h *Handlers) checkClientsHealth(ctx context.Context, healthCheckTime time.
 		select {
 		case <-ticker.C:
 			h.authClient.Health(ctx)
+			h.userClient.Health(ctx)
 			h.vacancyClient.Health(ctx)
 		case <-ctx.Done():
 			return

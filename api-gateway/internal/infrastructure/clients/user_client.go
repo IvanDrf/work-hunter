@@ -48,7 +48,7 @@ func (c *userClient) Close() {
 }
 
 func (c *userClient) Health(ctx context.Context) {
-
+	panic("UserClient not implemented Health")
 }
 
 func (c *userClient) SendGetCompanyName(ctx context.Context, userID string) (string, error) {
