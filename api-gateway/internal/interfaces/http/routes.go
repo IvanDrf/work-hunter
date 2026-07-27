@@ -7,6 +7,7 @@ func (s *Server) registerRoutes() {
 
 	s.registerHealthRoute(mux)
 	s.registerAuthRoutes(mux)
+	s.registerVacancyRoutes(mux)
 
 	s.server.Handler = mux
 }
@@ -25,4 +26,9 @@ func (s *Server) registerAuthRoutes(mux *http.ServeMux) {
 
 	mux.HandleFunc("POST /api/auth/email/send", s.handlers.SendVerificationEmail)
 	mux.HandleFunc("POST /api/auth/email/verify", s.handlers.VerifyEmail)
+}
+
+func (s *Server) registerVacancyRoutes(mux *http.ServeMux) {
+	mux.HandleFunc("POST /api/vacancy", s.middleware.RegistredMiddleware(s.handlers.CreateVacancy))
+	mux.HandleFunc("GET /api/vacancy", s.middleware.ProbablyUnregistredMiddleware(s.handlers.FindVacancyByID))
 }

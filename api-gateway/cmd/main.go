@@ -17,7 +17,7 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	go app.Start(ctx, config.App.HealthCheckTime)
+	go app.Start(ctx, config.App.PeriodCheckHealthTime)
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT)

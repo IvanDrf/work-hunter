@@ -20,6 +20,7 @@ func (h *Handlers) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	ctx = adapters.InsertLogger(ctx, log)
 
 	if status, err := validateHeaders(r); err != nil {
+		log.InfoContext(ctx, "invalid headers", slog.String("error", err.Error()))
 		w.WriteHeader(status)
 		json.NewEncoder(w).Encode(err)
 		return
@@ -45,6 +46,7 @@ func (h *Handlers) RegisterUser(w http.ResponseWriter, r *http.Request) {
 
 	tokens, err := h.authClient.SendRegisterRequest(ctx, user.Email, user.Password, user.Role)
 	if err != nil {
+		log.InfoContext(ctx, "error in RegisterUser", slog.String("error", err.Error()))
 		handleResponseError(w, err)
 		return
 	}
@@ -53,6 +55,7 @@ func (h *Handlers) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, access)
 	http.SetCookie(w, refresh)
 
+	log.InfoContext(ctx, "success")
 	w.WriteHeader(http.StatusNoContent)
 }
 

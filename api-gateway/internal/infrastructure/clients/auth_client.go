@@ -56,7 +56,9 @@ func (c *authClient) Health(ctx context.Context) {
 	log := slog.With(slog.String("client", "auth"))
 	ctx = adapters.InsertLogger(ctx, log)
 
-	resp, err := retry(ctx, c.retries, func() (any, error) {
+	const healthRetries = 2
+
+	resp, err := retry(ctx, healthRetries, func() (any, error) {
 		resp, err := c.client.Health(ctx, nil)
 		if err != nil {
 			log.ErrorContext(ctx, "can't check auth service health, auth service returned error", slog.String("error", err.Error()))

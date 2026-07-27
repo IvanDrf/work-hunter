@@ -11,8 +11,8 @@ type App struct {
 	server *http.Server
 }
 
-func (app *App) Start(ctx context.Context, healthCheckTime time.Duration) {
-	app.server.Start(ctx, healthCheckTime)
+func (app *App) Start(ctx context.Context, periodCheckHealthTime time.Duration) {
+	app.server.Start(ctx, periodCheckHealthTime)
 }
 
 func (app *App) Stop(ctx context.Context) {

@@ -14,13 +14,13 @@ import (
 
 func validateHeaders(r *http.Request) (int, error) {
 	if r.Header.Get("Content-Type") != "application/json" {
-		return 0, models.Error{
+		return http.StatusUnsupportedMediaType, models.Error{
 			Message: fmt.Sprintf("content type is not application/json, type=%s", r.Header.Get("Content-Type")),
 			Code:    models.ErrCodeUnsupportedMediaType,
 		}
 	}
 
-	return http.StatusUnsupportedMediaType, nil
+	return 0, nil
 }
 
 func handleResponseError(w http.ResponseWriter, err error) {
@@ -117,7 +117,7 @@ func validateModel(ctx context.Context, w http.ResponseWriter, model validator, 
 }
 
 func getUserInfo(ctx context.Context) (*models.UserInfo, error) {
-	val := ctx.Value("user_info")
+	val := ctx.Value(payloadKey)
 
 	userInfo, ok := val.(*models.UserInfo)
 	if !ok {

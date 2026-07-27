@@ -57,7 +57,9 @@ func (c *vacancyClient) Health(ctx context.Context) {
 	log := slog.With(slog.String("client", "vacancy"))
 	ctx = adapters.InsertLogger(ctx, log)
 
-	resp, err := retry(ctx, c.retries, func() (any, error) {
+	const healthRetries = 2
+
+	resp, err := retry(ctx, healthRetries, func() (any, error) {
 		resp, err := c.client.Health(ctx, nil)
 		if err != nil {
 			log.ErrorContext(ctx, "can't check vacancy service health, vacancy service returned error", slog.String("error", err.Error()))

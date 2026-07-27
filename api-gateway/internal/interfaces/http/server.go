@@ -27,11 +27,11 @@ func NewServer(host string, port int, handlers *Handlers, middleware *AuthMiddle
 	}
 }
 
-func (s *Server) Start(ctx context.Context, healthCheckTime time.Duration) {
+func (s *Server) Start(ctx context.Context, periodCheckHealthTime time.Duration) {
 	l := slog.With(slog.String("server", "http"))
 
 	s.registerRoutes()
-	go s.checkServicesHealth(ctx, healthCheckTime)
+	go s.checkServicesHealth(ctx, periodCheckHealthTime)
 
 	l.Info("Starting server", slog.String("addr", s.server.Addr))
 	if err := s.server.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
@@ -46,6 +46,6 @@ func (s *Server) Close(ctx context.Context) {
 	s.handlers.close()
 }
 
-func (s *Server) checkServicesHealth(ctx context.Context, healthCheckTime time.Duration) {
-	s.handlers.checkClientsHealth(ctx, healthCheckTime)
+func (s *Server) checkServicesHealth(ctx context.Context, periodCheckHealthTime time.Duration) {
+	s.handlers.checkClientsHealth(ctx, periodCheckHealthTime)
 }

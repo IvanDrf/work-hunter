@@ -22,9 +22,17 @@ func (h *Handlers) CreateVacancy(w http.ResponseWriter, r *http.Request) {
 
 	userInfo, err := getUserInfo(ctx)
 	if err != nil {
+		log.InfoContext(ctx, "can't get user info", slog.String("error", err.Error()))
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(err)
+		return
+	}
+
+	if status, e := validateHeaders(r); e != nil {
+		log.InfoContext(ctx, "invalid headers", slog.String("error", e.Error()))
+		w.WriteHeader(status)
+		json.NewEncoder(w).Encode(e)
 		return
 	}
 
@@ -43,16 +51,19 @@ func (h *Handlers) CreateVacancy(w http.ResponseWriter, r *http.Request) {
 
 	companyName, err := h.userClient.SendGetCompanyName(ctx, userInfo.UserID)
 	if err != nil {
+		log.InfoContext(ctx, "error in SendGetCompanyName", slog.String("error", err.Error()))
 		handleResponseError(w, err)
 		return
 	}
 
 	resp, err := h.vacancyClient.SendCreateVacancy(ctx, vacancy, userInfo, companyName)
 	if err != nil {
+		log.InfoContext(ctx, "error in SendCreateVacancy", slog.String("error", err.Error()))
 		handleResponseError(w, err)
 		return
 	}
 
+	log.InfoContext(ctx, "success")
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(resp)
@@ -69,6 +80,7 @@ func (h *Handlers) FindVacancyByID(w http.ResponseWriter, r *http.Request) {
 
 	id := r.URL.Query().Get("vacancy")
 	if id == "" {
+		log.InfoContext(ctx, "invalid vacancy id in query", slog.String("vacancyID", id))
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadGateway)
 		json.NewEncoder(w).Encode(models.Error{
@@ -80,7 +92,7 @@ func (h *Handlers) FindVacancyByID(w http.ResponseWriter, r *http.Request) {
 
 	vacancyID, err := strconv.ParseUint(id, 10, 64)
 	if err != nil {
-		log.Info("invalid vacancy id in query", slog.String("error", err.Error()))
+		log.InfoContext(ctx, "invalid vacancy id in query", slog.String("error", err.Error()))
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(models.Error{
@@ -94,10 +106,12 @@ func (h *Handlers) FindVacancyByID(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := h.vacancyClient.SendFindVacancyByID(ctx, vacancyID, userInfo)
 	if err != nil {
+		log.InfoContext(ctx, "error in SendFindVacancyByID", slog.String("error", err.Error()))
 		handleResponseError(w, err)
 		return
 	}
 
+	slog.InfoContext(ctx, "success")
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(resp)

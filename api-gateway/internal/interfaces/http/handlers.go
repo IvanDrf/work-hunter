@@ -46,19 +46,25 @@ func (h *Handlers) close() {
 	h.vacancyClient.Close()
 }
 
-func (h *Handlers) checkClientsHealth(ctx context.Context, healthCheckTime time.Duration) {
+func (h *Handlers) checkClientsHealth(ctx context.Context, periodCheckTime time.Duration) {
 	defer slog.InfoContext(ctx, "stoppping clients health check")
-	ticker := time.NewTicker(healthCheckTime)
+	ticker := time.NewTicker(periodCheckTime)
 	defer ticker.Stop()
+
+	h.sendHealthChecks(ctx)
 
 	for {
 		select {
 		case <-ticker.C:
-			h.authClient.Health(ctx)
-			h.userClient.Health(ctx)
-			h.vacancyClient.Health(ctx)
+			h.sendHealthChecks(ctx)
 		case <-ctx.Done():
 			return
 		}
 	}
+}
+
+func (h *Handlers) sendHealthChecks(ctx context.Context) {
+	h.authClient.Health(ctx)
+	h.userClient.Health(ctx)
+	h.vacancyClient.Health(ctx)
 }

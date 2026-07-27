@@ -19,8 +19,8 @@ type Config struct {
 		RequestTime time.Duration `env:"REQUEST_TIME"`
 		Retries     int           `env:"RETRIES"`
 
-		ShutdownTime    time.Duration `env:"SHUTDOWN_TIME"`
-		HealthCheckTime time.Duration `env:"HEALTH_CHECK_TIME"`
+		ShutdownTime          time.Duration `env:"SHUTDOWN_TIME"`
+		PeriodCheckHealthTime time.Duration `env:"HEALTH_CHECK_TIME"`
 	}
 
 	Auth struct {
