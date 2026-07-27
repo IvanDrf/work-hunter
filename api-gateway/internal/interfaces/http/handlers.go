@@ -42,6 +42,8 @@ func (h *Handlers) Health(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handlers) close() {
 	h.authClient.Close()
+	h.userClient.Close()
+	h.vacancyClient.Close()
 }
 
 func (h *Handlers) checkClientsHealth(ctx context.Context, healthCheckTime time.Duration) {
