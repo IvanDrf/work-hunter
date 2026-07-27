@@ -14,7 +14,7 @@ func (h *Handlers) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), h.requestTime)
 	defer cancel()
 
-	log := slog.With(slog.String("handlers", "register"))
+	log := slog.With(slog.String("handlers", "RegisterUser"))
 	log.InfoContext(ctx, "request")
 
 	ctx = adapters.InsertLogger(ctx, log)
@@ -60,7 +60,7 @@ func (h *Handlers) LoginUser(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), h.requestTime)
 	defer cancel()
 
-	log := slog.With(slog.String("handlers", "login"))
+	log := slog.With(slog.String("handlers", "LoginUser"))
 	log.InfoContext(ctx, "request")
 
 	ctx = adapters.InsertLogger(ctx, log)
@@ -106,7 +106,7 @@ func (h *Handlers) ChangeUserPassword(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), h.requestTime)
 	defer cancel()
 
-	log := slog.With(slog.String("handlers", "change-password"))
+	log := slog.With(slog.String("handlers", "ChangeUserPassword"))
 	log.InfoContext(ctx, "request")
 
 	ctx = adapters.InsertLogger(ctx, log)
@@ -153,7 +153,7 @@ func (h *Handlers) RefreshTokens(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), h.requestTime)
 	defer cancel()
 
-	log := slog.With(slog.String("handlers", "refresh-tokens"))
+	log := slog.With(slog.String("handlers", "RefreshTokens"))
 	log.InfoContext(ctx, "request")
 
 	ctx = adapters.InsertLogger(ctx, log)
@@ -181,7 +181,7 @@ func (h *Handlers) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), h.requestTime)
 	defer cancel()
 
-	log := slog.With(slog.String("handlers", "delete-user"))
+	log := slog.With(slog.String("handlers", "DeleteUser"))
 	log.InfoContext(ctx, "request")
 
 	ctx = adapters.InsertLogger(ctx, log)
@@ -226,7 +226,7 @@ func (h *Handlers) SendVerificationEmail(w http.ResponseWriter, r *http.Request)
 	ctx, cancel := context.WithTimeout(r.Context(), h.requestTime)
 	defer cancel()
 
-	log := slog.With(slog.String("handlers", "send-verification-email"))
+	log := slog.With(slog.String("handlers", "SendVerificationEmail"))
 	log.InfoContext(ctx, "request")
 
 	ctx = adapters.InsertLogger(ctx, log)
@@ -249,7 +249,7 @@ func (h *Handlers) VerifyEmail(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), h.requestTime)
 	defer cancel()
 
-	log := slog.With(slog.String("handlers", "verify-email"))
+	log := slog.With(slog.String("handlers", "vVerifyEmail"))
 	log.InfoContext(ctx, "request")
 
 	ctx = adapters.InsertLogger(ctx, log)

@@ -25,4 +25,5 @@ type AuthClient interface {
 
 type VacancyClient interface {
 	Health(ctx context.Context)
+	CreateVacancy(ctx context.Context, vacancy *models.Vacancy, userInfo *models.UserInfo, companyName string) (*models.VacancyInfo, error)
 }

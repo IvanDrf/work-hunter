@@ -115,3 +115,17 @@ func validateModel(ctx context.Context, w http.ResponseWriter, model validator, 
 
 	return err
 }
+
+func getUserInfo(ctx context.Context) (*models.UserInfo, error) {
+	val := ctx.Value("user_info")
+
+	userInfo, ok := val.(*models.UserInfo)
+	if !ok {
+		return nil, models.Error{
+			Message: "can't get user info",
+			Code:    models.ErrCodeInternal,
+		}
+	}
+
+	return userInfo, nil
+}
