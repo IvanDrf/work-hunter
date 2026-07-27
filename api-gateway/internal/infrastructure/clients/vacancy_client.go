@@ -116,6 +116,31 @@ func (c *vacancyClient) SendCreateVacancy(ctx context.Context, vacancy *models.V
 	return resp.(*models.VacancyInfo), nil
 }
 
+func (c *vacancyClient) SendFindVacancyByID(ctx context.Context, vacancyID uint64, userInfo *models.UserInfo) (*models.VacancyInfo, error) {
+	log := slog.With(slog.String("client", "vacancy"))
+	ctx = adapters.InsertLogger(ctx, log)
+
+	resp, err := retry(ctx, c.retries, func() (any, error) {
+		resp, err := c.client.FindVacancyByID(ctx, &vacancy_api.FindVacancyByIDRequest{
+			VacancyId: vacancyID,
+			UserInfo:  userInfoDTO(userInfo),
+		})
+
+		if err != nil {
+			log.ErrorContext(ctx, "can't find vacancy by ID, vacancy service returned error", slog.String("error", err.Error()))
+			return nil, err
+		}
+
+		return vacancyInfoDTO(resp), err
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.(*models.VacancyInfo), nil
+}
+
 func vacancyInfoDTO(resp *vacancy_api.VacancyInfo) *models.VacancyInfo {
 	return &models.VacancyInfo{
 		Vacancy: models.Vacancy{
@@ -146,6 +171,18 @@ func vacancyInfoDTO(resp *vacancy_api.VacancyInfo) *models.VacancyInfo {
 		Views:             resp.Views,
 		Applications:      resp.ApplicationsCount,
 		AuthorName:        resp.GetAuthorName(),
+	}
+}
+
+func userInfoDTO(userInfo *models.UserInfo) *common.UserInfo {
+	if userInfo == nil {
+		return nil
+	}
+
+	return &common.UserInfo{
+		Role:        common.UserRole(userInfo.Role),
+		UserId:      userInfo.UserID,
+		Verificated: userInfo.Verificated,
 	}
 }
 
