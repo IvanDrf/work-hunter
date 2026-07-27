@@ -7,11 +7,11 @@
 package user_api
 
 import (
+	common "github.com/IvanDrf/work-hunter/pkg/common"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
-	common "pkg/common"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
