@@ -22,18 +22,15 @@ func NewFabric(config *config.Config) *fabric {
 func (f *fabric) NewApp() *App {
 	auth := clients.NewAuthClient(f.config.Auth.Host, f.config.Auth.Port, f.config.App.Retries)
 	vacancy := clients.NewVacancyClient(f.config.Vacancy.Host, f.config.Vacancy.Port, f.config.App.Retries)
+	user := clients.NewUserClient(f.config.User.Host, f.config.User.Port, f.config.App.Retries)
 
-	handlers := f.newHandlers(auth, vacancy, f.config.App.RequestTime)
+	handlers := http.NewHandlers(auth, vacancy, user, f.config.App.RequestTime)
 	middleware := f.newAuthMiddleware(auth, f.config.App.RequestTime)
 
 	server := f.newHttpServer(f.config.App.Host, f.config.App.Port, handlers, middleware)
 	return &App{
 		server: server,
 	}
-}
-
-func (f *fabric) newHandlers(authClient ports.AuthClient, vacancyClient ports.VacancyClient, requestTime time.Duration) *http.Handlers {
-	return http.NewHandlers(authClient, vacancyClient, requestTime)
 }
 
 func (f *fabric) newAuthMiddleware(authClient ports.AuthClient, requestTime time.Duration) *http.AuthMiddleware {

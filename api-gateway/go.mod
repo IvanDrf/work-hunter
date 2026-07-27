@@ -15,6 +15,7 @@ require (
 )
 
 require (
+	github.com/IvanDrf/work-hunter/pkg/user-api v0.0.0-20260727074253-012d1da1ceb9 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	golang.org/x/net v0.53.0 // indirect

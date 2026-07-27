@@ -42,6 +42,11 @@ type Config struct {
 		Host string `env:"VALIDATION_HOST"`
 		Port int    `env:"VALIDATION_PORT"`
 	}
+
+	User struct {
+		Host string `env:"VALIDATION_HOST"`
+		Port int    `env:"VALIDATION_PORT"`
+	}
 }
 
 func LoadFromENV() *Config {

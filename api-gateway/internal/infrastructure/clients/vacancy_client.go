@@ -74,7 +74,7 @@ func (c *vacancyClient) Health(ctx context.Context) {
 	}
 }
 
-func (c *vacancyClient) CreateVacancy(ctx context.Context, vacancy *models.Vacancy, userInfo *models.UserInfo, companyName string) (*models.VacancyInfo, error) {
+func (c *vacancyClient) SendCreateVacancy(ctx context.Context, vacancy *models.Vacancy, userInfo *models.UserInfo, companyName string) (*models.VacancyInfo, error) {
 	log := slog.With(slog.String("client", "vacancy"))
 	ctx = adapters.InsertLogger(ctx, log)
 

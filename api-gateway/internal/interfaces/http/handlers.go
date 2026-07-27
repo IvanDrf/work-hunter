@@ -17,14 +17,16 @@ const (
 type Handlers struct {
 	authClient    ports.AuthClient
 	vacancyClient ports.VacancyClient
+	userClient    ports.UserClient
 
 	requestTime time.Duration
 }
 
-func NewHandlers(authClient ports.AuthClient, vacancyClient ports.VacancyClient, requestTime time.Duration) *Handlers {
+func NewHandlers(authClient ports.AuthClient, vacancyClient ports.VacancyClient, userClient ports.UserClient, requestTime time.Duration) *Handlers {
 	return &Handlers{
 		authClient:    authClient,
 		vacancyClient: vacancyClient,
+		userClient:    userClient,
 		requestTime:   requestTime,
 	}
 }

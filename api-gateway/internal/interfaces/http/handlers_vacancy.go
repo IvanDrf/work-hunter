@@ -40,10 +40,13 @@ func (h *Handlers) CreateVacancy(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	companyName := ""
-	// panic("send request to user service for company name")
+	companyName, err := h.userClient.SendGetCompanyName(ctx, userInfo.UserID)
+	if err != nil {
+		handleResponseError(w, err)
+		return
+	}
 
-	resp, err := h.vacancyClient.CreateVacancy(ctx, vacancy, userInfo, companyName)
+	resp, err := h.vacancyClient.SendCreateVacancy(ctx, vacancy, userInfo, companyName)
 	if err != nil {
 		handleResponseError(w, err)
 		return
