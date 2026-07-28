@@ -51,6 +51,7 @@ func (h *Handlers) checkClientsHealth(ctx context.Context, periodCheckTime time.
 	ticker := time.NewTicker(periodCheckTime)
 	defer ticker.Stop()
 
+	time.Sleep(1 * time.Second)
 	h.sendHealthChecks(ctx)
 
 	for {

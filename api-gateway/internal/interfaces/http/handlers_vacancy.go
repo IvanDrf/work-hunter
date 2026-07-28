@@ -49,14 +49,14 @@ func (h *Handlers) CreateVacancy(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	companyName, err := h.userClient.SendGetCompanyName(ctx, userInfo.UserID)
+	companyName, err := h.userClient.SendGetCompanyNameRequest(ctx, userInfo.UserID)
 	if err != nil {
 		log.InfoContext(ctx, "error in SendGetCompanyName", slog.String("error", err.Error()))
 		handleResponseError(w, err)
 		return
 	}
 
-	resp, err := h.vacancyClient.SendCreateVacancy(ctx, vacancy, userInfo, companyName)
+	resp, err := h.vacancyClient.SendCreateVacancyRequest(ctx, vacancy, userInfo, companyName)
 	if err != nil {
 		log.InfoContext(ctx, "error in SendCreateVacancy", slog.String("error", err.Error()))
 		handleResponseError(w, err)
@@ -104,7 +104,7 @@ func (h *Handlers) FindVacancyByID(w http.ResponseWriter, r *http.Request) {
 
 	userInfo, _ := getUserInfo(ctx) // ignore error, because user info can be nil and in this request it's valid
 
-	resp, err := h.vacancyClient.SendFindVacancyByID(ctx, vacancyID, userInfo)
+	resp, err := h.vacancyClient.SendFindVacancyByIDRequest(ctx, vacancyID, userInfo)
 	if err != nil {
 		log.InfoContext(ctx, "error in SendFindVacancyByID", slog.String("error", err.Error()))
 		handleResponseError(w, err)

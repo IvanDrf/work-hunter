@@ -51,6 +51,6 @@ func (c *userClient) Health(ctx context.Context) {
 	panic("UserClient not implemented Health")
 }
 
-func (c *userClient) SendGetCompanyName(ctx context.Context, userID string) (string, error) {
+func (c *userClient) SendGetCompanyNameRequest(ctx context.Context, userID string) (string, error) {
 	panic("UserClient not implemented SendGetCompanyName")
 }

@@ -76,7 +76,7 @@ func (c *vacancyClient) Health(ctx context.Context) {
 	}
 }
 
-func (c *vacancyClient) SendCreateVacancy(ctx context.Context, vacancy *models.Vacancy, userInfo *models.UserInfo, companyName string) (*models.VacancyInfo, error) {
+func (c *vacancyClient) SendCreateVacancyRequest(ctx context.Context, vacancy *models.Vacancy, userInfo *models.UserInfo, companyName string) (*models.VacancyInfo, error) {
 	log := slog.With(slog.String("client", "vacancy"))
 	ctx = adapters.InsertLogger(ctx, log)
 
@@ -118,7 +118,7 @@ func (c *vacancyClient) SendCreateVacancy(ctx context.Context, vacancy *models.V
 	return resp.(*models.VacancyInfo), nil
 }
 
-func (c *vacancyClient) SendFindVacancyByID(ctx context.Context, vacancyID uint64, userInfo *models.UserInfo) (*models.VacancyInfo, error) {
+func (c *vacancyClient) SendFindVacancyByIDRequest(ctx context.Context, vacancyID uint64, userInfo *models.UserInfo) (*models.VacancyInfo, error) {
 	log := slog.With(slog.String("client", "vacancy"))
 	ctx = adapters.InsertLogger(ctx, log)
 

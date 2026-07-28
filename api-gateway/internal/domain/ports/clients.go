@@ -26,8 +26,8 @@ type AuthClient interface {
 type VacancyClient interface {
 	Health(ctx context.Context)
 
-	SendCreateVacancy(ctx context.Context, vacancy *models.Vacancy, userInfo *models.UserInfo, companyName string) (*models.VacancyInfo, error)
-	SendFindVacancyByID(ctx context.Context, vacancyID uint64, userInfo *models.UserInfo) (*models.VacancyInfo, error)
+	SendCreateVacancyRequest(ctx context.Context, vacancy *models.Vacancy, userInfo *models.UserInfo, companyName string) (*models.VacancyInfo, error)
+	SendFindVacancyByIDRequest(ctx context.Context, vacancyID uint64, userInfo *models.UserInfo) (*models.VacancyInfo, error)
 
 	Close()
 }
@@ -35,7 +35,7 @@ type VacancyClient interface {
 type UserClient interface {
 	Health(ctx context.Context)
 
-	SendGetCompanyName(ctx context.Context, userID string) (string, error)
+	SendGetCompanyNameRequest(ctx context.Context, userID string) (string, error)
 
 	Close()
 }
