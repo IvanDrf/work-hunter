@@ -1,0 +1,9 @@
+from src.embeddings.base import EmbeddingModel
+
+
+class TFIDFEmbedding(EmbeddingModel):
+    def __init__(self): ...
+
+    def encode_document(self, text): ...
+
+    def encode_query(self, text): ...

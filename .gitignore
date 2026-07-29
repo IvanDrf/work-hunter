@@ -1,3 +1,28 @@
+.env
+
+# Окружения
+.venv/
+.venv_ml/
+__pycache__/
+
+# бд
+recsys/qdrant_storage/
+
+# сырые датасеты
+recsys/data/cache/
+recsys/data/processed/
+recsys/data/raw/
+
+# Jupyter мусор
+*.ipynb_checkpoints/
+
+# временные файлы
+recsys/notebooks/00_research.ipynb
+recsys/src/test.py
+
+
+# ========================================================
+
 # If you prefer the allow list template instead of the deny list, see community template:
 # https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
 #
