@@ -88,6 +88,9 @@ class MessageRedisSaver:
                 self.logger.critical(f"save_messages: can't save messages, details={e}")
                 raise InternalError("can't save messages in redis saver")
 
+    async def stop(self) -> None:
+        await self.client.close()
+
 
 def generate_name(message: ApplicationMessage) -> str:
     return f"message:vacancy:{message.vacancy_id}"

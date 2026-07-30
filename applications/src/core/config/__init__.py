@@ -1,11 +1,12 @@
 from src.core.config.app import AppConfig
 from src.core.config.broker import RabbitMQConfig
 from src.core.config.config import Config
-from src.core.config.database import PostgreSQLConfig
+from src.core.config.database import PostgreSQLConfig, RedisConfig
 
 __all__ = [
     "AppConfig",
     "Config",
     "PostgreSQLConfig",
     "RabbitMQConfig",
+    "RedisConfig",
 ]
