@@ -26,5 +26,5 @@ jobs:
         run: uv sync --locked --all-extras --dev
 
       - name: Run ruff check
-        working-director: ./applications
+        working-directory: ./applications
         run: uv run ruff check
