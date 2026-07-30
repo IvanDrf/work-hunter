@@ -34,5 +34,5 @@ message FindVacanciesIDByUserIDResponse {
     uint32 limit = 2;
     uint32 offset = 3;
 
-    repeated string vacancies_ids = 4;
+    repeated uint64 vacancies_ids = 4;
 }

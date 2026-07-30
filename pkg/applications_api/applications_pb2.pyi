@@ -44,11 +44,11 @@ class FindVacanciesIDByUserIDResponse(_message.Message):
     user_id: str
     limit: int
     offset: int
-    vacancies_ids: _containers.RepeatedScalarFieldContainer[str]
+    vacancies_ids: _containers.RepeatedScalarFieldContainer[int]
     def __init__(
         self,
         user_id: _Optional[str] = ...,
         limit: _Optional[int] = ...,
         offset: _Optional[int] = ...,
-        vacancies_ids: _Optional[_Iterable[str]] = ...,
+        vacancies_ids: _Optional[_Iterable[int]] = ...,
     ) -> None: ...

@@ -1,5 +1,6 @@
 from asyncio import wait_for
 
+from applications.src.api.grpc.dto.user_info import user_info_dto
 from grpc.aio import ServicerContext
 from pkg.applications_api.applications_pb2 import (
     FindVacanciesIDByUserIDRequest,
@@ -46,4 +47,15 @@ class ApplicationHandlers(ApplicationServiceServicer):
         request: FindVacanciesIDByUserIDRequest,
         context: ServicerContext,
     ) -> FindVacanciesIDByUserIDResponse:
-        raise NotImplementedError
+        vacancies = await wait_for(
+            self.application_service.find_vacancies_ids_by_applications(
+                user_info_dto(request.user_info),
+                limit=request.limit,
+                offset=request.offset,
+            ),
+            timeout=self.service_timeout,
+        )
+
+        return FindVacanciesIDByUserIDResponse(
+            user_id=request.user_info.user_id, limit=request.limit, offset=request.offset, vacancies_ids=vacancies
+        )
