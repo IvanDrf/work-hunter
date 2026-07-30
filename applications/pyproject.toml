@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.12"
 dependencies = [
+    "aio-pika>=10.0.1",
     "alembic>=1.18.5",
     "asyncpg>=0.31.0",
     "grpcio-reflection>=1.82.0",
