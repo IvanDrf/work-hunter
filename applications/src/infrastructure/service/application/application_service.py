@@ -29,7 +29,7 @@ class ApplicationService:
 
         self.application_producer: IApplicationProducer = application_producer
         self.message_box: IMessageBox[ApplicationSchema] = message_box
-        self.message_saver: IMessageSaver[ApplicationMessage] = message_saver
+        self.message_saver: IMessageSaver = message_saver
 
         self.logger = logging.getLogger("ApplicationService")
 

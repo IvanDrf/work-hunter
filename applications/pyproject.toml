@@ -11,6 +11,7 @@ dependencies = [
     "grpcio-tools>=1.82.0",
     "pydantic>=2.13.4",
     "pydantic-settings>=2.14.2",
+    "redis>=8.1.0",
     "ruff>=0.16.0",
     "sqlalchemy>=2.0.51",
 ]
