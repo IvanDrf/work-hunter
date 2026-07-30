@@ -15,6 +15,7 @@ class Server:
         self.server: grpcServer | None = None
 
         self.shutdown_time = 1
+        self.logger = logging.getLogger("server")
 
     def register(self, handlers: ApplicationServiceServicer) -> None:
         self.handlers = handlers
@@ -29,7 +30,7 @@ class Server:
         if self.server is None:
             raise RuntimeError("servier is not registred")
 
-        logging.info(f"Start applications service on {self.config.app_address}")
+        self.logger.info(f"Start applications service on {self.config.app_address}")
         await self.server.start()
         await self.server.wait_for_termination()
 
@@ -40,3 +41,5 @@ class Server:
         await self.server.stop(self.shutdown_time)
         if hasattr(self.handlers, "stop"):
             await self.handlers.stop()  # type: ignore
+
+        self.logger.info(f"Stopping applications service on {self.config.app_address}")

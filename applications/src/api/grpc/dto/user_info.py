@@ -16,5 +16,5 @@ def user_info_dto(user_info: PKGUserInfo) -> UserInfo:
         )
 
     except ValueError as e:
-        logging.info(f"Invalid user_id was given: {user_info.user_id}, details={e}")
+        logging.getLogger("user_info_dto").info(f"Invalid user_id was given: {user_info.user_id}, details={e}")
         raise ArgumentError(f"invalid user_id was given, not uuid: {user_info.user_id}")
