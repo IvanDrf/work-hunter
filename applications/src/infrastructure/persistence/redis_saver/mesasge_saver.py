@@ -72,6 +72,22 @@ class MessageRedisSaver:
                 self.logger.critical(f"get_last_message: invalid keys in redis, details={e}")
                 return None
 
+            except (RedisError, ConnectionError) as e:
+                self.logger.critical(f"save_messages: can't get last messages, details={e}")
+                raise InternalError("can't get last messages from redis saver")
+
+    async def delete_last_messages(self, size: int) -> None:
+        current_time = datetime.now(UTC).timestamp()
+
+        names = await self.client.zrangebyscore(ZSET_NAME, min=0, max=current_time, start=0, num=size)
+        async with self.client.pipeline() as pipeline:
+            try:
+                pipeline.zrem(ZSET_NAME, *names)
+                await pipeline.execute()
+            except (RedisError, ConnectionError) as e:
+                self.logger.critical(f"save_messages: can't save messages, details={e}")
+                raise InternalError("can't save messages in redis saver")
+
 
 def generate_name(message: ApplicationMessage) -> str:
     return f"message:vacancy:{message.vacancy_id}"
