@@ -1,7 +1,7 @@
 package config
 
 // Server configuration
-type ServerConfig struct {
-	Host string `yaml:"host"`
-	Port int    `yaml:"port"`
+type AppConfig struct {
+	Host string `env:"APP_HOST" env-default:"0.0.0.0"`
+	Port int    `env:"APP_PORT" env-default:"8080"`
 }

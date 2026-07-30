@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"time"
+	"strings"
 
 	"github.com/IvanDrf/work-hunter/users/internal/domain/models"
 	"github.com/IvanDrf/work-hunter/users/internal/domain/rules"
@@ -135,7 +135,7 @@ func (r *UserRepository) DeleteUser(ctx context.Context, id uuid.UUID, permanent
 		`
 	}
 
-	_, err := r.db.ExecContext(ctx, query, string(rules.UserStatusDeleted), time.Now(), id)
+	_, err := r.db.ExecContext(ctx, query, id)
 
 	if err != nil {
 		return models.Error{
@@ -147,59 +147,77 @@ func (r *UserRepository) DeleteUser(ctx context.Context, id uuid.UUID, permanent
 	return nil
 }
 
-func (r *UserRepository) ListUsers(ctx context.Context, params map[string]string) ([]*models.User, int32, error) {
-	baseQuery := `
-	SELECT * FROM users
-	WHERE status != 'deleted'
-	`
+func (r *UserRepository) ListUsers(ctx context.Context, params *models.ListUsersParams) ([]*models.User, int32, error) {
+	baseQuery := `FROM users WHERE status != 'deleted'`
 
-	countQuery := `SELECT COUNT(*) FROM users WHERE status != 'deleted'`
-
-	var whereConditions string
-
-	var offset string
-	var limit string
-	var orderBy string
-
-	args := make([]string, 0, len(params))
+	var conditions []string
+	var args []any
 	argPos := 1
 
-	for key, val := range params {
-		switch key {
-		case "offset":
-			offset = val
-
-		case "limit":
-			limit = val
-
-		case "order_by":
-			orderBy = val
-
-		default:
-			whereConditions += fmt.Sprintf(" AND %s = '$%d'", key, argPos)
-			argPos++
-			args = append(args, val)
-		}
+	if params.Status != "" {
+		conditions = append(conditions, fmt.Sprintf("status = $%d", argPos))
+		args = append(args, params.Status)
+		argPos++
 	}
 
+	if params.Role != "" {
+		conditions = append(conditions, fmt.Sprintf("role = $%d", argPos))
+		args = append(args, params.Role)
+		argPos++
+	}
+
+	if params.SearchQuery != "" {
+		searchPattern := "%" + params.SearchQuery + "%"
+		conditions = append(conditions, fmt.Sprintf(
+			"(email ILIKE $%d OR first_name ILIKE $%d OR last_name ILIKE $%d)",
+			argPos, argPos+1, argPos+2,
+		))
+		args = append(args, searchPattern, searchPattern, searchPattern)
+		argPos += 3
+	}
+
+	whereClause := ""
+	if len(conditions) > 0 {
+		whereClause = " AND " + strings.Join(conditions, " AND ")
+	}
+
+	orderClause := " ORDER BY created_at DESC"
+	if params.SortBy != "" {
+		direction := "ASC"
+		if params.SortDesc {
+			direction = "DESC"
+		}
+		orderClause = fmt.Sprintf(" ORDER BY %s %s", params.SortBy, direction)
+	}
+
+	if params.Page < 1 {
+		params.Page = 1
+	}
+	if params.PageSize < 1 {
+		params.PageSize = 10
+	}
+	if params.PageSize > 100 {
+		params.PageSize = 100
+	}
+
+	offset := (params.Page - 1) * params.PageSize
+	paginationClause := fmt.Sprintf(" LIMIT $%d OFFSET $%d", argPos, argPos+1)
+	args = append(args, params.PageSize, offset)
+
+	countQuery := "SELECT COUNT(*) " + baseQuery + whereClause
 	var totalCount int32
-	if err := r.db.GetContext(ctx, &totalCount, countQuery+whereConditions, args); err != nil {
-		return nil, 0, models.Error{
-			Message: fmt.Sprintf("failed to count users: %v", err),
-			Code:    models.ErrCodeInternal,
-		}
+	if err := r.db.GetContext(ctx, &totalCount, countQuery, args[:len(args)-2]...); err != nil {
+		return nil, 0, fmt.Errorf("failed to count users: %w", err)
 	}
 
-	baseQuery += whereConditions
-	baseQuery += fmt.Sprintf(" ORDER BY $%d LIMIT $%d OFFSET $%d", argPos, argPos+1, argPos+2)
-	args = append(args, orderBy, limit, offset)
+	if totalCount == 0 {
+		return []*models.User{}, 0, nil
+	}
 
+	query := "SELECT * " + baseQuery + whereClause + orderClause + paginationClause
 	var users []*models.User
-	if err := r.db.SelectContext(ctx, &users, baseQuery, args); err != nil {
-		return nil, 0, models.Error{
-			Message: fmt.Sprintf("failed to list users: %v", err),
-			Code:    models.ErrCodeInternal,
-		}
+	if err := r.db.SelectContext(ctx, &users, query, args...); err != nil {
+		return nil, 0, fmt.Errorf("failed to list users: %w", err)
 	}
 
 	return users, totalCount, nil

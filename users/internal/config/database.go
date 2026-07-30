@@ -7,16 +7,16 @@ import (
 
 // Database config PostgreSQL
 type DBConfig struct {
-	Host     string `yaml:"host"`
-	Port     int    `yaml:"port"`
-	User     string `yaml:"user"`
-	Password string `yaml:"password"`
-	DBName   string `yaml:"dbname"`
-	SSLMode  string `yaml:"sslmode"`
+	Host     string `env:"DB_HOST" env-default:"localhost"`
+	Port     int    `env:"DB_PORT" env-default:"5432"`
+	User     string `env:"DB_USER" env-default:"postgres"`
+	Password string `env:"DB_PASSWORD" env-default:"postgres"`
+	DBName   string `env:"DB_NAME" env-default:"users_db"`
+	SSLMode  string `env:"DB_SSLMODE" env-default:"disable"`
 
-	MaxOpenConns    int           `yaml:"max_open_conns"`
-	MaxIdleConns    int           `yaml:"max_idle_conns"`
-	ConnMaxLifetime time.Duration `yaml:"conn_max_lifetime"`
+	MaxOpenConns    int           `env:"DB_MAX_OPEN_CONNS" env-default:"10"`
+	MaxIdleConns    int           `env:"DB_MAX_IDLE_CONNS" env-default:"5"`
+	ConnMaxLifetime time.Duration `env:"DB_CONN_MAX_LIFETIME" env-default:"1h"`
 }
 
 func (c *DBConfig) DSN() string {

@@ -37,8 +37,10 @@ func NewPostgresConnection(cfg config.DBConfig) (*PostgresConnection, error) {
 	}, nil
 }
 
-func (c *PostgresConnection) GetDB() *sqlx.DB {
-	return c.db
+func NewPostgresConnectionTest(db *sqlx.DB) *PostgresConnection {
+	return &PostgresConnection{
+		db: db,
+	}
 }
 
 func (c *PostgresConnection) Close() {

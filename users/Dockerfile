@@ -8,18 +8,20 @@ RUN go mod download
 COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o /bin/server ./cmd/server/main.go
-
 RUN CGO_ENABLED=0 GOOS=linux go build -o /bin/migrator ./cmd/migrator/main.go
 
-FROM alpine:latest
+FROM alpine:3.18
 
 WORKDIR /app
 
-COPY --from=builder /bin/server /app/server
-COPY --from=builder /bin/migrator /app/migrator
+COPY --from=builder /bin/server ./server
+COPY --from=builder /bin/migrator ./migrator
+COPY --from=builder /app/entry.sh ./entry.sh
 
-COPY --from=builder /app/internal/infrastructure/persistence/postgres/migrations /app/internal/infrastructure/persistence/postgres/migrations
+COPY --from=builder /app/internal/infrastructure/persistence/postgres/migrations /app/migrations
 
-RUN mkdir -p /app/config
+RUN chmod +x ./entry.sh
 
-CMD ["/app/server"]
+EXPOSE 8080
+
+ENTRYPOINT ["./entry.sh"]

@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"net/url"
-	"strconv"
 
 	"github.com/IvanDrf/work-hunter/users/internal/domain/models"
 	repository "github.com/IvanDrf/work-hunter/users/internal/domain/ports/repo"
@@ -13,6 +11,11 @@ import (
 	"github.com/IvanDrf/work-hunter/users/internal/interfaces/grpc/dto"
 	"github.com/IvanDrf/work-hunter/users/internal/logger"
 	"github.com/google/uuid"
+)
+
+const (
+	maxPageSize = 100
+	minPageSize = 1
 )
 
 type UserService struct {
@@ -135,83 +138,55 @@ func (s *UserService) DeleteProfile(ctx context.Context, id string) error {
 }
 
 func (s *UserService) ListUsers(ctx context.Context, req *dto.ListUsersRequest) (*dto.ListUsersResponse, error) {
-	log := s.log.With(slog.String("scope", "infrastructure/service/ListUsers"))
+	log := s.log.With(slog.String("scope", "service/ListUsers"))
 
-	enabledFields := map[string]struct{}{
-		"id": {}, "email": {}, "first_name": {}, "last_name": {}, "company_name": {},
-		"created_at": {}, "updated_at": {}, "verificated": {},
+	if req.Page < 1 {
+		req.Page = 1
+	}
+	if req.PageSize < minPageSize {
+		req.PageSize = minPageSize
+	}
+	if req.PageSize > maxPageSize {
+		req.PageSize = maxPageSize
 	}
 
-	params := make(map[string]string)
-	if req.Role != "" {
-		params["role"] = req.Role
+	repoParams := models.ListUsersParams{
+		Page:     req.Page,
+		PageSize: req.PageSize,
+		SortBy:   req.SortBy,
+		SortDesc: req.SortDesc,
 	}
 
-	if req.Status != "" {
-		params["status"] = req.Status
+	if req.Filter != nil {
+		repoParams.Status = req.Filter.Status
+		repoParams.Role = req.Filter.Role
+		repoParams.SearchQuery = req.Filter.SearchQuery
 	}
 
-	if req.PageSize == 0 {
-		params["limit"] = "100"
-	} else {
-		params["limit"] = strconv.Itoa(int(req.PageSize))
-	}
-
-	params["offset"] = strconv.Itoa(int(req.Offset))
-
-	if req.SortBy != "" {
-		params["order_by"] = req.SortBy
-	}
-
-	values, err := url.ParseQuery(req.SearchQuery)
-	if err != nil {
-		log.Error("failed to parse query", slog.String("error", err.Error()))
-		return nil, models.Error{
-			Message: fmt.Sprintf("failed to parse search query: %v", err),
-			Code:    models.ErrCodeInvalidRequest,
-		}
-	}
-
-	for key, val := range values {
-		_, ok := enabledFields[key]
-		if !ok {
-			log.Error("cannot use this field", slog.String("field", key))
-			return nil, models.Error{
-				Message: fmt.Sprintf("cannot use this field: %s", key),
-				Code:    models.ErrCodeInvalidRequest,
-			}
-		}
-
-		if len(val) > 0 {
-			params[key] = val[0]
-		}
-	}
-	log.Debug("params created successfully")
-
-	users, totalCount, err := s.repo.ListUsers(ctx, params)
+	users, totalCount, err := s.repo.ListUsers(ctx, &repoParams)
 	if err != nil {
 		log.Error("failed to list users", slog.String("error", err.Error()))
 		return nil, err
 	}
-	if totalCount == 0 {
-		log.Error("users not found")
-		return nil, &models.Error{
-			Message: "users not found",
-			Code:    models.ErrCodeUserNotFound,
-		}
-	}
-	log.Info("users listed successfully", slog.Int("count", len(users)))
 
 	usersResp := make([]*dto.UserResponse, 0, len(users))
-	for _, val := range users {
-		userResp := modelToResp(val)
-
-		usersResp = append(usersResp, userResp)
+	for _, user := range users {
+		usersResp = append(usersResp, modelToResp(user))
 	}
+
+	totalPages := int32((totalCount + int32(req.PageSize) - 1) / int32(req.PageSize))
+
+	log.Info("users listed successfully",
+		slog.Int("count", len(users)),
+		slog.Int("total", int(totalCount)),
+	)
 
 	return &dto.ListUsersResponse{
 		Users:      usersResp,
 		TotalCount: totalCount,
+		Page:       req.Page,
+		PageSize:   req.PageSize,
+		TotalPages: totalPages,
 	}, nil
 }
 

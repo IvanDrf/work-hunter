@@ -72,10 +72,40 @@ func convertUserResponseToUserProfile(user *dto.UserResponse) *user_api.UserProf
 	return &u
 }
 
+func convertListReqToDto(req *user_api.ListUsersRequest) *dto.ListUsersRequest {
+	filter := dto.UserFilter{}
+	if req.Filter != nil {
+		if req.Filter.Role != nil {
+			filter.Role = common.UserRole_name[int32(*req.Filter.Role)]
+		}
+
+		if req.Filter.Status != nil {
+			filter.Status = user_api.UserStatus_name[int32(*req.Filter.Status)]
+		}
+
+		if req.Filter.SearchQuery != nil {
+			filter.SearchQuery = *req.Filter.SearchQuery
+		}
+	}
+
+	dto := &dto.ListUsersRequest{
+		Filter:   &filter,
+		Page:     int(req.Page),
+		PageSize: int(req.PageSize),
+		SortBy:   req.GetSortBy(),
+		SortDesc: req.GetSortDesc(),
+	}
+
+	return dto
+}
+
 func convertListDtoToListResp(dto *dto.ListUsersResponse) *user_api.ListUsersResponse {
 	resp := &user_api.ListUsersResponse{
 		Users:      make([]*user_api.UserProfile, 0, len(dto.Users)),
 		TotalCount: dto.TotalCount,
+		Page:       int32(dto.Page),
+		PageSize:   int32(dto.PageSize),
+		TotalPages: dto.TotalPages,
 	}
 
 	for _, val := range dto.Users {

@@ -41,17 +41,25 @@ type UpdateUserRequest struct {
 
 // DTO for listing users
 type ListUsersRequest struct {
-	PageSize    int32
+	Page     int
+	PageSize int
+	Filter   *UserFilter
+	SortBy   string
+	SortDesc bool
+}
+
+type UserFilter struct {
 	Status      string
 	Role        string
 	SearchQuery string
-	SortBy      string
-	Offset      int32
 }
 
 type ListUsersResponse struct {
 	Users      []*UserResponse
 	TotalCount int32
+	Page       int
+	PageSize   int
+	TotalPages int32
 }
 
 // DTO for updating user status
