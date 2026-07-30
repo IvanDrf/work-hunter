@@ -18,10 +18,17 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Setup GO
+      - name: Setup Go
         uses: actions/setup-go@v5
         with:
           go-version: "1.25"
+
+      - name: Run GO lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: latest
+          working-directory: ./auth
+          args: --timeout=5m
 
       - name: Run GO tests for [AUTH]
         working-directory: ./auth/tests

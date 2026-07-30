@@ -9,7 +9,8 @@ require (
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
-	github.com/IvanDrf/work-hunter/pkg/auth-api v0.0.0-20260416202508-c777a235a248
+	github.com/IvanDrf/work-hunter/pkg/auth-api v0.0.0-20260623142025-cfa246ff3430
+	github.com/IvanDrf/work-hunter/pkg/common v0.0.0-20260623141734-1db0e1440525
 	github.com/caarlos0/env/v11 v11.4.1
 	github.com/go-redis/redismock/v9 v9.2.0
 	github.com/golang-jwt/jwt/v5 v5.3.1

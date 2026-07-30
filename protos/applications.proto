@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package vacancy;
 
+option go_package = "pkg/applications_api";
+
 import "common.proto";
 
 service ApplicationService {

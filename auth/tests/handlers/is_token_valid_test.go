@@ -9,6 +9,7 @@ import (
 	"github.com/IvanDrf/work-hunter/auth/tests/mocks"
 	auth_api "github.com/IvanDrf/work-hunter/pkg/auth-api"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -35,25 +36,29 @@ func TestIsTokenValid(t *testing.T) {
 	})
 }
 
-// Test to validate jwt tokens
+// Test to validate jwt tokens.
 func testIsTokenValid(t *testing.T, handlers *handlers.Handler, tokens map[string]*Tokens) {
+	t.Helper()
+
 	for _, tokens := range tokens {
 		resp, err := handlers.IsTokenValid(t.Context(), &auth_api.AccessToken{
 			Access: tokens.Access,
 		})
 
-		assert.Nil(t, err)
+		require.NoError(t, err)
 		assert.NotNil(t, resp)
 
 		payload, _ := mocks.Jwter.GetPayload(tokens.Access)
-		assert.Equal(t, payload.UserID, resp.Id)
-		assert.Equal(t, payload.Verificated, resp.Verificated)
-		assert.Equal(t, string(payload.Role), resp.Role.String())
+		assert.Equal(t, payload.UserID, resp.GetId())
+		assert.Equal(t, payload.Verificated, resp.GetVerificated())
+		assert.Equal(t, string(payload.Role), resp.GetRole().String())
 	}
 }
 
-// Test to validate token with invalid userID
+// Test to validate token with invalid userID.
 func testIsTokenValidInvalidUserID(t *testing.T, handlers *handlers.Handler) {
+	t.Helper()
+
 	access, _, _ := mocks.Jwter.CreateTokens(&models.JwtPayload{
 		UserID:      fixtures.InvalidUserID,
 		Verificated: false,
@@ -64,14 +69,16 @@ func testIsTokenValidInvalidUserID(t *testing.T, handlers *handlers.Handler) {
 		Access: access,
 	})
 
-	assert.NotNil(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), status.Error(codes.InvalidArgument, "").Error())
 
 	assert.Nil(t, resp)
 }
 
-// Test to validate jwt token with invalid Role
+// Test to validate jwt token with invalid Role.
 func testIsTokenValidInvalidUserRole(t *testing.T, handlers *handlers.Handler, tokens map[string]*Tokens) {
+	t.Helper()
+
 	for _, tokens := range tokens {
 		payload, _ := mocks.Jwter.GetPayload(tokens.Access)
 
@@ -85,7 +92,7 @@ func testIsTokenValidInvalidUserRole(t *testing.T, handlers *handlers.Handler, t
 			Access: access,
 		})
 
-		assert.NotNil(t, err)
+		require.Error(t, err)
 		assert.Contains(t, err.Error(), status.Error(codes.InvalidArgument, "").Error())
 
 		assert.Nil(t, resp)

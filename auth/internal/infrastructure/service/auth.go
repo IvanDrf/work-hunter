@@ -70,7 +70,7 @@ func (a *AuthService) RegisterUser(ctx context.Context, email string, password s
 	if err != nil {
 		slog.Error("auth:RegisterUser error", slog.String("error", err.Error()))
 		return "", "", models.Error{
-			Message: "can't create jwt tokens for user",
+			Message: models.CantCreateJWTMsg,
 			Code:    models.ErrCodeInternal,
 		}
 	}
@@ -105,7 +105,7 @@ func (a *AuthService) LoginUser(ctx context.Context, email string, password stri
 	if err != nil {
 		slog.Error("auth:LoginUser error", slog.String("error", err.Error()))
 		return "", "", models.Error{
-			Message: "can't create jwt tokens for user",
+			Message: models.CantCreateJWTMsg,
 			Code:    models.ErrCodeInternal,
 		}
 	}
@@ -119,7 +119,7 @@ func (a *AuthService) DeleteUser(ctx context.Context, access string, password st
 	if err != nil {
 		slog.Info("auth:DeleteUser got invalid jwt token")
 		return models.Error{
-			Message: "invalid jwt token",
+			Message: models.InvalidJWTMsg,
 			Code:    models.ErrCodeInvalidJWT,
 		}
 	}
@@ -128,7 +128,7 @@ func (a *AuthService) DeleteUser(ctx context.Context, access string, password st
 	if err != nil {
 		slog.Info("auth:DeleteUser got invalid userID in jwt token")
 		return models.Error{
-			Message: "invalid userID in jwt token",
+			Message: models.InvalidUserIDInTokenMsg,
 			Code:    models.ErrCodeInvalidJWT,
 		}
 	}
@@ -163,12 +163,12 @@ func (a *AuthService) DeleteUser(ctx context.Context, access string, password st
 	return nil
 }
 
-func (a *AuthService) ChangeUserPassword(ctx context.Context, access string, old string, new string) error {
+func (a *AuthService) ChangeUserPassword(ctx context.Context, access string, oldPassword string, newPassword string) error {
 	payload, err := a.jwter.GetPayload(access)
 	if err != nil {
 		slog.Info("auth:ChangeUserPassword got invalid jwt token")
 		return models.Error{
-			Message: "invalid jwt token",
+			Message: models.InvalidJWTMsg,
 			Code:    models.ErrCodeInvalidJWT,
 		}
 	}
@@ -177,7 +177,7 @@ func (a *AuthService) ChangeUserPassword(ctx context.Context, access string, old
 	if err != nil {
 		slog.Info("auth:ChangeUserPassword got invalid userID in jwt token")
 		return models.Error{
-			Message: "invalid userID in jwt token",
+			Message: models.InvalidUserIDInTokenMsg,
 			Code:    models.ErrCodeInvalidJWT,
 		}
 	}
@@ -191,7 +191,7 @@ func (a *AuthService) ChangeUserPassword(ctx context.Context, access string, old
 		}
 	}
 
-	if !rules.IsPasswordsSame(old, user.HashedPassword) {
+	if !rules.IsPasswordsSame(oldPassword, user.HashedPassword) {
 		slog.Info("auth:ChangeUserPassword old password in request and password in dataabse are different")
 		return models.Error{
 			Message: "password is incorrect",
@@ -199,7 +199,7 @@ func (a *AuthService) ChangeUserPassword(ctx context.Context, access string, old
 		}
 	}
 
-	if !rules.IsPasswordCorrect(new) {
+	if !rules.IsPasswordCorrect(newPassword) {
 		slog.Info("auth:ChangeUserPassword new password is incorrect, doesn't fit rules")
 		return models.Error{
 			Message: "new password is incorrect",
@@ -207,7 +207,7 @@ func (a *AuthService) ChangeUserPassword(ctx context.Context, access string, old
 		}
 	}
 
-	hashed, err := rules.HashPassword(new)
+	hashed, err := rules.HashPassword(newPassword)
 	if err != nil {
 		slog.Error("auth:ChangeUserPassword can't hash new password", slog.String("error", err.Error()))
 		return models.Error{
@@ -234,7 +234,7 @@ func (a *AuthService) RefreshTokens(ctx context.Context, refresh string) (string
 	if err != nil {
 		slog.Error("auth:RefreshTokens error cant get valid payload", slog.String("error", err.Error()))
 		return "", "", models.Error{
-			Message: "invalid jwt token",
+			Message: models.InvalidJWTMsg,
 			Code:    models.ErrCodeInvalidJWT,
 		}
 	}
@@ -251,7 +251,7 @@ func (a *AuthService) RefreshTokens(ctx context.Context, refresh string) (string
 	if err != nil {
 		slog.Error("auth:RefreshTokens error, cant create new tokens", slog.String("error", err.Error()))
 		return "", "", models.Error{
-			Message: "can't create new jwt tokens",
+			Message: models.CantCreateJWTMsg,
 			Code:    models.ErrCodeInternal,
 		}
 	}
@@ -266,7 +266,7 @@ func (a *AuthService) GetTokenPayload(ctx context.Context, access string) (*mode
 		slog.Error("auth:GetTokenPayload error", slog.String("error", err.Error()))
 		return nil, models.Error{
 			Code:    models.ErrCodeInvalidJWT,
-			Message: "invalid jwt token",
+			Message: models.InvalidJWTMsg,
 		}
 	}
 

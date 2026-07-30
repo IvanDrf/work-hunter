@@ -53,7 +53,7 @@ func (v *VerificationService) ResendVerificationEmail(ctx context.Context, acces
 	payload, err := v.jwter.GetPayload(access)
 	if err != nil {
 		return models.Error{
-			Message: "invalid jwt token",
+			Message: models.InvalidJWTMsg,
 			Code:    models.ErrCodeInvalidJWT,
 		}
 	}
@@ -61,7 +61,7 @@ func (v *VerificationService) ResendVerificationEmail(ctx context.Context, acces
 	userID, err := uuid.Parse(payload.UserID)
 	if err != nil {
 		return models.Error{
-			Message: "invalid userID in jwt token",
+			Message: models.InvalidUserIDInTokenMsg,
 			Code:    models.ErrCodeInvalidJWT,
 		}
 	}
@@ -75,43 +75,6 @@ func (v *VerificationService) ResendVerificationEmail(ctx context.Context, acces
 	}
 
 	return v.sendVerificationEmailForUser(ctx, user)
-}
-
-func (v *VerificationService) sendVerificationEmailForUser(ctx context.Context, user *models.User) error {
-	if user.Verificated {
-		return models.Error{
-			Message: "user already verificated",
-			Code:    models.ErrCodeUserAlreadyVerificated,
-		}
-	}
-
-	token := rules.GenerateToken()
-
-	err := v.tokenRepo.CreateToken(ctx, user.Email, token, rules.TokenTTL)
-	if err != nil {
-		slog.Error("verif:SendVerifEmail service error", slog.String("error", err.Error()))
-		return models.Error{
-			Message: "can't create token for user",
-			Code:    models.ErrCodeInternal,
-		}
-	}
-
-	err = v.emailProducer.SendEmailInQueue(ctx, &models.EmailMessage{
-		Email: user.Email,
-		Token: token,
-		Exp:   rules.NewExpTime(),
-	})
-
-	if err != nil {
-		slog.Error("verif:SendVerifEmail service error", slog.String("error", err.Error()))
-		return models.Error{
-			Message: "can't send verification message",
-			Code:    models.ErrCodeInternal,
-		}
-	}
-
-	slog.Info("verif:SendVerifEmail service success")
-	return nil
 }
 
 func (v *VerificationService) VerifyEmailByToken(ctx context.Context, token string) (string, string, error) {
@@ -155,11 +118,48 @@ func (v *VerificationService) VerifyEmailByToken(ctx context.Context, token stri
 	if err != nil {
 		slog.Error("verif:VerifyEmailByToken error", slog.String("error", err.Error()))
 		return "", "", models.Error{
-			Message: "can't create jwt tokens for user",
+			Message: models.CantCreateJWTMsg,
 			Code:    models.ErrCodeInternal,
 		}
 	}
 
 	slog.Info("verif:VerifyEmailByToken service success")
 	return access, refresh, nil
+}
+
+func (v *VerificationService) sendVerificationEmailForUser(ctx context.Context, user *models.User) error {
+	if user.Verificated {
+		return models.Error{
+			Message: "user already verificated",
+			Code:    models.ErrCodeUserAlreadyVerificated,
+		}
+	}
+
+	token := rules.GenerateToken()
+
+	err := v.tokenRepo.CreateToken(ctx, user.Email, token, rules.TokenTTL)
+	if err != nil {
+		slog.Error("verif:SendVerifEmail service error", slog.String("error", err.Error()))
+		return models.Error{
+			Message: "can't create verification token for user",
+			Code:    models.ErrCodeInternal,
+		}
+	}
+
+	err = v.emailProducer.SendEmailInQueue(ctx, &models.EmailMessage{
+		Email: user.Email,
+		Token: token,
+		Exp:   rules.NewExpTime(),
+	})
+
+	if err != nil {
+		slog.Error("verif:SendVerifEmail service error", slog.String("error", err.Error()))
+		return models.Error{
+			Message: "can't send verification message",
+			Code:    models.ErrCodeInternal,
+		}
+	}
+
+	slog.Info("verif:SendVerifEmail service success")
+	return nil
 }

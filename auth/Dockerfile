@@ -20,6 +20,7 @@ COPY --from=builder /app/migrator .
 COPY --from=builder /app/email_worker .
 COPY --from=builder /app/.env .
 COPY --from=builder /app/entry.sh .
+COPY --from=builder /app/static /app/static
 RUN chmod +x entry.sh 
 COPY --from=builder /app/internal/infrastructure/persistence/postgres/migrations/ .
 

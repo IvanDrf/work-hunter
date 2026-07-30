@@ -10,6 +10,7 @@ import (
 	auth_api "github.com/IvanDrf/work-hunter/pkg/auth-api"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -57,55 +58,61 @@ func TestDeleteUser(t *testing.T) {
 	})
 }
 
-// Test to delete users
+// Test to delete users.
 func testDeleteUser(t *testing.T, handlers *handlers.Handler, tokens map[string]*Tokens) {
+	t.Helper()
+
 	for _, req := range fixtures.Users {
 		resp, err := handlers.DeleteUser(t.Context(), &auth_api.DeleteUserRequest{
-			Access:   tokens[req.Email].Access,
-			Password: req.Password,
+			Access:   tokens[req.GetEmail()].Access,
+			Password: req.GetPassword(),
 		})
 
-		assert.Nil(t, err)
+		require.NoError(t, err)
 		assert.NotNil(t, resp)
 
-		// after deletion user can't login
+		// after deletion user can't login.
 		_, err = handlers.Login(t.Context(), req)
-		assert.NotNil(t, err)
+		require.Error(t, err)
 		assert.Contains(t, err.Error(), status.Error(codes.NotFound, "").Error())
 	}
 }
 
-// Test to delete user with invalid jwt
+// Test to delete user with invalid jwt.
 func testDeleteUserInvalidJWT(t *testing.T, handlers *handlers.Handler, tokens map[string]*Tokens) {
+	t.Helper()
+
 	for _, req := range fixtures.Users {
-		// get userID from valid access token
+		// get userID from valid access token.
 		payload, _ := handlers.IsTokenValid(t.Context(), &auth_api.AccessToken{
-			Access: tokens[req.Email].Access,
+			Access: tokens[req.GetEmail()].Access,
 		})
 
-		// create access jwt token with valid payload, but with invalid signature
+		// create access jwt token with valid payload, but with invalid signature.
 		access, _, _ := mocks.InvalidJwter.CreateTokens(&models.JwtPayload{
-			UserID:      payload.Id,
+			UserID:      payload.GetId(),
 			Verificated: false,
 			Role:        models.EMPLOYEE,
 		})
 
 		resp, err := handlers.DeleteUser(t.Context(), &auth_api.DeleteUserRequest{
 			Access:   access,
-			Password: req.Password,
+			Password: req.GetPassword(),
 		})
 
-		assert.NotNil(t, err)
+		require.Error(t, err)
 		assert.Contains(t, err.Error(), status.Error(codes.InvalidArgument, "").Error())
 
 		assert.Nil(t, resp)
 	}
 }
 
-// Test to delete user valid jwt but invalid userID
+// Test to delete user valid jwt but invalid userID.
 func testDeleteUserInvalidJWTUserID(t *testing.T, handlers *handlers.Handler) {
+	t.Helper()
+
 	for _, req := range fixtures.Users {
-		// create valid jwt tokens with invalid userID
+		// create valid jwt tokens with invalid userID.
 		access, _, _ := mocks.Jwter.CreateTokens(&models.JwtPayload{
 			UserID:      fixtures.InvalidUserID,
 			Verificated: false,
@@ -114,18 +121,20 @@ func testDeleteUserInvalidJWTUserID(t *testing.T, handlers *handlers.Handler) {
 
 		resp, err := handlers.DeleteUser(t.Context(), &auth_api.DeleteUserRequest{
 			Access:   access,
-			Password: req.Password,
+			Password: req.GetPassword(),
 		})
 
-		assert.NotNil(t, err)
+		require.Error(t, err)
 		assert.Contains(t, err.Error(), status.Error(codes.InvalidArgument, "").Error())
 
 		assert.Nil(t, resp)
 	}
 }
 
-// Test to delete user with valid userID, but user with that userID doesn't exists
+// Test to delete user with valid userID, but user with that userID doesn't exists.
 func testDeleteUserInvalidUserID(t *testing.T, handlers *handlers.Handler) {
+	t.Helper()
+
 	userID := uuid.New()
 
 	for _, req := range fixtures.Users {
@@ -137,25 +146,27 @@ func testDeleteUserInvalidUserID(t *testing.T, handlers *handlers.Handler) {
 
 		resp, err := handlers.DeleteUser(t.Context(), &auth_api.DeleteUserRequest{
 			Access:   access,
-			Password: req.Password,
+			Password: req.GetPassword(),
 		})
 
-		assert.NotNil(t, err)
+		require.Error(t, err)
 		assert.Contains(t, err.Error(), status.Error(codes.NotFound, "").Error())
 
 		assert.Nil(t, resp)
 	}
 }
 
-// Test to delete user with invalid password
+// Test to delete user with invalid password.
 func testDeleteUserInvalidPassword(t *testing.T, handlers *handlers.Handler, tokens map[string]*Tokens) {
+	t.Helper()
+
 	for _, req := range fixtures.Users {
 		resp, err := handlers.DeleteUser(t.Context(), &auth_api.DeleteUserRequest{
-			Access:   tokens[req.Email].Access,
+			Access:   tokens[req.GetEmail()].Access,
 			Password: fixtures.InvalidPassword,
 		})
 
-		assert.NotNil(t, err)
+		require.Error(t, err)
 		assert.Contains(t, err.Error(), status.Error(codes.InvalidArgument, "").Error())
 
 		assert.Nil(t, resp)

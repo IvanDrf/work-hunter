@@ -2,8 +2,10 @@ github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161 h1:L/gRVlceqvL25
 github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161/go.mod h1:xomTg63KZ2rFqZQzSB4Vz2SUXa1BpHTVz9L5PTmPC4E=
 github.com/DATA-DOG/go-sqlmock v1.5.2 h1:OcvFkGmslmlZibjAjaHm3L//6LiuBgolP7OputlJIzU=
 github.com/DATA-DOG/go-sqlmock v1.5.2/go.mod h1:88MAG/4G7SMwSE3CeA0ZKzrT5CiOU3OJ+JlNzwDqpNU=
-github.com/IvanDrf/work-hunter/pkg/auth-api v0.0.0-20260416202508-c777a235a248 h1:N4vtOqz7cHXD6AXMeUqqereY30LPlmWqA+whDetw9c8=
-github.com/IvanDrf/work-hunter/pkg/auth-api v0.0.0-20260416202508-c777a235a248/go.mod h1:7MFO9fbUEPhWluguZqRzBpZav9eAIUesXODMj7s/AVI=
+github.com/IvanDrf/work-hunter/pkg/auth-api v0.0.0-20260623142025-cfa246ff3430 h1:3Q7QXuPs4KQO7UfiUwW9K4Z0fC3Il3KPMQe8lNa3hi0=
+github.com/IvanDrf/work-hunter/pkg/auth-api v0.0.0-20260623142025-cfa246ff3430/go.mod h1:Pu6L56yGB7ayaTcpKnIgdHG8dW+X/XoJqXR7VYahB4I=
+github.com/IvanDrf/work-hunter/pkg/common v0.0.0-20260623141734-1db0e1440525 h1:DO3wE/DhKEwxJkyKj5nZp9I/Aah4MsfxtJsKr8hJy5I=
+github.com/IvanDrf/work-hunter/pkg/common v0.0.0-20260623141734-1db0e1440525/go.mod h1:z6NaDjAIy4urS4mVrNt0MV9e8wngU9LvPJ0lJm5DXFY=
 github.com/Microsoft/go-winio v0.6.2 h1:F2VQgta7ecxGYO8k3ZZz3RS8fVIXVxONVUPlNERoyfY=
 github.com/Microsoft/go-winio v0.6.2/go.mod h1:yd8OoFMLzJbo9gZq8j5qaps8bJ9aShtEA8Ipt1oGCvU=
 github.com/bsm/ginkgo/v2 v2.12.0 h1:Ny8MWAHyOepLGlLKYmXG4IEkioBysk6GpaRTLC8zwWs=

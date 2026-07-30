@@ -1,0 +1,282 @@
+package http
+
+import (
+	"context"
+	"encoding/json"
+	"log/slog"
+	"net/http"
+
+	"github.com/IvanDrf/work-hunter/api-gateway/internal/domain/models"
+	"github.com/IvanDrf/work-hunter/api-gateway/internal/infrastructure/adapters"
+)
+
+func (h *Handlers) RegisterUser(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), h.requestTime)
+	defer cancel()
+
+	log := slog.With(slog.String("handlers", "RegisterUser"))
+	log.InfoContext(ctx, "request")
+
+	ctx = adapters.InsertLogger(ctx, log)
+
+	if status, err := validateHeaders(r); err != nil {
+		log.InfoContext(ctx, "invalid headers", slog.String("error", err.Error()))
+		w.WriteHeader(status)
+		json.NewEncoder(w).Encode(err)
+		return
+	}
+
+	user := &models.User{}
+	if err := json.NewDecoder(r.Body).Decode(user); err != nil {
+		log.InfoContext(ctx, "can't parse requests's body", slog.String("error", err.Error()))
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		json.NewEncoder(w).Encode(models.Error{
+			Message: invalidBodyRequestMessage,
+			Code:    models.ErrCodeUnprocessableEntity,
+		})
+		return
+	}
+	defer r.Body.Close()
+
+	if err := validateModel(ctx, w, user, "email or password is empty"); err != nil {
+		log.InfoContext(ctx, "invalid user content in request body", slog.String("error", err.Error()))
+		return
+	}
+
+	tokens, err := h.authClient.SendRegisterRequest(ctx, user.Email, user.Password, user.Role)
+	if err != nil {
+		log.InfoContext(ctx, "error in RegisterUser", slog.String("error", err.Error()))
+		handleResponseError(w, err)
+		return
+	}
+
+	access, refresh := createCookie(Access, tokens.Access), createCookie(Refresh, tokens.Refresh)
+	http.SetCookie(w, access)
+	http.SetCookie(w, refresh)
+
+	log.InfoContext(ctx, "success")
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (h *Handlers) LoginUser(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), h.requestTime)
+	defer cancel()
+
+	log := slog.With(slog.String("handlers", "LoginUser"))
+	log.InfoContext(ctx, "request")
+
+	ctx = adapters.InsertLogger(ctx, log)
+
+	if status, err := validateHeaders(r); err != nil {
+		w.WriteHeader(status)
+		json.NewEncoder(w).Encode(err)
+		return
+	}
+
+	user := &models.User{}
+	if err := json.NewDecoder(r.Body).Decode(user); err != nil {
+		log.InfoContext(ctx, "can't parse requests's body", slog.String("error", err.Error()))
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		json.NewEncoder(w).Encode(models.Error{
+			Message: invalidBodyRequestMessage,
+			Code:    models.ErrCodeUnprocessableEntity,
+		})
+		return
+	}
+	defer r.Body.Close()
+
+	if err := validateModel(ctx, w, user, "email or password is empty"); err != nil {
+		log.InfoContext(ctx, "invalid user content in request body", slog.String("error", err.Error()))
+		return
+	}
+
+	tokens, err := h.authClient.SendLoginRequest(ctx, user.Email, user.Password)
+	if err != nil {
+		handleResponseError(w, err)
+		return
+	}
+
+	access, refresh := createCookie(Access, tokens.Access), createCookie(Refresh, tokens.Refresh)
+	http.SetCookie(w, access)
+	http.SetCookie(w, refresh)
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (h *Handlers) ChangeUserPassword(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), h.requestTime)
+	defer cancel()
+
+	log := slog.With(slog.String("handlers", "ChangeUserPassword"))
+	log.InfoContext(ctx, "request")
+
+	ctx = adapters.InsertLogger(ctx, log)
+
+	if status, err := validateHeaders(r); err != nil {
+		w.WriteHeader(status)
+		json.NewEncoder(w).Encode(err)
+		return
+	}
+
+	password := &models.Password{}
+	if err := json.NewDecoder(r.Body).Decode(password); err != nil {
+		log.InfoContext(ctx, "can't parse requests's body", slog.String("error", err.Error()))
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		json.NewEncoder(w).Encode(models.Error{
+			Message: invalidBodyRequestMessage,
+			Code:    models.ErrCodeUnprocessableEntity,
+		})
+		return
+	}
+	defer r.Body.Close()
+
+	if err := validateModel(ctx, w, password, "old or new password is empty"); err != nil {
+		log.InfoContext(ctx, "invalid user content in request body", slog.String("error", err.Error()))
+		return
+	}
+
+	access, err := getCookie(ctx, w, r, Access)
+	if err != nil {
+		log.InfoContext(ctx, "invalid cookie in request", slog.String("error", err.Error()))
+		return
+	}
+
+	if err := h.authClient.SendChangePasswordRequest(ctx, access.Value, password.Old, password.New); err != nil {
+		handleResponseError(w, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (h *Handlers) RefreshTokens(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), h.requestTime)
+	defer cancel()
+
+	log := slog.With(slog.String("handlers", "RefreshTokens"))
+	log.InfoContext(ctx, "request")
+
+	ctx = adapters.InsertLogger(ctx, log)
+
+	refresh, err := getCookie(ctx, w, r, Refresh)
+	if err != nil {
+		log.InfoContext(ctx, "invalid cookie in request", slog.String("error", err.Error()))
+		return
+	}
+
+	tokens, err := h.authClient.SendRefreshTokensRequest(ctx, refresh.Value)
+	if err != nil {
+		handleResponseError(w, err)
+		return
+	}
+
+	access, refresh := createCookie(Access, tokens.Access), createCookie(Refresh, tokens.Refresh)
+	http.SetCookie(w, access)
+	http.SetCookie(w, refresh)
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (h *Handlers) DeleteUser(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), h.requestTime)
+	defer cancel()
+
+	log := slog.With(slog.String("handlers", "DeleteUser"))
+	log.InfoContext(ctx, "request")
+
+	ctx = adapters.InsertLogger(ctx, log)
+
+	if status, err := validateHeaders(r); err != nil {
+		w.WriteHeader(status)
+		json.NewEncoder(w).Encode(err)
+		return
+	}
+
+	password := &struct {
+		Password string `json:"password"`
+	}{}
+
+	if err := json.NewDecoder(r.Body).Decode(password); err != nil {
+		log.InfoContext(ctx, "can't parse requests's body", slog.String("error", err.Error()))
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		json.NewEncoder(w).Encode(models.Error{
+			Message: invalidBodyRequestMessage,
+			Code:    models.ErrCodeUnprocessableEntity,
+		})
+		return
+	}
+	defer r.Body.Close()
+
+	access, err := getCookie(ctx, w, r, Access)
+	if err != nil {
+		log.InfoContext(ctx, "invalid cookie in request", slog.String("error", err.Error()))
+		return
+	}
+
+	if err := h.authClient.SendDeleteUserRequest(ctx, access.Value, password.Password); err != nil {
+		handleResponseError(w, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (h *Handlers) SendVerificationEmail(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), h.requestTime)
+	defer cancel()
+
+	log := slog.With(slog.String("handlers", "SendVerificationEmail"))
+	log.InfoContext(ctx, "request")
+
+	ctx = adapters.InsertLogger(ctx, log)
+
+	access, err := getCookie(ctx, w, r, Access)
+	if err != nil {
+		log.InfoContext(ctx, "invalid cookie in request", slog.String("error", err.Error()))
+		return
+	}
+
+	if err := h.authClient.SendVerificationEmailRequest(ctx, access.Value); err != nil {
+		handleResponseError(w, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (h *Handlers) VerifyEmail(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), h.requestTime)
+	defer cancel()
+
+	log := slog.With(slog.String("handlers", "vVerifyEmail"))
+	log.InfoContext(ctx, "request")
+
+	ctx = adapters.InsertLogger(ctx, log)
+
+	token := r.URL.Query().Get("token")
+	if token == "" {
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNotAcceptable)
+		json.NewEncoder(w).Encode(models.Error{
+			Message: "verification token required",
+			Code:    models.ErrCodeInvalidArgument,
+		})
+		return
+	}
+
+	tokens, err := h.authClient.SendVerifyEmailRequest(ctx, token)
+	if err != nil {
+		handleResponseError(w, err)
+		return
+	}
+
+	access, refresh := createCookie(Access, tokens.Access), createCookie(Refresh, tokens.Refresh)
+	http.SetCookie(w, access)
+	http.SetCookie(w, refresh)
+
+	w.WriteHeader(http.StatusNoContent)
+}

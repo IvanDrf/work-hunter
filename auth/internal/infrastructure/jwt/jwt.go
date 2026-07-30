@@ -8,8 +8,6 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var ErrInvalidJWT = errors.New("invalid jwt token")
-
 type claims struct {
 	models.JwtPayload
 
@@ -45,25 +43,14 @@ func (j *Jwt) CreateTokens(payload *models.JwtPayload) (string, string, error) {
 	return access, refresh, nil
 }
 
-func (j *Jwt) createToken(payload *models.JwtPayload, duration time.Duration) (string, error) {
-	claims := claims{
-		JwtPayload: *payload,
-
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(duration)),
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(j.secret)
-}
+var errInvalidJwt = errors.New(models.InvalidJWTMsg)
 
 func (j *Jwt) GetPayload(token string) (*models.JwtPayload, error) {
-	claims := &claims{}
+	data := &claims{}
 
-	t, err := jwt.ParseWithClaims(token, claims, func(t *jwt.Token) (any, error) {
+	t, err := jwt.ParseWithClaims(token, data, func(t *jwt.Token) (any, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, ErrInvalidJWT
+			return nil, errInvalidJwt
 		}
 
 		return j.secret, nil
@@ -74,8 +61,21 @@ func (j *Jwt) GetPayload(token string) (*models.JwtPayload, error) {
 	}
 
 	return &models.JwtPayload{
-		UserID:      claims.UserID,
-		Verificated: claims.Verificated,
-		Role:        claims.Role,
+		UserID:      data.UserID,
+		Verificated: data.Verificated,
+		Role:        data.Role,
 	}, err
+}
+
+func (j *Jwt) createToken(payload *models.JwtPayload, duration time.Duration) (string, error) {
+	data := claims{
+		JwtPayload: *payload,
+
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(duration)),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, data)
+	return token.SignedString(j.secret)
 }

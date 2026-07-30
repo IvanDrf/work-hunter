@@ -3,12 +3,11 @@ package handlers
 import (
 	"context"
 
-	auth_api "github.com/IvanDrf/work-hunter/pkg/auth-api"
-	"google.golang.org/grpc/codes"
+	"github.com/IvanDrf/work-hunter/pkg/common"
 )
 
-func (h *Handler) Health(ctx context.Context, _ *auth_api.Empty) (*auth_api.ServiceStatus, error) {
-	return &auth_api.ServiceStatus{
-		Code: int32(codes.OK),
+func (h *Handler) Health(ctx context.Context, _ *common.Empty) (*common.ServiceStatus, error) {
+	return &common.ServiceStatus{
+		Status: common.Status_AVAILABLE,
 	}, nil
 }

@@ -62,8 +62,7 @@ volumes:
 
 networks:
   shared_network:
-    driver: bridge
-    name: shared_network
+    external: true
   validation_network:
     driver: bridge
     name: validation_network
