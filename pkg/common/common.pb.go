@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v3.21.12
-// source: common.proto
+// source: protos/common.proto
 
 package common
 
@@ -57,11 +57,11 @@ func (x UserRole) String() string {
 }
 
 func (UserRole) Descriptor() protoreflect.EnumDescriptor {
-	return file_common_proto_enumTypes[0].Descriptor()
+	return file_protos_common_proto_enumTypes[0].Descriptor()
 }
 
 func (UserRole) Type() protoreflect.EnumType {
-	return &file_common_proto_enumTypes[0]
+	return &file_protos_common_proto_enumTypes[0]
 }
 
 func (x UserRole) Number() protoreflect.EnumNumber {
@@ -70,7 +70,106 @@ func (x UserRole) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use UserRole.Descriptor instead.
 func (UserRole) EnumDescriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{0}
+	return file_protos_common_proto_rawDescGZIP(), []int{0}
+}
+
+type ResponseStatus int32
+
+const (
+	ResponseStatus_SUCCESS   ResponseStatus = 0
+	ResponseStatus_FAILED    ResponseStatus = 1
+	ResponseStatus_NOT_FOUND ResponseStatus = 2
+	ResponseStatus_FORBIDDEN ResponseStatus = 3
+)
+
+// Enum value maps for ResponseStatus.
+var (
+	ResponseStatus_name = map[int32]string{
+		0: "SUCCESS",
+		1: "FAILED",
+		2: "NOT_FOUND",
+		3: "FORBIDDEN",
+	}
+	ResponseStatus_value = map[string]int32{
+		"SUCCESS":   0,
+		"FAILED":    1,
+		"NOT_FOUND": 2,
+		"FORBIDDEN": 3,
+	}
+)
+
+func (x ResponseStatus) Enum() *ResponseStatus {
+	p := new(ResponseStatus)
+	*p = x
+	return p
+}
+
+func (x ResponseStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ResponseStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_protos_common_proto_enumTypes[1].Descriptor()
+}
+
+func (ResponseStatus) Type() protoreflect.EnumType {
+	return &file_protos_common_proto_enumTypes[1]
+}
+
+func (x ResponseStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ResponseStatus.Descriptor instead.
+func (ResponseStatus) EnumDescriptor() ([]byte, []int) {
+	return file_protos_common_proto_rawDescGZIP(), []int{1}
+}
+
+// service status
+type Status int32
+
+const (
+	Status_UNAVAILABLE Status = 0
+	Status_AVAILABLE   Status = 1
+)
+
+// Enum value maps for Status.
+var (
+	Status_name = map[int32]string{
+		0: "UNAVAILABLE",
+		1: "AVAILABLE",
+	}
+	Status_value = map[string]int32{
+		"UNAVAILABLE": 0,
+		"AVAILABLE":   1,
+	}
+)
+
+func (x Status) Enum() *Status {
+	p := new(Status)
+	*p = x
+	return p
+}
+
+func (x Status) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_protos_common_proto_enumTypes[2].Descriptor()
+}
+
+func (Status) Type() protoreflect.EnumType {
+	return &file_protos_common_proto_enumTypes[2]
+}
+
+func (x Status) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use Status.Descriptor instead.
+func (Status) EnumDescriptor() ([]byte, []int) {
+	return file_protos_common_proto_rawDescGZIP(), []int{2}
 }
 
 type UserInfo struct {
@@ -84,7 +183,7 @@ type UserInfo struct {
 
 func (x *UserInfo) Reset() {
 	*x = UserInfo{}
-	mi := &file_common_proto_msgTypes[0]
+	mi := &file_protos_common_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -96,7 +195,7 @@ func (x *UserInfo) String() string {
 func (*UserInfo) ProtoMessage() {}
 
 func (x *UserInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_common_proto_msgTypes[0]
+	mi := &file_protos_common_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -109,7 +208,7 @@ func (x *UserInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserInfo.ProtoReflect.Descriptor instead.
 func (*UserInfo) Descriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{0}
+	return file_protos_common_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *UserInfo) GetRole() UserRole {
@@ -137,7 +236,7 @@ type FullUserInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Role          UserRole               `protobuf:"varint,1,opt,name=role,proto3,enum=common.UserRole" json:"role,omitempty"`
 	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Username      string                 `protobuf:"bytes,3,opt,name=username,proto3" json:"username,omitempty"`
+	CompanyName   string                 `protobuf:"bytes,3,opt,name=company_name,json=companyName,proto3" json:"company_name,omitempty"`
 	Verificated   bool                   `protobuf:"varint,4,opt,name=verificated,proto3" json:"verificated,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -145,7 +244,7 @@ type FullUserInfo struct {
 
 func (x *FullUserInfo) Reset() {
 	*x = FullUserInfo{}
-	mi := &file_common_proto_msgTypes[1]
+	mi := &file_protos_common_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -157,7 +256,7 @@ func (x *FullUserInfo) String() string {
 func (*FullUserInfo) ProtoMessage() {}
 
 func (x *FullUserInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_common_proto_msgTypes[1]
+	mi := &file_protos_common_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -170,7 +269,7 @@ func (x *FullUserInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FullUserInfo.ProtoReflect.Descriptor instead.
 func (*FullUserInfo) Descriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{1}
+	return file_protos_common_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *FullUserInfo) GetRole() UserRole {
@@ -187,9 +286,9 @@ func (x *FullUserInfo) GetUserId() string {
 	return ""
 }
 
-func (x *FullUserInfo) GetUsername() string {
+func (x *FullUserInfo) GetCompanyName() string {
 	if x != nil {
-		return x.Username
+		return x.CompanyName
 	}
 	return ""
 }
@@ -201,77 +300,231 @@ func (x *FullUserInfo) GetVerificated() bool {
 	return false
 }
 
-var File_common_proto protoreflect.FileDescriptor
+type Response struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Status        ResponseStatus         `protobuf:"varint,1,opt,name=status,proto3,enum=common.ResponseStatus" json:"status,omitempty"`
+	Details       string                 `protobuf:"bytes,2,opt,name=details,proto3" json:"details,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
 
-const file_common_proto_rawDesc = "" +
+func (x *Response) Reset() {
+	*x = Response{}
+	mi := &file_protos_common_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Response) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Response) ProtoMessage() {}
+
+func (x *Response) ProtoReflect() protoreflect.Message {
+	mi := &file_protos_common_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Response.ProtoReflect.Descriptor instead.
+func (*Response) Descriptor() ([]byte, []int) {
+	return file_protos_common_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *Response) GetStatus() ResponseStatus {
+	if x != nil {
+		return x.Status
+	}
+	return ResponseStatus_SUCCESS
+}
+
+func (x *Response) GetDetails() string {
+	if x != nil {
+		return x.Details
+	}
+	return ""
+}
+
+type Empty struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Empty) Reset() {
+	*x = Empty{}
+	mi := &file_protos_common_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Empty) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Empty) ProtoMessage() {}
+
+func (x *Empty) ProtoReflect() protoreflect.Message {
+	mi := &file_protos_common_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Empty.ProtoReflect.Descriptor instead.
+func (*Empty) Descriptor() ([]byte, []int) {
+	return file_protos_common_proto_rawDescGZIP(), []int{3}
+}
+
+type ServiceStatus struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Status        Status                 `protobuf:"varint,1,opt,name=status,proto3,enum=common.Status" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ServiceStatus) Reset() {
+	*x = ServiceStatus{}
+	mi := &file_protos_common_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ServiceStatus) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ServiceStatus) ProtoMessage() {}
+
+func (x *ServiceStatus) ProtoReflect() protoreflect.Message {
+	mi := &file_protos_common_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ServiceStatus.ProtoReflect.Descriptor instead.
+func (*ServiceStatus) Descriptor() ([]byte, []int) {
+	return file_protos_common_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *ServiceStatus) GetStatus() Status {
+	if x != nil {
+		return x.Status
+	}
+	return Status_UNAVAILABLE
+}
+
+var File_protos_common_proto protoreflect.FileDescriptor
+
+const file_protos_common_proto_rawDesc = "" +
 	"\n" +
-	"\fcommon.proto\x12\x06common\"k\n" +
+	"\x13protos/common.proto\x12\x06common\"k\n" +
 	"\bUserInfo\x12$\n" +
 	"\x04role\x18\x01 \x01(\x0e2\x10.common.UserRoleR\x04role\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12 \n" +
-	"\vverificated\x18\x03 \x01(\bR\vverificated\"\x8b\x01\n" +
+	"\vverificated\x18\x03 \x01(\bR\vverificated\"\x92\x01\n" +
 	"\fFullUserInfo\x12$\n" +
 	"\x04role\x18\x01 \x01(\x0e2\x10.common.UserRoleR\x04role\x12\x17\n" +
-	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x1a\n" +
-	"\busername\x18\x03 \x01(\tR\busername\x12 \n" +
-	"\vverificated\x18\x04 \x01(\bR\vverificated*B\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\x12!\n" +
+	"\fcompany_name\x18\x03 \x01(\tR\vcompanyName\x12 \n" +
+	"\vverificated\x18\x04 \x01(\bR\vverificated\"T\n" +
+	"\bResponse\x12.\n" +
+	"\x06status\x18\x01 \x01(\x0e2\x16.common.ResponseStatusR\x06status\x12\x18\n" +
+	"\adetails\x18\x02 \x01(\tR\adetails\"\a\n" +
+	"\x05Empty\"7\n" +
+	"\rServiceStatus\x12&\n" +
+	"\x06status\x18\x01 \x01(\x0e2\x0e.common.StatusR\x06status*B\n" +
 	"\bUserRole\x12\x0f\n" +
 	"\vUNSPECIFIED\x10\x00\x12\t\n" +
 	"\x05ADMIN\x10\x01\x12\f\n" +
 	"\bEMPLOYEE\x10\x02\x12\f\n" +
-	"\bEMPLOYER\x10\x03B\fZ\n" +
+	"\bEMPLOYER\x10\x03*G\n" +
+	"\x0eResponseStatus\x12\v\n" +
+	"\aSUCCESS\x10\x00\x12\n" +
+	"\n" +
+	"\x06FAILED\x10\x01\x12\r\n" +
+	"\tNOT_FOUND\x10\x02\x12\r\n" +
+	"\tFORBIDDEN\x10\x03*(\n" +
+	"\x06Status\x12\x0f\n" +
+	"\vUNAVAILABLE\x10\x00\x12\r\n" +
+	"\tAVAILABLE\x10\x01B\fZ\n" +
 	"pkg/commonb\x06proto3"
 
 var (
-	file_common_proto_rawDescOnce sync.Once
-	file_common_proto_rawDescData []byte
+	file_protos_common_proto_rawDescOnce sync.Once
+	file_protos_common_proto_rawDescData []byte
 )
 
-func file_common_proto_rawDescGZIP() []byte {
-	file_common_proto_rawDescOnce.Do(func() {
-		file_common_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_common_proto_rawDesc), len(file_common_proto_rawDesc)))
+func file_protos_common_proto_rawDescGZIP() []byte {
+	file_protos_common_proto_rawDescOnce.Do(func() {
+		file_protos_common_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_protos_common_proto_rawDesc), len(file_protos_common_proto_rawDesc)))
 	})
-	return file_common_proto_rawDescData
+	return file_protos_common_proto_rawDescData
 }
 
-var file_common_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_common_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_common_proto_goTypes = []any{
-	(UserRole)(0),        // 0: common.UserRole
-	(*UserInfo)(nil),     // 1: common.UserInfo
-	(*FullUserInfo)(nil), // 2: common.FullUserInfo
+var file_protos_common_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
+var file_protos_common_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_protos_common_proto_goTypes = []any{
+	(UserRole)(0),         // 0: common.UserRole
+	(ResponseStatus)(0),   // 1: common.ResponseStatus
+	(Status)(0),           // 2: common.Status
+	(*UserInfo)(nil),      // 3: common.UserInfo
+	(*FullUserInfo)(nil),  // 4: common.FullUserInfo
+	(*Response)(nil),      // 5: common.Response
+	(*Empty)(nil),         // 6: common.Empty
+	(*ServiceStatus)(nil), // 7: common.ServiceStatus
 }
-var file_common_proto_depIdxs = []int32{
+var file_protos_common_proto_depIdxs = []int32{
 	0, // 0: common.UserInfo.role:type_name -> common.UserRole
 	0, // 1: common.FullUserInfo.role:type_name -> common.UserRole
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	1, // 2: common.Response.status:type_name -> common.ResponseStatus
+	2, // 3: common.ServiceStatus.status:type_name -> common.Status
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
-func init() { file_common_proto_init() }
-func file_common_proto_init() {
-	if File_common_proto != nil {
+func init() { file_protos_common_proto_init() }
+func file_protos_common_proto_init() {
+	if File_protos_common_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_common_proto_rawDesc), len(file_common_proto_rawDesc)),
-			NumEnums:      1,
-			NumMessages:   2,
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_protos_common_proto_rawDesc), len(file_protos_common_proto_rawDesc)),
+			NumEnums:      3,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_common_proto_goTypes,
-		DependencyIndexes: file_common_proto_depIdxs,
-		EnumInfos:         file_common_proto_enumTypes,
-		MessageInfos:      file_common_proto_msgTypes,
+		GoTypes:           file_protos_common_proto_goTypes,
+		DependencyIndexes: file_protos_common_proto_depIdxs,
+		EnumInfos:         file_protos_common_proto_enumTypes,
+		MessageInfos:      file_protos_common_proto_msgTypes,
 	}.Build()
-	File_common_proto = out.File
-	file_common_proto_goTypes = nil
-	file_common_proto_depIdxs = nil
+	File_protos_common_proto = out.File
+	file_protos_common_proto_goTypes = nil
+	file_protos_common_proto_depIdxs = nil
 }

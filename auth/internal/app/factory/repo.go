@@ -10,8 +10,11 @@ import (
 )
 
 func (f *Factory) newRepos() (repo.UserRepo, repo.TokenRepo) {
-	db := postgres.Connect(&f.cfg.Database)
-	client := r.Connect(&f.cfg.Redis)
+	db := postgres.Connect(f.cfg)
+	if db == nil {
+		panic("postgres connection is nil")
+	}
+	client := r.Connect(f.cfg)
 
 	return f.newUserRepo(db), f.newTokenRepo(client)
 }

@@ -4,7 +4,6 @@ package main
 // Example usage
 // go run cmd/migrator/main.go
 // --mig=./internal/infrastructure/persistence/postgres/migrations/
-// --config=./config/config.yaml
 // --cmd=up
 // --steps=1
 
@@ -15,6 +14,7 @@ package main
 // steps - migrations steps, file code 001, 002
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -33,9 +33,11 @@ func main() {
 	flag.StringVar(&migrations, "mig", "", "path to migration files")
 	flag.StringVar(&command, "cmd", "", "command for migration: up or down")
 	flag.IntVar(&steps, "steps", 1, "amount of steps for migrations")
-	cfg := config.LoadFromYAML()
+	flag.Parse()
 
-	m, err := migrate.New(fmt.Sprintf("file://%s", migrations), cfg.Database.DSN())
+	cfg := config.LoadFromENV()
+
+	m, err := migrate.New(fmt.Sprintf("file://%s", migrations), cfg.POSTGRES_DSN())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -45,7 +47,7 @@ func main() {
 	}
 
 	if command == "up" {
-		if err = m.Steps(steps); err != migrate.ErrNoChange && err != nil {
+		if err = m.Steps(steps); !errors.Is(err, migrate.ErrNoChange) && err != nil {
 			log.Fatal(err)
 		}
 
@@ -53,7 +55,7 @@ func main() {
 	}
 
 	if command == "down" {
-		if err = m.Steps(-steps); err != migrate.ErrNoChange && err != nil {
+		if err = m.Steps(-steps); !errors.Is(err, migrate.ErrNoChange) && err != nil {
 			log.Fatal(err)
 		}
 

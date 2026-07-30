@@ -9,6 +9,7 @@ import (
 	"github.com/go-redis/redismock/v9"
 	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func connect() (*r.TokenRepo, redismock.ClientMock) {
@@ -28,8 +29,8 @@ func TestCreateToken(t *testing.T) {
 		mock.ExpectSet(token, email, rules.TokenTTL).RedisNil()
 		err := repo.CreateToken(t.Context(), email, token, rules.TokenTTL)
 
-		assert.Equal(t, redis.Nil, err)
-		assert.Nil(t, mock.ExpectationsWereMet())
+		require.Equal(t, redis.Nil, err)
+		require.NoError(t, mock.ExpectationsWereMet())
 	}
 }
 
@@ -45,7 +46,7 @@ func TestFindEmailByToken(t *testing.T) {
 		e := repo.FindEmailByToken(t.Context(), token)
 
 		assert.Equal(t, email, e)
-		assert.Nil(t, mock.ExpectationsWereMet())
+		require.NoError(t, mock.ExpectationsWereMet())
 	}
 }
 
@@ -61,6 +62,6 @@ func TestDeleteToken(t *testing.T) {
 		err := repo.DeleteToken(t.Context(), token)
 
 		assert.Equal(t, redis.Nil, err)
-		assert.Nil(t, mock.ExpectationsWereMet())
+		require.NoError(t, mock.ExpectationsWereMet())
 	}
 }

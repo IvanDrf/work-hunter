@@ -5,10 +5,10 @@ import (
 	"github.com/google/uuid"
 )
 
-// fixtures size, users, tokens
+// fixtures size, users, tokens.
 const size = 6
 
-// fixtures
+// fixtures.
 var (
 	Users = map[string]string{
 		"first@gmail.com":  "12345Qwerty",
@@ -19,7 +19,7 @@ var (
 		"sixth@gmail.com":  "eorigjkplw",
 	}
 
-	// user ids
+	// UserIDs.
 	UserIDs = [size]uuid.UUID{
 		uuid.New(),
 		uuid.New(),
@@ -38,7 +38,7 @@ var (
 		UserIDs[5].String(),
 	}
 
-	// unregistred users, using this in TestLoginUser
+	// Unregistered users, using this in TestLoginUser.
 	Unregistered = map[string]string{
 		"unregistred@gmail.com": "eruigjwkmelf",
 		"un2egistred@gmail.com": "23iyrguhf",
@@ -48,7 +48,7 @@ var (
 		"unregsixth@gmail.com":  "wroefhjqk",
 	}
 
-	// Tokens for registred users
+	// Tokens for registred users.
 	Tokens = [size]string{
 		rules.GenerateToken(),
 		rules.GenerateToken(),
@@ -58,7 +58,7 @@ var (
 		rules.GenerateToken(),
 	}
 
-	// invalid tokens
+	// UnusedTokens - invalid tokens.
 	UnusedTokens = [size]string{
 		rules.GenerateToken(),
 		rules.GenerateToken(),

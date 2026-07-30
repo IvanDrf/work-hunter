@@ -1,10 +1,12 @@
-from asyncio import create_task
+import logging
+from asyncio import create_task, gather
 from datetime import timedelta
 
-from src.core.exc import AccessError, ArgumentError
-from src.domain.rules.user import is_user_admin
+from src.core.exc import AccessError, ArgumentError, InternalError
+from src.domain.rules.user import is_user_admin, is_user_employee, is_user_employer
 from src.domain.rules.vacancy import has_right_to_vacancy, is_vacancy_id_valid
 from src.domain.schemas import UserInfo, VacancyResponseSchema
+from src.domain.types import OrderBy, VacancyStatus
 from src.infrastructure.service.base_vacancy import BaseVacancyService
 from src.infrastructure.service.dependencies import ICache, IUnitOfWork, IVacancyRepo
 from src.infrastructure.service.dto.vacancy_dto import vacancy_orm_to_response_dto
@@ -29,10 +31,8 @@ class VacancySearchService(BaseVacancyService):
             raise ArgumentError(f"vacancy_id must be non negative number, {vacancy_id=}")
 
         vacancy = await self._get_vacancy_from_cache_by_id(vacancy_id)
-        if vacancy is not None:
-            if not has_right_to_vacancy(vacancy, user_info):
-                raise AccessError("this vacancy is moderating now or deleted, you can't see it now")
-
+        if vacancy is not None and has_right_to_vacancy(vacancy, user_info):
+            create_task(self._update_vacancy_views(vacancy, user_info))
             return vacancy
 
         async with self.uof_factory as uof:
@@ -43,16 +43,17 @@ class VacancySearchService(BaseVacancyService):
         if not has_right_to_vacancy(vacancy, user_info):
             raise AccessError("this vacancy is moderating now or deleted, you can't see it now")
 
-        vacancySchema = vacancy_orm_to_response_dto(vacancy)
-        create_task(self._save_vacancy_in_cache_by_id(vacancySchema))
+        vacancy_schema = vacancy_orm_to_response_dto(vacancy)
+        gather(*[self._save_vacancy_in_cache_by_id(vacancy_schema), self._update_vacancy_views(vacancy_schema, user_info)])
 
-        return vacancySchema
+        return vacancy_schema
 
     async def find_vacancies_with_tags(
         self,
         tags: list[str],
         offset: int,
         limit: int,
+        order_by: OrderBy,
         user_info: UserInfo | None,
     ) -> list[VacancyResponseSchema] | None:
         if not tags:
@@ -60,9 +61,9 @@ class VacancySearchService(BaseVacancyService):
 
         async with self.uof_factory as uof:
             if user_info is not None and is_user_admin(user_info):
-                vacancies = await self.vacancy_repo.find_vacancies_for_admin_with_tags(uof, tags, offset, limit)
+                vacancies = await self.vacancy_repo.find_vacancies_for_admin_with_tags(uof, tags, order_by, offset, limit)
             else:
-                vacancies = await self.vacancy_repo.find_only_published_vacancies_with_tags(uof, tags, offset, limit)
+                vacancies = await self.vacancy_repo.find_only_published_vacancies_with_tags(uof, tags, order_by, offset, limit)
 
             if vacancies is None:
                 return None
@@ -74,19 +75,45 @@ class VacancySearchService(BaseVacancyService):
         author: str,
         offset: int,
         limit: int,
+        order_by: OrderBy,
         user_info: UserInfo | None,
     ) -> list[VacancyResponseSchema] | None:
         if not author:
             raise ArgumentError("invalid author name, author name is empty")
 
+        vacancies = await self._get_vacancies_by_author(author, order_by, user_info, offset, limit)
+        if vacancies is not None:
+            return vacancies
+
         async with self.uof_factory as uof:
             if user_info is not None and is_user_admin(user_info):
-                vacancies = await self.vacancy_repo.find_vacancies_for_admin_by_author(uof, author, offset, limit)
+                vacancies = await self.vacancy_repo.find_vacancies_for_admin_by_author(uof, author, order_by, offset, limit)
             else:
-                vacancies = await self.vacancy_repo.find_only_published_vacancies_by_author(uof, author, offset, limit)
+                vacancies = await self.vacancy_repo.find_only_published_vacancies_by_author(uof, author, order_by, offset, limit)
 
             if vacancies is None:
                 return None
+
+        vacancies = [vacancy_orm_to_response_dto(vacancy) for vacancy in vacancies]
+        create_task(self._save_vacancies_by_author(vacancies, author, order_by, user_info, offset, limit))
+
+        return vacancies
+
+    async def find_vacancies_by_author_id(
+        self,
+        offset: int,
+        limit: int,
+        order_by: OrderBy,
+        user_info: UserInfo,
+    ) -> list[VacancyResponseSchema] | None:
+        if not is_user_employer(user_info) and not is_user_admin(user_info):
+            raise AccessError(f"only employer or admin can see his vacancies, but user_role={user_info.user_role.name}")
+
+        async with self.uof_factory as uof:
+            vacancies = await self.vacancy_repo.find_vacancies_by_author_id(uof, user_info.user_id, order_by, offset, limit)
+
+        if vacancies is None:
+            return None
 
         return [vacancy_orm_to_response_dto(vacancy) for vacancy in vacancies]
 
@@ -95,6 +122,7 @@ class VacancySearchService(BaseVacancyService):
         title: str,
         offset: int,
         limit: int,
+        order_by: OrderBy,
         user_info: UserInfo | None,
     ) -> list[VacancyResponseSchema] | None:
         if not title:
@@ -102,11 +130,24 @@ class VacancySearchService(BaseVacancyService):
 
         async with self.uof_factory as uof:
             if user_info is not None and is_user_admin(user_info):
-                vacancies = await self.vacancy_repo.find_vacancies_for_admin_by_title(uof, title, offset, limit)
+                vacancies = await self.vacancy_repo.find_vacancies_for_admin_by_title(uof, title, order_by, offset, limit)
             else:
-                vacancies = await self.vacancy_repo.find_only_published_vacancies_by_title(uof, title, offset, limit)
+                vacancies = await self.vacancy_repo.find_only_published_vacancies_by_title(uof, title, order_by, offset, limit)
 
         if vacancies is None:
             return None
 
         return [vacancy_orm_to_response_dto(vacancy) for vacancy in vacancies]
+
+    async def _update_vacancy_views(self, vacancy: VacancyResponseSchema, user_info: UserInfo | None) -> None:
+        if vacancy.status != VacancyStatus.PUBLISHED:
+            return
+
+        if user_info is not None and (not is_user_employee(user_info) or user_info.user_id == vacancy.author_id):
+            return
+
+        async with self.uof_factory as uof:
+            try:
+                await self.vacancy_repo.update_vacancy(uof, vacancy.vacancy_id, {"views": vacancy.views + 1})
+            except InternalError as e:
+                logging.critical(f"can't update views for {vacancy.vacancy_id=}, details={e}")

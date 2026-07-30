@@ -3,6 +3,7 @@ from uuid import UUID
 
 from src.domain.models import TagORM
 from src.domain.models.vacancy import VacancyORM
+from src.domain.types.enums import OrderBy
 from src.infrastructure.service.dependencies.unit_of_work import IUnitOfWork
 
 
@@ -12,6 +13,7 @@ class IVacancySearchRepo(Protocol):
         self,
         uof: IUnitOfWork,
         tags: list[str],
+        order_by: OrderBy,
         offset: int,
         limit: int,
     ) -> list[VacancyORM] | None: ...
@@ -19,13 +21,16 @@ class IVacancySearchRepo(Protocol):
         self,
         uof: IUnitOfWork,
         tags: list[str],
+        order_by: OrderBy,
         offset: int,
         limit: int,
     ) -> list[VacancyORM] | None: ...
+
     async def find_only_published_vacancies_by_author(
         self,
         uof: IUnitOfWork,
         author: str,
+        order_by: OrderBy,
         offset: int,
         limit: int,
     ) -> list[VacancyORM] | None: ...
@@ -33,13 +38,24 @@ class IVacancySearchRepo(Protocol):
         self,
         uof: IUnitOfWork,
         author: str,
+        order_by: OrderBy,
         offset: int,
         limit: int,
     ) -> list[VacancyORM] | None: ...
+    async def find_vacancies_by_author_id(
+        self,
+        uof: IUnitOfWork,
+        author_id: UUID,
+        order_by: OrderBy,
+        offset: int,
+        limit: int,
+    ) -> list[VacancyORM] | None: ...
+
     async def find_vacancies_for_admin_by_title(
         self,
         uof: IUnitOfWork,
         title: str,
+        order_by: OrderBy,
         offset: int,
         limit: int,
     ) -> list[VacancyORM] | None: ...
@@ -47,9 +63,11 @@ class IVacancySearchRepo(Protocol):
         self,
         uof: IUnitOfWork,
         title: str,
+        order_by: OrderBy,
         offset: int,
         limit: int,
     ) -> list[VacancyORM] | None: ...
+
     async def find_vacancy_author(self, uof: IUnitOfWork, vacancy_id: int) -> UUID | None: ...
 
 

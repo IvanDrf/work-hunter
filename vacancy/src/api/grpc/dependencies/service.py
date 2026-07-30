@@ -1,0 +1,55 @@
+from typing import Protocol
+
+from src.domain.schemas import UserInfo, VacancyCreateSchema, VacancyResponseSchema, VacancyUpdateSchema
+from src.domain.types.enums import OrderBy, VacancyStatus
+
+
+class IVacancyService(Protocol):
+    async def create_vacancy(self, vacancy: VacancyCreateSchema, user_info: UserInfo) -> VacancyResponseSchema: ...
+
+    async def find_vacancy_by_id(self, vacancy_id: int, user_info: UserInfo | None) -> VacancyResponseSchema | None: ...
+    async def find_vacancies_by_author(
+        self,
+        author: str,
+        offset: int,
+        limit: int,
+        order_by: OrderBy,
+        user_info: UserInfo | None,
+    ) -> list[VacancyResponseSchema] | None: ...
+    async def find_vacancies_by_author_id(
+        self,
+        offset: int,
+        limit: int,
+        order_by: OrderBy,
+        user_info: UserInfo,
+    ) -> list[VacancyResponseSchema] | None: ...
+
+    async def find_vacancies_with_tags(
+        self,
+        tags: list[str],
+        offset: int,
+        limit: int,
+        order_by: OrderBy,
+        user_info: UserInfo | None,
+    ) -> list[VacancyResponseSchema] | None: ...
+    async def find_vacancies_by_title(
+        self,
+        title: str,
+        offset: int,
+        limit: int,
+        order_by: OrderBy,
+        user_info: UserInfo | None,
+    ) -> list[VacancyResponseSchema] | None: ...
+
+    async def update_vacancy(self, vacancy_update_schema: VacancyUpdateSchema, user_info: UserInfo) -> VacancyResponseSchema: ...
+    async def delete_vacancy(self, vacancy_id: int, user_info: UserInfo) -> None: ...
+
+    async def set_vacancy_status(
+        self,
+        vacancy_id: int,
+        status: VacancyStatus,
+        moderator_comments: str,
+        user_info: UserInfo,
+    ) -> None: ...
+
+    async def stop(self) -> None: ...

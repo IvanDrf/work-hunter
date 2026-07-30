@@ -5,8 +5,7 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 
 from src.domain.schemas.mixins import ExperienceValidatorMixin, SalaryValidatorMixin
-from src.domain.types.enums import Currency, RemoteType, TimeType, VacancyStatus
-from src.domain.types.types import UNSET_VALUE, Money, UnsetValue, Year
+from src.domain.types import UNSET_VALUE, Currency, Money, RemoteType, TimeType, UnsetValue, VacancyStatus, Year
 
 MIN_TITLE_LENGTH: Final[int] = 5
 MAX_TITLE_LENGTH: Final[int] = 150
@@ -14,6 +13,14 @@ MAX_TITLE_LENGTH: Final[int] = 150
 MAX_DESCRIPTION_LENGTH: Final[int] = 20_000
 MAX_REQUIREMENTS_LENGTH: Final[int] = 20_000
 MAX_CONDITIONS_LENGTH: Final[int] = 20_000
+
+MAX_CITY_LENGTH: Final[int] = 40
+MAX_METRO_LENGTH: Final[int] = 50
+
+MIN_TAGS_AMOUNT: Final[int] = 0
+MAX_TAGS_AMOUNT: Final[int] = 20
+
+MAX_AUTHOR_NAME_LENGTH: Final[int] = 30
 
 
 class VacancySchema(BaseModel, SalaryValidatorMixin, ExperienceValidatorMixin):
@@ -28,21 +35,23 @@ class VacancySchema(BaseModel, SalaryValidatorMixin, ExperienceValidatorMixin):
 
     currency: Currency = Currency.RUB
 
-    city: str | None = None
-    metro: str | None = None
+    city: str | None = Field(default=None, max_length=MAX_CITY_LENGTH)
+    metro: str | None = Field(default=None, max_length=MAX_METRO_LENGTH)
+    is_city_valid: bool = False
+    is_metro_valid: bool = False
 
-    remote_type: RemoteType = Field(default=RemoteType.ANY)
-    time_type: TimeType = Field(default=TimeType.FULL)
+    remote_type: RemoteType = RemoteType.ANY
+    time_type: TimeType = TimeType.FULL
 
     experience_min: Year | None = None
     experience_max: Year | None = None
 
-    tags: list[str] = []
+    tags: list[str] = Field(default_factory=list, min_length=MIN_TAGS_AMOUNT, max_length=MAX_TAGS_AMOUNT)
 
 
-class VacancyCreateSchema(VacancySchema, SalaryValidatorMixin, ExperienceValidatorMixin):
+class VacancyCreateSchema(VacancySchema):
     author_id: UUID
-    author_name: str
+    author_name: str = Field(max_length=MAX_AUTHOR_NAME_LENGTH)
 
 
 class VacancyUpdateSchema(BaseModel, SalaryValidatorMixin, ExperienceValidatorMixin):
@@ -70,8 +79,8 @@ class VacancyUpdateSchema(BaseModel, SalaryValidatorMixin, ExperienceValidatorMi
     tags: list[str] | UnsetValue = UNSET_VALUE
 
 
-class VacancyResponseSchema(VacancySchema, SalaryValidatorMixin, ExperienceValidatorMixin):
-    vacancy_id: int
+class VacancyResponseSchema(VacancySchema):
+    vacancy_id: int = Field(ge=0)
     author_name: str
     author_id: UUID
 

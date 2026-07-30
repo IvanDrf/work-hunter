@@ -2,12 +2,14 @@ syntax = "proto3";
 
 package auth;
 
-option  go_package = "pkg/auth-api";
+option go_package = "pkg/auth-api";
+
+import "common.proto";
 
 // auth servuce by jwt
 service Auth {
     // check service health
-    rpc Health(Empty) returns (ServiceStatus);
+    rpc Health(common.Empty) returns (common.ServiceStatus);
 
     // register user by username, password
     rpc Register(User) returns (JwtTokens); 
@@ -34,17 +36,11 @@ service Auth {
     rpc RefreshTokens(RefreshToken) returns (JwtTokens);
 }
 
-enum Role {
-    ADMIN = 0;
-    EMPLOYEE = 1;
-    EMPLOYER = 2;
-}
-
 
 message User {
     string email = 1;
     string password = 2;
-    Role role = 3; // ADMIN, EMPLOYEE, EMPLOYER
+    common.UserRole role = 3; // ADMIN, EMPLOYEE, EMPLOYER
 }
 
 
@@ -64,7 +60,7 @@ message JwtTokens {
 message TokenPayload {
     string id = 1;
     bool verificated = 2;
-    Role role = 3;
+    common.UserRole role = 3;
 }
 
 
@@ -84,8 +80,4 @@ message ChangePasswordRequest {
 }
 
 message Empty {
-}
-
-message ServiceStatus {
-    int32 code = 1;
 }

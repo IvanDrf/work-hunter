@@ -8,6 +8,7 @@ import (
 	"github.com/IvanDrf/work-hunter/auth/internal/domain/rules"
 	"github.com/IvanDrf/work-hunter/auth/tests/rules/fixtures"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestIsEmailValid(t *testing.T) {
@@ -35,7 +36,7 @@ func TestPasswordHashing(t *testing.T) {
 	for _, password := range fixtures.ValidPasswords {
 		hashed, err := rules.HashPassword(password)
 
-		assert.Nil(t, err)
+		require.NoError(t, err)
 		assert.NotEmpty(t, hashed)
 		assert.NotEqual(t, password, hashed)
 		assert.True(t, rules.IsPasswordsSame(password, hashed))

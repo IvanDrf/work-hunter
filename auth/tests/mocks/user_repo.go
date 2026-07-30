@@ -19,7 +19,11 @@ func NewUserRepo() *UserRepo {
 	}
 }
 
-// Returns new filled user repo with registred users from fixtures.Users
+const (
+	closedStorageMessage = "storage is closed"
+)
+
+// NewFilledUserRepo returns new filled user repo with registred users from fixtures.Users.
 func NewFilledUserRepo(verificated bool, users map[string]string) *UserRepo {
 	userRepo := NewUserRepo()
 	i := 0
@@ -42,7 +46,7 @@ func NewFilledUserRepo(verificated bool, users map[string]string) *UserRepo {
 func (u *UserRepo) CreateUser(ctx context.Context, user *models.User) error {
 	if u.Storage == nil {
 		return models.Error{
-			Message: "storage is closed",
+			Message: closedStorageMessage,
 			Code:    models.ErrCodeInternal,
 		}
 	}
@@ -62,7 +66,7 @@ func (u *UserRepo) DeleteUser(ctx context.Context, email string) error {
 	old := len(u.Storage)
 	delete(u.Storage, email)
 
-	// if storage len doesn't change means there are no user wit given email
+	// if storage len doesn't change means there are no user wit given email.
 	if old == len(u.Storage) {
 		return models.Error{
 			Message: "can't delete user with given email",
@@ -89,7 +93,7 @@ func (u *UserRepo) FindUserByID(ctx context.Context, userID uuid.UUID) (*models.
 func (u *UserRepo) FindUserByEmail(ctx context.Context, email string) (*models.User, error) {
 	if u.Storage == nil {
 		return nil, models.Error{
-			Message: "storage is closed",
+			Message: closedStorageMessage,
 			Code:    models.ErrCodeInternal,
 		}
 	}
@@ -117,7 +121,7 @@ func (u *UserRepo) ChangeUserPassword(ctx context.Context, userID uuid.UUID, has
 func (u *UserRepo) VerifyEmail(ctx context.Context, email string) error {
 	if u.Storage == nil {
 		return models.Error{
-			Message: "storage is closed",
+			Message: closedStorageMessage,
 			Code:    models.ErrCodeInternal,
 		}
 	}

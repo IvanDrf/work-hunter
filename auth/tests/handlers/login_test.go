@@ -8,15 +8,14 @@ import (
 	"github.com/IvanDrf/work-hunter/auth/tests/handlers/fixtures"
 	auth_api "github.com/IvanDrf/work-hunter/pkg/auth-api"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 func TestLoginHandler(t *testing.T) {
-	t.Parallel()
-
 	handlers := newHandlers(nil)
-	// register users, so we can log in
+	// register users, so we can log in.
 	registerUsers(handlers, fixtures.Users)
 
 	t.Run("Login registred users", func(t *testing.T) {
@@ -30,45 +29,50 @@ func TestLoginHandler(t *testing.T) {
 	t.Run("Login with invalid password", func(t *testing.T) {
 		testLoginWithInvalidPassword(t, handlers)
 	})
-
 }
 
-// Test to login registred users
+// Test to login registred users.
 func testLoginUsers(t *testing.T, handlers *handlers.Handler) {
+	t.Helper()
+
 	for _, req := range fixtures.Users {
 		resp, err := handlers.Login(t.Context(), req)
 
-		assert.Nil(t, err)
+		require.NoError(t, err)
 		assert.NotNil(t, resp)
-		// jwt tokens must be valid after successfull login
-		common.TestTokenValidatation(t, resp.Access, resp.Refresh, false)
+		// jwt tokens must be valid after successful login.
+		common.TestTokenValidatation(t, resp.GetAccess(), resp.GetRefresh(), false)
 	}
 }
 
-// Test to login unregistred users
+// Test to login unregistred users.
 func testLoginUnregistredUsers(t *testing.T, handlers *handlers.Handler) {
+	t.Helper()
+
 	for _, req := range fixtures.UnregistredUsers {
 		resp, err := handlers.Login(t.Context(), req)
 
+		require.Error(t, err)
 		assert.Nil(t, resp)
-		assert.NotNil(t, err)
 		assert.Contains(t, err.Error(), status.Error(codes.NotFound, "").Error())
 	}
 }
 
-// Test to login user with invalid password
+// Test to login user with invalid password.
 func testLoginWithInvalidPassword(t *testing.T, handlers *handlers.Handler) {
+	t.Helper()
+
 	for _, req := range fixtures.Users {
 		r := &auth_api.User{
-			Email:    req.Email,
+			Email:    req.GetEmail(),
 			Password: fixtures.InvalidPassword,
-			Role:     req.Role,
+			Role:     req.GetRole(),
 		}
 
 		resp, err := handlers.Login(t.Context(), r)
 
 		assert.Nil(t, resp)
-		assert.NotNil(t, err)
+		require.Error(t, err)
 		assert.Contains(t, err.Error(), status.Error(codes.InvalidArgument, "").Error())
 	}
 }

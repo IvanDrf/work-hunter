@@ -2,43 +2,48 @@ package handlers
 
 import (
 	"context"
-	"errors"
 	"log/slog"
 
-	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
 	auth_api "github.com/IvanDrf/work-hunter/pkg/auth-api"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 func (h *Handler) Register(ctx context.Context, user *auth_api.User) (*auth_api.JwtTokens, error) {
 	slog.Info("Register got request")
-	access, refresh, err := h.authService.RegisterUser(ctx, user.Email, user.Password, user.Role.String())
 
-	var e models.Error
-	if err != nil && errors.As(err, &e) {
-		slog.Error("Register error", slog.String("error", err.Error()))
-
-		switch e.Code {
-		case models.ErrCodeUserAlreadyExists:
-			return nil, status.Error(codes.AlreadyExists, e.Message)
-
-		case models.ErrCodeInvalidUserRole, models.ErrCodeInvalidPassword, models.ErrCodeInvalidEmail:
-			return nil, status.Error(codes.InvalidArgument, e.Message)
-
-		case models.ErrCodeInternal:
-			return nil, status.Error(codes.Internal, e.Message)
-		}
-	}
-
-	err = h.verificationService.SendVerificationEmail(ctx, user.Email)
+	access, refresh, err := h.authService.RegisterUser(ctx, user.GetEmail(), user.GetPassword(), user.GetRole().String())
 	if err != nil {
-		slog.Error("Register error", slog.String("error", err.Error()))
+		return nil, handleError(err, "Register error")
 	}
 
-	slog.Info("Register successfull response")
+	const attempts = 5
+	err = retry(attempts, func() error {
+		err = h.verificationService.SendVerificationEmail(ctx, user.GetEmail())
+		if err != nil {
+			slog.Error("Register error", slog.String("error", err.Error()))
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
+		slog.Error("Cant send verification email after all attempts", slog.String("error", err.Error()))
+	}
+
+	slog.Info("Register successful response")
 	return &auth_api.JwtTokens{
 		Access:  access,
 		Refresh: refresh,
 	}, nil
+}
+
+func retry(attempts int, fn func() error) error {
+	var err error
+
+	for range attempts + 1 {
+		if err = fn(); err == nil {
+			return nil
+		}
+	}
+
+	return err
 }

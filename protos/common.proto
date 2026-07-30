@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package common;
 
-option go_package = "pkg/common";
+option go_package = "github.com/IvanDrf/work-hunter/pkg/common";
 
 enum UserRole {
     UNSPECIFIED = 0;
@@ -20,6 +20,31 @@ message UserInfo {
 message FullUserInfo {
     UserRole role = 1;
     string user_id = 2;
-    string username = 3;
+    string company_name = 3;
     bool verificated = 4;
+}
+
+enum ResponseStatus {
+    SUCCESS = 0;
+    FAILED = 1;
+    NOT_FOUND = 2;
+    FORBIDDEN = 3;
+}
+
+message Response {
+    ResponseStatus status = 1;
+    string details = 2;
+}
+
+message Empty {
+}
+
+// service status
+enum Status { 
+    UNAVAILABLE = 0;
+    AVAILABLE = 1;
+}
+
+message ServiceStatus {
+    Status status = 1;
 }

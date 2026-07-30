@@ -16,3 +16,7 @@ class InternalError(BaseError):
 
 class NotFoundError(BaseError):
     pass
+
+
+class RetryError(BaseError):
+    pass
