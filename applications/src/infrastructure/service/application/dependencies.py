@@ -2,6 +2,7 @@ from typing import Protocol, Self
 from uuid import UUID
 
 from src.domain.models import ApplicationORM
+from src.domain.schemas import ApplicationMessage
 
 
 class IUnitOfWork(Protocol):
@@ -27,3 +28,20 @@ class IApplicationRepo(Protocol):
         limit: int,
         offset: int,
     ) -> list[int] | None: ...
+
+
+class IApplicationProducer(Protocol):
+    async def publish_applications(self, messages: list[ApplicationMessage]) -> None: ...
+
+    async def stop(self) -> None: ...
+
+
+class IMessageBox[T](Protocol):
+    def add_message(self, message: T) -> None: ...
+    def drop_box(self) -> None: ...
+    def get_messages(self) -> list[T | None]: ...
+
+
+class IMessageSaver[T](Protocol):
+    async def save_messages(self, messages: list[T]) -> None: ...
+    async def get_last_messages(self, size: int) -> list[T] | None: ...

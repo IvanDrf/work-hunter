@@ -8,7 +8,7 @@ from src.core.exc import InternalError
 from src.domain.schemas import ApplicationMessage, Messages
 
 
-class ApplicationsProducer:
+class ApplicationsRabbitMQProducer:
     def __init__(
         self, conn: AbstractRobustConnection, chan: AbstractChannel, exchange: AbstractExchange, routing_key: str
     ) -> None:
@@ -19,7 +19,7 @@ class ApplicationsProducer:
 
         self.logger = logging.getLogger("ApplicationsProducer")
 
-    async def publish_application(self, messages: list[ApplicationMessage]) -> None:
+    async def publish_applications(self, messages: list[ApplicationMessage]) -> None:
         try:
             await self.exchange.publish(
                 message=Message(body=Messages.dump_json(messages)),
@@ -28,3 +28,7 @@ class ApplicationsProducer:
         except (ConnectionClosed, PublishError, DeliveryError) as e:
             self.logger.critical(f"publish_application: can't send applications, details={e}")
             raise InternalError("can't send applications to vacany service")
+
+    async def stop(self) -> None:
+        await self.chan.close()
+        await self.conn.close()

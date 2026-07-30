@@ -5,7 +5,7 @@ class MessageBox[T]:
 
     def add_message(self, message: T) -> None:
         if self.pos > len(self.box) - 1:
-            raise IndexError(f"box is already full, max_size={len(self.box)}, pos={self.pos + 1}")
+            raise OverflowError(f"box is already full, max_size={len(self.box)}, pos={self.pos + 1}")
 
         self.box[self.pos] = message
         self.pos += 1
