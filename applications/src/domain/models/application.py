@@ -3,6 +3,7 @@ from uuid import UUID
 from sqlalchemy import BIGINT, CheckConstraint
 from sqlalchemy import UUID as SQLUUID
 from sqlalchemy.orm import Mapped, mapped_column
+
 from src.domain.models.base import Base
 
 

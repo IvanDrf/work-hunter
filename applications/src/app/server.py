@@ -1,12 +1,12 @@
-from concurrent.futures import ThreadPoolExecutor
 import logging
+from concurrent.futures import ThreadPoolExecutor
 
 from grpc.aio import Server as grpcServer
 from grpc.aio import server
 from grpc_reflection.v1alpha.reflection import SERVICE_NAME, enable_server_reflection
-from src.core.config import AppConfig
-
 from pkg.applications_api.applications_pb2_grpc import ApplicationServiceServicer, add_ApplicationServiceServicer_to_server
+
+from src.core.config import AppConfig
 
 
 class Server:

@@ -1,12 +1,12 @@
+from pkg.applications_api.applications_pb2_grpc import ApplicationServiceServicer
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
+
 from src.api.grpc.dependencies import IApplicationService
 from src.api.grpc.handlers import ApplicationHandlers
 from src.core.config import Config
 from src.infrastructure.persistence.postgresql_repo import ApplicationPostgreSQLRepo, UnitOfWork, connect_to_postgresql
 from src.infrastructure.service.application import ApplicationService
 from src.infrastructure.service.application.dependencies import IApplicationRepo, IUnitOfWork
-
-from pkg.applications_api.applications_pb2_grpc import ApplicationServiceServicer
 
 
 class Fabric:

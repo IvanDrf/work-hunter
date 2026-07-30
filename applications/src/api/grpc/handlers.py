@@ -1,10 +1,6 @@
 from asyncio import wait_for
 
 from grpc.aio import ServicerContext
-from src.api.grpc.dependencies import IApplicationService
-from src.api.grpc.dto import application_dto
-from src.api.grpc.utils import handle_errors, validate_limit_offset
-
 from pkg.applications_api.applications_pb2 import (
     FindVacanciesIDByUserIDRequest,
     FindVacanciesIDByUserIDResponse,
@@ -12,6 +8,10 @@ from pkg.applications_api.applications_pb2 import (
 )
 from pkg.applications_api.applications_pb2_grpc import ApplicationServiceServicer
 from pkg.common.common_pb2 import Response, ResponseStatus, ServiceStatus, Status
+
+from src.api.grpc.dependencies import IApplicationService
+from src.api.grpc.dto import application_dto
+from src.api.grpc.utils import handle_errors, validate_limit_offset
 
 
 class ApplicationHandlers(ApplicationServiceServicer):
@@ -46,4 +46,4 @@ class ApplicationHandlers(ApplicationServiceServicer):
         request: FindVacanciesIDByUserIDRequest,
         context: ServicerContext,
     ) -> FindVacanciesIDByUserIDResponse:
-        raise
+        raise NotImplementedError

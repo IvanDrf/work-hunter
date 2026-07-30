@@ -2,6 +2,7 @@ from uuid import UUID
 
 from sqlalchemy import and_, select
 from sqlalchemy.exc import DBAPIError, SQLAlchemyError
+
 from src.core.exc import InternalError
 from src.domain.models import ApplicationORM
 from src.infrastructure.persistence.postgresql_repo.uof import UnitOfWork

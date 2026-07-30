@@ -1,10 +1,10 @@
 import logging
 from uuid import UUID
 
+from pkg.common.common_pb2 import UserInfo as PKGUserInfo
+
 from src.core.exc import ArgumentError
 from src.domain.schemas import UserInfo, UserRole
-
-from pkg.common.common_pb2 import UserInfo as PKGUserInfo
 
 
 def user_info_dto(user_info: PKGUserInfo) -> UserInfo:

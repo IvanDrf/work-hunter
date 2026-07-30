@@ -3,6 +3,6 @@ from src.domain.schemas.user import UserInfo, UserRole
 
 __all__ = [
     "ApplicationSchema",
-    "UserRole",
     "UserInfo",
+    "UserRole",
 ]
