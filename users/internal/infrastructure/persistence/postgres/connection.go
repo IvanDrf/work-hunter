@@ -43,10 +43,6 @@ func NewPostgresConnectionTest(db *sqlx.DB) *PostgresConnection {
 	}
 }
 
-func (c *PostgresConnection) GetDB() *sqlx.DB {
-	return c.db
-}
-
 func (c *PostgresConnection) Close() {
 	c.db.Close()
 }

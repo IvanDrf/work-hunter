@@ -143,7 +143,10 @@ func (s *UserService) ListUsers(ctx context.Context, req *dto.ListUsersRequest) 
 	if req.Page < 1 {
 		req.Page = 1
 	}
-	if req.PageSize < minPageSize || req.PageSize > maxPageSize {
+	if req.PageSize < minPageSize {
+		req.PageSize = minPageSize
+	}
+	if req.PageSize > maxPageSize {
 		req.PageSize = maxPageSize
 	}
 

@@ -1,48 +1,46 @@
+version: '3.9'
+
 services:
-  postgres:
-    image: postgres:18-alpine
+  database:
+    image: postgres:17.10
+    container_name: user_database_postgres
+    restart: always
     environment:
-      POSTGRES_USER: devuser
-      POSTGRES_PASSWORD: devpassword
-      POSTGRES_DB: userDB
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT}:5432"
     volumes:
-      - pgdata:/var/lib/postgresql
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - app_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U devuser -d workhunter"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 5
 
-  migrator:
+  app:
     build:
       context: .
       dockerfile: Dockerfile
-    command: /app/migrator -mig /app/internal/infrastructure/persistence/postgres/migrations -cmd up -steps 1
-    environment:
-      CONFIG_PATH: /app/config/config.yaml
-    volumes:
-      - ./config/config.yaml:/app/config/config.yaml
-      - ./internal/infrastructure/persistence/postgres/migrations:/app/internal/infrastructure/persistence/postgres/migrations
-    depends_on:
-      postgres:
-        condition: service_healthy
-
-  server:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: /app/server
+    container_name: user_app
+    restart: on-failure
     ports:
-      - "8080:8080"
-    environment:
-      CONFIG_PATH: /app/config/config.yaml
-    volumes:
-      - ./config/config.yaml:/app/config/config.yaml
+      - "${APP_PORT}:8080"
+    env_file:
+      - .env
     depends_on:
-      migrator:
-        condition: service_completed_successfully
+      database:
+        condition: service_healthy
+    networks:
+      - app_network
 
 volumes:
   pgdata:
+
+networks:
+  app_network:
+    name: app_network
+    driver: bridge
