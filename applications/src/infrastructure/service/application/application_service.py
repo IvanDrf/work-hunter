@@ -1,7 +1,7 @@
 from asyncio import wait_for
 
-from src.core.exc import AccessError, AlreadyExistsError
-from src.domain.schemas import ApplicationSchema, UserRole
+from src.core.exc import AccessError, AlreadyExistsError, NotFoundError
+from src.domain.schemas import ApplicationSchema, UserInfo, UserRole
 from src.infrastructure.service.application.dependencies import IApplicationRepo, IUnitOfWork
 from src.infrastructure.service.application.dto import application_dto
 
@@ -32,3 +32,23 @@ class ApplicationService:
                 raise AlreadyExistsError("you have already applied for this job")
 
             await self.application_repo.add_application(uof, application_dto(application))
+
+    async def find_vacancies_ids_by_applications(self, user_info: UserInfo, *, limit: int, offset: int) -> list[int]:
+        if user_info.user_role != UserRole.EMPLOYEE and user_info.user_role != UserRole.ADMIN:
+            raise AccessError("only employee can apply for a job, so there is no vacancies")
+
+        async with self.uof as uof:
+            vacancies_ids = await wait_for(
+                self.application_repo.find_vacancies_ids_by_user_id(
+                    uof,
+                    user_info.user_id,
+                    limit=limit,
+                    offset=offset,
+                ),
+                timeout=self.repo_timeout,
+            )
+
+        if vacancies_ids is None:
+            raise NotFoundError(f"can't find any vacancies for user_id={user_info.user_id}, {limit=}, {offset=}")
+
+        return vacancies_ids

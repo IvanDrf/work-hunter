@@ -1,3 +1,4 @@
+import logging
 from asyncio import wait_for
 
 from applications.src.api.grpc.dto.user_info import user_info_dto
@@ -22,6 +23,8 @@ class ApplicationHandlers(ApplicationServiceServicer):
         self.application_service: IApplicationService = application_service
         self.service_timeout: float = service_timeout
 
+        self.logger = logging.getLogger("ApplicationHandlers")
+
     async def stop(self) -> None:
         await self.application_service.stop()
 
@@ -30,15 +33,18 @@ class ApplicationHandlers(ApplicationServiceServicer):
 
     @handle_errors
     async def UpdateApplications(self, request: UpdateApplicationsRequest, context: ServicerContext) -> Response:
+        self.logger.info(f"UpdateApplications: got request {request=}")
         await wait_for(
             self.application_service.update_application(application=application_dto(request)),
             timeout=self.service_timeout,
         )
 
-        return Response(
+        response = Response(
             status=ResponseStatus.SUCCESS,
             details=f"successfully updated application for user={request.user_info.user_id}, vacancy={request.vacancy_id}",
         )
+        self.logger.info(f"UpdateApplications: success {request=}{response=}")
+        return response
 
     @handle_errors
     @validate_limit_offset
@@ -47,6 +53,7 @@ class ApplicationHandlers(ApplicationServiceServicer):
         request: FindVacanciesIDByUserIDRequest,
         context: ServicerContext,
     ) -> FindVacanciesIDByUserIDResponse:
+        self.logger.info(f"FindVacanciesIDByUserID: got request {request=}")
         vacancies = await wait_for(
             self.application_service.find_vacancies_ids_by_applications(
                 user_info_dto(request.user_info),
@@ -56,6 +63,8 @@ class ApplicationHandlers(ApplicationServiceServicer):
             timeout=self.service_timeout,
         )
 
-        return FindVacanciesIDByUserIDResponse(
+        response = FindVacanciesIDByUserIDResponse(
             user_id=request.user_info.user_id, limit=request.limit, offset=request.offset, vacancies_ids=vacancies
         )
+        self.logger.info(f"FindVacanciesIDByUserID: success {request=}{response=}")
+        return response

@@ -4,7 +4,7 @@ from functools import wraps
 from grpc import StatusCode
 from grpc.aio import ServicerContext
 
-from src.core.exc import AccessError, AlreadyExistsError, ArgumentError, InternalError
+from src.core.exc import AccessError, AlreadyExistsError, ArgumentError, InternalError, NotFoundError
 
 
 def handle_errors(func):
@@ -41,6 +41,10 @@ def handle_errors(func):
         except AlreadyExistsError as e:
             log.info(f"AlreadyExistsError {func.__name__}, details={e}")
             await context.abort(code=StatusCode.ALREADY_EXISTS, details=str(e))
+
+        except NotFoundError as e:
+            log.info(f"NotFoundError {func.__name__}, details={e}")
+            await context.abort(code=StatusCode.NOT_FOUND, details=str(e))
 
     return wrapper
 
