@@ -1,6 +1,6 @@
 class MessageBox[T]:
     def __init__(self, max_size: int) -> None:
-        self.box: list[T | None] = [None for _ in range(max_size)]
+        self.box: list[T | None] = [None] * max_size
         self.pos: int = 0
 
     def add_message(self, message: T) -> None:
@@ -11,7 +11,7 @@ class MessageBox[T]:
         self.pos += 1
 
     def drop_box(self) -> None:
-        self.box = [None for _ in range(self.pos)]
+        self.box = [None] * self.pos
         self.pos = 0
 
     def get_messages(self) -> list[T | None]:
