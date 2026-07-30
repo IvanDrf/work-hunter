@@ -1,9 +1,9 @@
 import logging
 from datetime import UTC, datetime
 
-from aioredis.client import Pipeline, Redis
-from aioredis.exceptions import ConnectionError, RedisError
 from pydantic import ValidationError
+from redis.asyncio.client import Pipeline, Redis
+from redis.exceptions import ConnectionError, RedisError
 
 from src.core.exc import InternalError
 from src.domain.schemas import ApplicationMessage
@@ -56,7 +56,7 @@ class MessageRedisSaver:
     async def get_last_messages(self, size: int) -> list[ApplicationMessage] | None:
         current_time = datetime.now(UTC).timestamp()
 
-        names = await self.client.zrangebyscore(name=ZSET_NAME, min=0, max=current_time, start=0, num=size)
+        names = map(str, await self.client.zrangebyscore(name=ZSET_NAME, min=0, max=current_time, start=0, num=size))
         if not names:
             return None
 
@@ -79,7 +79,7 @@ class MessageRedisSaver:
     async def delete_last_messages(self, size: int) -> None:
         current_time = datetime.now(UTC).timestamp()
 
-        names = await self.client.zrangebyscore(ZSET_NAME, min=0, max=current_time, start=0, num=size)
+        names = map(str, await self.client.zrangebyscore(ZSET_NAME, min=0, max=current_time, start=0, num=size))
         async with self.client.pipeline() as pipeline:
             try:
                 pipeline.zrem(ZSET_NAME, *names)

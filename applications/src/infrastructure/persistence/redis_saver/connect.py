@@ -1,4 +1,4 @@
-from aioredis.client import Redis
+from redis.asyncio.client import Redis
 
 from src.core.config import RedisConfig
 

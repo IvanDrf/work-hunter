@@ -1,5 +1,5 @@
 import logging
-from asyncio import create_task, wait_for
+from asyncio import create_task, gather, wait_for
 
 from src.core.exc import AccessError, AlreadyExistsError, InternalError, NotFoundError
 from src.domain.schemas import ApplicationMessage, ApplicationSchema, UserInfo, UserRole
@@ -34,7 +34,7 @@ class ApplicationService:
         self.logger = logging.getLogger("ApplicationService")
 
     async def stop(self) -> None:
-        await self.uof.stop()
+        await gather(*[self.uof.stop(), self.application_producer.stop(), self.message_saver.stop()])
 
     async def update_application(self, application: ApplicationSchema) -> None:
         if not application.user_info.verificated:
