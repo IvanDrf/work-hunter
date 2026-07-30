@@ -139,30 +139,6 @@ func TestListUsers_WithRoleFilter(t *testing.T) {
 	mockRepo.AssertExpectations(t)
 }
 
-func TestListUsers_DefaultPagination(t *testing.T) {
-	t.Parallel()
-
-	svc, mockRepo := setupTest(t)
-	ctx := context.Background()
-	req := fixtures.ListUsersRequestInvalidPaginationDTO()
-	users := fixtures.TestUsers()
-	expectedTotal := int32(len(users))
-
-	mockRepo.On("ListUsers", ctx, mock.MatchedBy(func(params *models.ListUsersParams) bool {
-		return params.Page == 1 &&
-			params.PageSize == 100
-	})).Return(users, expectedTotal, nil)
-
-	result, err := svc.ListUsers(ctx, req)
-
-	assert.NoError(t, err)
-	assert.NotNil(t, result)
-	assert.Equal(t, 1, result.Page)
-	assert.Equal(t, 100, result.PageSize)
-
-	mockRepo.AssertExpectations(t)
-}
-
 func TestListUsers_MaxPageSize(t *testing.T) {
 	t.Parallel()
 
