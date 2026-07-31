@@ -1,4 +1,5 @@
-from typing import Final, Sequence
+from collections.abc import Sequence
+from typing import Final
 
 from src.core.exc import ArgumentError
 from src.domain.schemas.vacancy import MAX_TAGS_AMOUNT, MIN_TAGS_AMOUNT

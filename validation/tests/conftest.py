@@ -16,8 +16,7 @@ def cities_and_metro_json():
 
         def data_yield():
             for city in objects:
-                for city_name, metro_stations in city.items():
-                    yield (city_name, metro_stations)
+                yield from city.items()
 
         yield data_yield()
 
@@ -30,7 +29,6 @@ def cities_json():
         cities = items(cities_file, "cities.item")
 
         def data_yield():
-            for city in cities:
-                yield city
+            yield from cities
 
         yield data_yield()

@@ -7,10 +7,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 from src.core.config.config import Config
-from src.domain.models.association import VacanciesTagsORM
 from src.domain.models.base import Base
-from src.domain.models.tag import TagORM
-from src.domain.models.vacancy import VacancyORM
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

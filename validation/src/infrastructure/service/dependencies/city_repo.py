@@ -1,6 +1,0 @@
-from typing import Protocol
-
-
-class ICityRepo(Protocol):
-    async def is_city_exists(self, city: str) -> bool: ...
-    async def close(self) -> None: ...
