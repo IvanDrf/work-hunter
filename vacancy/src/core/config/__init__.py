@@ -5,9 +5,9 @@ from src.core.config.config import Config
 from src.core.config.database import PostgreSQLConfig
 
 __all__ = [
-    "Config",
     "AppConfig",
-    "RedisConfig",
+    "Config",
     "PostgreSQLConfig",
     "RabbitMQConfig",
+    "RedisConfig",
 ]

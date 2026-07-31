@@ -9,6 +9,8 @@ from src.core.exc import RetryError
 
 def max_retries(*, max_retries: int, base_delay: float):
     def decorator(func):
+        logger = logging.getLogger(f"max_retries: {func.__name__}")
+
         @wraps(func)
         async def wrapper(*args, **kwargs):
             last_exc = None
@@ -18,7 +20,7 @@ def max_retries(*, max_retries: int, base_delay: float):
                 try:
                     return await func(*args, **kwargs)
                 except (RetryError, ConnectError) as e:
-                    logging.error(f"retrying to send request, attempt: {attempt}, details={e}")
+                    logger.error(f"retrying to send request, attempt: {attempt}, details={e}")
                     await sleep(delay)
 
                     last_exc = e
@@ -35,6 +37,8 @@ class ValidationClient:
     def __init__(self, url: str, api_key: str) -> None:
         self.url: str = url
         self.api_key: str = api_key
+
+        self.logger = logging.getLogger("ValidationClient")
 
     @cached_property
     def validate_metro_url(self) -> str:
@@ -54,7 +58,7 @@ class ValidationClient:
                 )
 
             except (RetryError, ConnectError) as e:
-                logging.error(f"can't validate metro after all attempts, details={e}")
+                self.logger.error(f"can't validate metro after all attempts, details={e}")
                 return False
 
     async def is_city_valid(self, city: str) -> bool:
@@ -67,7 +71,7 @@ class ValidationClient:
                 )
 
             except (RetryError, ConnectError) as e:
-                logging.error(f"can't validate city after all attempts, details={e}")
+                self.logger.error(f"can't validate city after all attempts, details={e}")
                 return False
 
     @max_retries(max_retries=3, base_delay=0.2)
@@ -90,20 +94,20 @@ class ValidationClient:
 
         match code:
             case codes.UNPROCESSABLE_ENTITY:
-                logging.critical(f"invalid request body in validation service, details={message}, {json=}")
+                self.logger.critical(f"invalid request body in validation service, details={message}, {json=}")
 
             case codes.FORBIDDEN:
-                logging.critical(f"invalid api-key, can't validate, details={message}")
+                self.logger.critical(f"invalid api-key, can't validate, details={message}")
 
             case codes.UNAUTHORIZED:
-                logging.critical(f"api-key wasn't send in request, details={message}")
+                self.logger.critical(f"api-key wasn't send in request, details={message}")
 
             case codes.INTERNAL_SERVER_ERROR:
-                logging.error(f"validation service error, details={message}")
+                self.logger.error(f"validation service error, details={message}")
                 raise RetryError("validation service is not available")
 
             case codes.TOO_MANY_REQUESTS:
-                logging.error(f"validation service error, details={message}")
+                self.logger.error(f"validation service error, details={message}")
                 raise RetryError("too many requests to validation service")
 
         return False

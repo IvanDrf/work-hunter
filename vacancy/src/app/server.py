@@ -24,6 +24,8 @@ class Server:
         self.metrics_server = None
         self.shutdown_time: float = config.app_shutdown_time
 
+        self.logger = logging.getLogger("server")
+
     def register(self, handlers: VacancyHandlers) -> None:
         self.server = server(
             ThreadPoolExecutor(max_workers=self.WORKERS),
@@ -38,16 +40,16 @@ class Server:
         if self.server is None:
             raise RuntimeError("server is not registred")
 
-        logging.info(f"Starting server {self.address}")
+        self.logger.info(f"Starting server {self.address}")
         await self.server.start()
 
-        logging.info(f"Starting metrics server {self.metrics_port}")
+        self.logger.info(f"Starting metrics server {self.metrics_port}")
         self.metrics_server, _ = start_http_server(self.metrics_port)
 
         await self.server.wait_for_termination()
 
     async def stop(self) -> None:
-        logging.info(f"Stopping metrics server {self.metrics_port}")
+        self.logger.info(f"Stopping metrics server {self.metrics_port}")
         if self.metrics_server is None:
             raise RuntimeError("metrics server is not registred")
 
@@ -56,5 +58,5 @@ class Server:
         if self.server is None:
             raise RuntimeError("server is not registred")
 
-        logging.info(f"Stopping server {self.address}")
+        self.logger.info(f"Stopping server {self.address}")
         await self.server.stop(self.shutdown_time)

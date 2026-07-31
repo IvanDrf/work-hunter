@@ -1,17 +1,17 @@
-from typing import Any, Final, TypeAlias
+from typing import Any, ClassVar, Final
 
 from pydantic_core import CoreSchema, core_schema
 
-Money: TypeAlias = int
-Year: TypeAlias = int
+type Money = int
+type Year = int
 
 
 class SingleTon(type):
-    _instances = {}
+    _instances: ClassVar = {}
 
     def __call__(cls, *args: Any, **kwargs: Any) -> Any:
         if cls not in cls._instances:
-            cls._instances[cls] = super(SingleTon, cls).__call__(*args, **kwargs)
+            cls._instances[cls] = super().__call__(*args, **kwargs)
 
         return cls._instances[cls]
 

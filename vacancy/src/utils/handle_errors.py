@@ -8,6 +8,8 @@ from src.core.exc import AccessError, ArgumentError, InternalError, NotFoundErro
 
 
 def handle_errors(func):
+    logger = logging.getLogger("handle_errors")
+
     @wraps(func)
     async def wrapper(*args, **kwargs):
         if "context" in kwargs:
@@ -22,27 +24,27 @@ def handle_errors(func):
             return res
 
         except (ArgumentError, ValidationError) as e:
-            logging.info(f"{func.__name__}: {e}")
+            logger.info(f"{func.__name__}: {e}")
 
             await context.abort(StatusCode.INVALID_ARGUMENT, e.__str__())
 
         except AccessError as e:
-            logging.info(f"{func.__name__}: {e}")
+            logger.info(f"{func.__name__}: {e}")
 
             await context.abort(StatusCode.PERMISSION_DENIED, e.__str__())
 
         except InternalError as e:
-            logging.critical(f"{func.__name__}: {e}")
+            logger.critical(f"{func.__name__}: {e}")
 
             await context.abort(StatusCode.INTERNAL, e.__str__())
 
         except NotFoundError as e:
-            logging.info(f"{func.__name__}: {e}")
+            logger.info(f"{func.__name__}: {e}")
 
             await context.abort(StatusCode.NOT_FOUND, e.__str__())
 
         except OSError as e:
-            logging.critical(f"{func.__name__}: critical os error {e.__str__()}")
+            logger.critical(f"{func.__name__}: critical os error {e.__str__()}")
 
             await context.abort(StatusCode.INTERNAL, "internal error, service in not available now")
 
