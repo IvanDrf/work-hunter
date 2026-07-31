@@ -4,8 +4,8 @@ from src.infrastructure.persistence.postgresql_repo.unit_of_work import UnitOfWo
 from src.infrastructure.persistence.postgresql_repo.vacancy_repo import VacancyRepo
 
 __all__ = [
-    "connect",
-    "VacancyRepo",
     "TagRepo",
     "UnitOfWork",
+    "VacancyRepo",
+    "connect",
 ]

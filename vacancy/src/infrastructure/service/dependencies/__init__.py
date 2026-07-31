@@ -5,8 +5,8 @@ from src.infrastructure.service.dependencies.unit_of_work import IUnitOfWork
 
 __all__ = [
     "ICache",
-    "IVacancyRepo",
     "ITagRepo",
     "IUnitOfWork",
+    "IVacancyRepo",
     "IValidationServiceClient",
 ]

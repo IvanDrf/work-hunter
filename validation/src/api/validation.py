@@ -11,8 +11,9 @@ from src.core.exc import InternalError
 from src.domain.schemas import CitySchema, MetroSchema
 
 validation_router = APIRouter(prefix="/api", dependencies=[Depends(api_key_middleware)])
-
 limiter = Limiter(key_func=get_remote_address)
+
+logger = logging.getLogger("ValidationAPI")
 
 
 @validation_router.post("/metro", status_code=status.HTTP_204_NO_CONTENT)
@@ -27,7 +28,7 @@ async def validate_metro(
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
     except InternalError as e:
-        logging.critical(f"can't validate metro and city, details={e}")
+        logger.critical(f"can't validate metro and city, details={e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail={"error": str(e)})
 
 
@@ -43,5 +44,5 @@ async def validate_city(
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
     except InternalError as e:
-        logging.critical(f"can't validate city, details={e}")
+        logger.critical(f"can't validate city, details={e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail={"error": str(e)})

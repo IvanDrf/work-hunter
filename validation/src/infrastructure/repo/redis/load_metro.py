@@ -1,3 +1,4 @@
+from aiofiles import open as aopen
 from ijson import items
 from redis.asyncio import Redis
 
@@ -5,10 +6,10 @@ from src.core.config import Config
 
 
 async def load_cities_and_metro(config: Config, redis: Redis) -> None:
-    with open(config.metro_json, "r", encoding="utf-8") as metro_file:
+    async with aopen(config.metro_json, "r", encoding="utf-8") as metro_file:
         objects = items(metro_file, "cities.item")
 
-        for city in objects:
+        async for city in objects:
             await set_cities_and_metro(city, redis)
 
 

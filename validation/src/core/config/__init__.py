@@ -3,8 +3,8 @@ from src.core.config.config import CONFIG, Config
 from src.core.config.database import RedisConfig
 
 __all__ = [
-    "Config",
-    "AppConfig",
-    "RedisConfig",
     "CONFIG",
+    "AppConfig",
+    "Config",
+    "RedisConfig",
 ]

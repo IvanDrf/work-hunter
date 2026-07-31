@@ -10,12 +10,14 @@ class MetroRedisRepo:
     def __init__(self, redis: Redis) -> None:
         self.redis: Redis = redis
 
+        self.logger = logging.getLogger("MetroRedisRepo")
+
     async def is_metro_exists(self, city: str, metro: str) -> bool:
         try:
             return await self.redis.hexists(city, metro)
 
         except (RedisError, ConnectionError) as e:
-            logging.critical(f"can't check is {metro=} exists by {city=}, details={e}")
+            self.logger.critical(f"can't check is {metro=} exists by {city=}, details={e}")
 
             raise InternalError(f"can't check is {metro=} exists by {city=}")
 

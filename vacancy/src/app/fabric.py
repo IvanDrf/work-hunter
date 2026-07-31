@@ -1,4 +1,4 @@
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, AsyncEngine
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
 from src.api.grpc.handlers import VacancyHandlers
 from src.api.rabbitmq.connection import connect_to_rabbitmq, declare_channel, declare_exchange, declare_queue
