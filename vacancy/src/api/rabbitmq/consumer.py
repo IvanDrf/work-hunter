@@ -27,6 +27,12 @@ class RabbitMQConsumer:
 
         self.logger = logging.getLogger("RabbitMQConsumer")
 
+    async def stop(self) -> None:
+        await self.chan.close()
+        await self.conn.close()
+
+        await self.application_service.stop()
+
     async def start_consuming(self) -> None:
         self.logger.info("Starting consumer")
         async with self.queue.iterator() as it:

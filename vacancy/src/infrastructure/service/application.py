@@ -6,10 +6,13 @@ from src.infrastructure.service.dependencies import IUnitOfWork, IVacancyRepo
 class ApplicationService:
     def __init__(self, vacancy_repo: IVacancyRepo, uof: IUnitOfWork) -> None:
         self.vacancy_repo: IVacancyRepo = vacancy_repo
-        self.uof_factory: IUnitOfWork = uof
+        self.uof: IUnitOfWork = uof
+
+    async def stop(self) -> None:
+        await self.uof.stop()
 
     async def increase_vacancy_applications(self, message: ApplicationMessage) -> None:
-        async with self.uof_factory as uof:
+        async with self.uof as uof:
             vacancy = await self.vacancy_repo.find_vacancy_by_id(uof, message.vacancy_id)
             if vacancy is None:
                 raise ArgumentError(f"can't find vacancy with vacancy_id={message.vacancy_id}")

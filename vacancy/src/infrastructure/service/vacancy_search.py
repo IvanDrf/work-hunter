@@ -24,7 +24,7 @@ class VacancySearchService(BaseVacancyService):
         BaseVacancyService.__init__(self, cache, vacancy_ttl, cache_timeout)
 
         self.vacancy_repo: IVacancyRepo = vacancy_repo
-        self.uof_factory: IUnitOfWork = uof
+        self.uof: IUnitOfWork = uof
 
         self.logger = logging.getLogger("VacancySearchService")
 
@@ -37,7 +37,7 @@ class VacancySearchService(BaseVacancyService):
             create_task(self._update_vacancy_views(vacancy, user_info))
             return vacancy
 
-        async with self.uof_factory as uof:
+        async with self.uof as uof:
             vacancy = await self.vacancy_repo.find_vacancy_by_id(uof, vacancy_id)
             if vacancy is None:
                 return None
@@ -61,7 +61,7 @@ class VacancySearchService(BaseVacancyService):
         if not tags:
             raise ArgumentError("invalid vacancy tags, tags can't be empty")
 
-        async with self.uof_factory as uof:
+        async with self.uof as uof:
             if user_info is not None and is_user_admin(user_info):
                 vacancies = await self.vacancy_repo.find_vacancies_for_admin_with_tags(uof, tags, order_by, offset, limit)
             else:
@@ -87,7 +87,7 @@ class VacancySearchService(BaseVacancyService):
         if vacancies is not None:
             return vacancies
 
-        async with self.uof_factory as uof:
+        async with self.uof as uof:
             if user_info is not None and is_user_admin(user_info):
                 vacancies = await self.vacancy_repo.find_vacancies_for_admin_by_author(uof, author, order_by, offset, limit)
             else:
@@ -111,7 +111,7 @@ class VacancySearchService(BaseVacancyService):
         if not is_user_employer(user_info) and not is_user_admin(user_info):
             raise AccessError(f"only employer or admin can see his vacancies, but user_role={user_info.user_role.name}")
 
-        async with self.uof_factory as uof:
+        async with self.uof as uof:
             vacancies = await self.vacancy_repo.find_vacancies_by_author_id(uof, user_info.user_id, order_by, offset, limit)
 
         if vacancies is None:
@@ -130,7 +130,7 @@ class VacancySearchService(BaseVacancyService):
         if not title:
             raise ArgumentError("invalid vacancy title, title can't be empty")
 
-        async with self.uof_factory as uof:
+        async with self.uof as uof:
             if user_info is not None and is_user_admin(user_info):
                 vacancies = await self.vacancy_repo.find_vacancies_for_admin_by_title(uof, title, order_by, offset, limit)
             else:
@@ -148,7 +148,7 @@ class VacancySearchService(BaseVacancyService):
         if user_info is not None and (not is_user_employee(user_info) or user_info.user_id == vacancy.author_id):
             return
 
-        async with self.uof_factory as uof:
+        async with self.uof as uof:
             try:
                 await self.vacancy_repo.update_vacancy(uof, vacancy.vacancy_id, {"views": vacancy.views + 1})
             except InternalError as e:

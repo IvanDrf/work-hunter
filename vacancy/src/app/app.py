@@ -38,3 +38,7 @@ class ConsumerApp:
             raise RuntimeError("RabbitMQ is not initialized")
 
         await self.rabbitmq_consumer.start_consuming()
+
+    async def stop(self) -> None:
+        if self.rabbitmq_consumer is not None:
+            await self.rabbitmq_consumer.stop()
