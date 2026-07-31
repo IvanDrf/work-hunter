@@ -9,7 +9,7 @@ from src.domain.schemas import UserInfo, VacancyResponseSchema
 from src.domain.types import OrderBy, VacancyStatus
 from src.infrastructure.service.base_vacancy import BaseVacancyService
 from src.infrastructure.service.dependencies import ICache, IUnitOfWork, IVacancyRepo
-from src.infrastructure.service.dto.vacancy_dto import vacancy_orm_to_response_dto
+from src.infrastructure.service.vacancy_dto import vacancy_orm_to_response_dto
 
 
 class VacancySearchService(BaseVacancyService):
@@ -25,6 +25,8 @@ class VacancySearchService(BaseVacancyService):
 
         self.vacancy_repo: IVacancyRepo = vacancy_repo
         self.uof_factory: IUnitOfWork = uof
+
+        self.logger = logging.getLogger("VacancySearchService")
 
     async def find_vacancy_by_id(self, vacancy_id: int, user_info: UserInfo | None) -> VacancyResponseSchema | None:
         if not is_vacancy_id_valid(vacancy_id):
@@ -150,4 +152,4 @@ class VacancySearchService(BaseVacancyService):
             try:
                 await self.vacancy_repo.update_vacancy(uof, vacancy.vacancy_id, {"views": vacancy.views + 1})
             except InternalError as e:
-                logging.critical(f"can't update views for {vacancy.vacancy_id=}, details={e}")
+                self.logger.critical(f"can't update views for {vacancy.vacancy_id=}, details={e}")

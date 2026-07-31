@@ -1,10 +1,8 @@
-from pydantic import BaseModel, Field
+from uuid import UUID
 
-from src.domain.schemas.user import UserInfo
+from pydantic import BaseModel, Field
 
 
 class ApplicationMessage(BaseModel):
+    message_id: UUID
     vacancy_id: int = Field(ge=0)
-    applications: int = Field(gt=0)
-
-    user_info: UserInfo

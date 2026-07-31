@@ -1,10 +1,31 @@
-from typing import Protocol
+from datetime import timedelta
+from typing import Protocol, Self
 from uuid import UUID
 
 from src.domain.models import TagORM
 from src.domain.models.vacancy import VacancyORM
 from src.domain.types.enums import OrderBy
-from src.infrastructure.service.dependencies.unit_of_work import IUnitOfWork
+
+
+class ICache(Protocol):
+    async def save(self, key: str, content: str, ttl: timedelta) -> None: ...
+    async def get(self, key: str) -> str | None: ...
+
+
+class IValidationServiceClient(Protocol):
+    async def is_metro_valid(self, city: str, metro: str) -> bool: ...
+    async def is_city_valid(self, city: str) -> bool: ...
+
+
+class IUnitOfWork(Protocol):
+    async def __aenter__(self) -> Self: ...
+    async def __aexit__(self, exc_type, exc, tb): ...
+
+    async def commit(self) -> None: ...
+    async def rollback(self) -> None: ...
+    async def flush(self) -> None: ...
+
+    async def stop(self) -> None: ...
 
 
 class IVacancySearchRepo(Protocol):

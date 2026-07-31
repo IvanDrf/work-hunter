@@ -1,4 +1,4 @@
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, AsyncEngine
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
 from src.api.grpc.handlers import VacancyHandlers
 from src.api.rabbitmq.connection import connect_to_rabbitmq, declare_channel, declare_exchange, declare_queue
@@ -22,8 +22,8 @@ class Fabric:
     async def new_handlers(self) -> VacancyHandlers:
         engine, session_maker = await connect_postgresql(self.config)
 
-        vacancy_repo: IVacancyRepo = self.new_vacancy_repo()
-        tag_repo: ITagRepo = self.new_tag_repo()
+        vacancy_repo: IVacancyRepo = self.new_vacancy_repo()  # type: ignore
+        tag_repo: ITagRepo = self.new_tag_repo()  # type: ignore
         cache: ICache = await self.new_cache()
         uof: IUnitOfWork = self.new_unit_of_work(engine, session_maker)
 
@@ -38,7 +38,7 @@ class Fabric:
         uof = self.new_unit_of_work(engine, session_maker)
         vacancy_repo = self.new_vacancy_repo()
 
-        application_service: IApplicationService = ApplicationService(vacancy_repo, uof)
+        application_service: IApplicationService = ApplicationService(vacancy_repo, uof)  # type: ignore
 
         conn = await connect_to_rabbitmq(self.config)
         chan = await declare_channel(conn)

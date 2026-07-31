@@ -1,5 +1,5 @@
 from asyncio import create_task, gather
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from src.core.exc import AccessError, ArgumentError, NotFoundError
 from src.domain.models.vacancy import VacancyORM, VacancyStatus
@@ -9,7 +9,7 @@ from src.domain.schemas import UserInfo, VacancyCreateSchema, VacancyResponseSch
 from src.domain.types import UNSET_VALUE, UnsetValue
 from src.infrastructure.service.base_vacancy import BaseVacancyService
 from src.infrastructure.service.dependencies import ICache, ITagRepo, IUnitOfWork, IVacancyRepo, IValidationServiceClient
-from src.infrastructure.service.dto.vacancy_dto import (
+from src.infrastructure.service.vacancy_dto import (
     create_vacancy_dto,
     vacancy_orm_to_response_dto,
 )
@@ -47,7 +47,7 @@ class VacancyDMLService(BaseVacancyService):
         if not is_user_employer(user_info):
             raise AccessError("only employer can create vacancies")
 
-        vacancy_create_date = datetime.now(timezone.utc)
+        vacancy_create_date = datetime.now(UTC)
         vacancy_status = VacancyStatus.MODERATING
         vacancyORM = create_vacancy_dto(vacancy, user_info, vacancy_create_date, vacancy_status)
 
@@ -181,13 +181,13 @@ def create_fields_for_update(vacancy_update_schema: VacancyUpdateSchema) -> dict
     if not fields and isinstance(vacancy_update_schema.tags, UnsetValue):
         raise ArgumentError("no fields were given to update")
 
-    fields["updated_at"] = datetime.now(timezone.utc)
+    fields["updated_at"] = datetime.now(UTC)
     return fields
 
 
 def create_fields_for_status_update(status: VacancyStatus, moderator_comments: str) -> dict:
     fields: dict = {"status": status}
-    updated_time = datetime.now(timezone.utc)
+    updated_time = datetime.now(UTC)
 
     match status:
         case VacancyStatus.PUBLISHED:
