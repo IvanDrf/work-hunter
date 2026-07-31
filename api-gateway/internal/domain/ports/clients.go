@@ -11,10 +11,31 @@ type AuthClient interface {
 
 	SendRegisterRequest(ctx context.Context, email string, password string, role models.UserRole) (*models.Tokens, error)
 	SendLoginRequest(ctx context.Context, email string, password string) (*models.Tokens, error)
-	SendChangePasswordRequest(ctx context.Context, access string, old string, new string) error
+	SendChangePasswordRequest(ctx context.Context, access string, oldPassword string, newPassword string) error
+	SendDeleteUserRequest(ctx context.Context, access string, password string) error
+
+	SendVerificationEmailRequest(ctx context.Context, access string) error
+	SendVerifyEmailRequest(ctx context.Context, token string) (*models.Tokens, error)
+
 	SendRefreshTokensRequest(ctx context.Context, refresh string) (*models.Tokens, error)
 	SendIsTokenValidRequest(ctx context.Context, access string) (*models.TokenPayload, error)
-	SendDeleteUserRequest(ctx context.Context, access string, password string) error
+
+	Close()
+}
+
+type VacancyClient interface {
+	Health(ctx context.Context)
+
+	SendCreateVacancyRequest(ctx context.Context, vacancy *models.Vacancy, userInfo *models.UserInfo, companyName string) (*models.VacancyInfo, error)
+	SendFindVacancyByIDRequest(ctx context.Context, vacancyID uint64, userInfo *models.UserInfo) (*models.VacancyInfo, error)
+
+	Close()
+}
+
+type UserClient interface {
+	Health(ctx context.Context)
+
+	SendGetCompanyNameRequest(ctx context.Context, userID string) (string, error)
 
 	Close()
 }

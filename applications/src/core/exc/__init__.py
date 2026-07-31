@@ -1,8 +1,9 @@
-from src.core.exc.exceptions import AccessError, AlreadyExistsError, ArgumentError, InternalError
+from src.core.exc.exceptions import AccessError, AlreadyExistsError, ArgumentError, InternalError, NotFoundError
 
 __all__ = [
-    "ArgumentError",
-    "InternalError",
     "AccessError",
     "AlreadyExistsError",
+    "ArgumentError",
+    "InternalError",
+    "NotFoundError",
 ]

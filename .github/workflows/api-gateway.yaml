@@ -1,4 +1,4 @@
-name: Run [AUTH] tests
+name: Run [API-GATEWAY] tests
 
 on:
   push:
@@ -22,16 +22,15 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: "1.25"
+          cache: true
 
-      - name: Run GO lint
+      - name: Run Go lint
         uses: golangci/golangci-lint-action@v9
         with:
           version: latest
-          working-directory: ./auth
+          working-directory: ./api-gateway
           args: --timeout=5m
 
-      - name: Run GO tests for [AUTH]
-        working-directory: ./auth/tests
-        run: |
-          go mod download
-          go test ./...
+      - name: Run Go tests
+        working-directory: ./api-gateway/tests
+        run: go test -v ./...

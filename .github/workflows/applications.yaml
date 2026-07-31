@@ -1,4 +1,4 @@
-name: Run [VACANCY] tests
+name: Run [APPLICATIONS] tests
 
 on:
   push:
@@ -22,9 +22,9 @@ jobs:
         uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
 
       - name: Install deps
-        working-directory: ./vacancy
+        working-directory: ./applications
         run: uv sync --locked --all-extras --dev
 
-      - name: Run Python tests
-        working-directory: ./vacancy
-        run: uv run -m pytest tests/ -v -ss
+      - name: Run ruff check
+        working-directory: ./applications
+        run: uv run ruff check

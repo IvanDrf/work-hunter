@@ -24,7 +24,27 @@ services:
       timeout: 5s
       retries: 5
 
-  app:
+  broker:
+    image: rabbitmq:4.3.0
+    container_name: vacancy_applications_broker
+    ports:
+      - "${RABBITMQ_OUTPUT_PORT}:5672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - applications_network
+      - shared_network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_port_connectivity"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  applications_app:
     build:
       context: ..
       dockerfile: applications/Dockerfile
@@ -43,8 +63,14 @@ services:
 
 volumes:
   pgdata:
+  rabbitmq_data:
 
 networks:
   applications_network:
+    name: applications_network
+    driver: bridge
+  shared_network:
+    external: true
+    name: shared_network
     driver: bridge
 

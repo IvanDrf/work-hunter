@@ -23,6 +23,10 @@ func NewAuthMiddleware(authClient ports.AuthClient, requestTime time.Duration) *
 	}
 }
 
+type payload string
+
+const payloadKey payload = "payload"
+
 func (m *AuthMiddleware) RegistredMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithTimeout(r.Context(), m.requestTime)
@@ -31,19 +35,42 @@ func (m *AuthMiddleware) RegistredMiddleware(next http.HandlerFunc) http.Handler
 		log := slog.With(slog.String("middleware", "RegistredMiddleware"))
 		ctx = adapters.InsertLogger(ctx, log)
 
-		access, err := getCookie(ctx, w, r, "access")
+		payload, err := m.getPyload(ctx, w, r)
 		if err != nil {
-			log.InfoContext(ctx, "invalid cookie in request", slog.String("error", err.Error()))
-			return
-		}
-
-		payload, err := m.authClient.SendIsTokenValidRequest(ctx, access.Value)
-		if err != nil {
+			log.InfoContext(ctx, "invalid token payload", slog.String("error", err.Error()))
 			handleResponseError(w, err)
 			return
 		}
 
-		ctx = context.WithValue(ctx, "payload", payload)
+		ctx = context.WithValue(ctx, payloadKey, &models.UserInfo{
+			Role:        payload.Role,
+			UserID:      payload.ID.String(),
+			Verificated: payload.Verificated,
+		})
+		next(w, r.WithContext(ctx))
+	}
+}
+
+func (m *AuthMiddleware) ProbablyUnregistredMiddleware(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx, cancel := context.WithTimeout(r.Context(), m.requestTime)
+		defer cancel()
+
+		log := slog.With(slog.String("middleware", "ProbablyUnregistredMiddleware"))
+		ctx = adapters.InsertLogger(ctx, log)
+
+		payload, err := m.getPyload(ctx, w, r)
+		if err == nil {
+			next(w, r.WithContext(ctx))
+			return
+		}
+
+		ctx = context.WithValue(ctx, payloadKey, &models.UserInfo{
+			Role:        payload.Role,
+			UserID:      payload.ID.String(),
+			Verificated: payload.Verificated,
+		})
+
 		next(w, r.WithContext(ctx))
 	}
 }
@@ -56,14 +83,9 @@ func (m *AuthMiddleware) AdminMiddleware(next http.HandlerFunc) http.HandlerFunc
 		log := slog.With(slog.String("middleware", "AdminMiddleware"))
 		ctx = adapters.InsertLogger(ctx, log)
 
-		access, err := getCookie(ctx, w, r, "access")
+		payload, err := m.getPyload(ctx, w, r)
 		if err != nil {
-			log.InfoContext(ctx, "invalid cookie in request", slog.String("error", err.Error()))
-			return
-		}
-
-		payload, err := m.authClient.SendIsTokenValidRequest(ctx, access.Value)
-		if err != nil {
+			log.InfoContext(ctx, "invalid token payload", slog.String("error", err.Error()))
 			handleResponseError(w, err)
 			return
 		}
@@ -73,9 +95,27 @@ func (m *AuthMiddleware) AdminMiddleware(next http.HandlerFunc) http.HandlerFunc
 				Message: "only admin user allowed",
 				Code:    models.ErrCodeAccess,
 			})
+			return
 		}
 
-		ctx = context.WithValue(ctx, "payload", payload)
+		ctx = context.WithValue(ctx, payloadKey, &models.UserInfo{
+			Role:        payload.Role,
+			UserID:      payload.ID.String(),
+			Verificated: payload.Verificated,
+		})
 		next(w, r.WithContext(ctx))
 	}
+}
+
+func (m *AuthMiddleware) getPyload(ctx context.Context, w http.ResponseWriter, r *http.Request) (*models.TokenPayload, error) {
+	log := adapters.GetLogger(ctx)
+
+	access, err := getCookie(ctx, w, r, "access")
+	if err != nil {
+		log.InfoContext(ctx, "invalid cookie in request", slog.String("error", err.Error()))
+		return nil, err
+	}
+
+	payload, err := m.authClient.SendIsTokenValidRequest(ctx, access.Value)
+	return payload, err
 }

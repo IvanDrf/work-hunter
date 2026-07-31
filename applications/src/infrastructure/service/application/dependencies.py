@@ -1,0 +1,36 @@
+from typing import Protocol, Self
+from uuid import UUID
+
+from src.domain.models import ApplicationORM
+from src.domain.schemas import ApplicationMessage
+
+
+class IUnitOfWork(Protocol):
+    async def __aenter__(self) -> Self: ...
+    async def __aexit__(self, exc_type, exc, tb): ...
+
+    async def commit(self): ...
+    async def flush(self): ...
+    async def rollback(self): ...
+
+    async def stop(self) -> None: ...
+
+
+class IApplicationRepo(Protocol):
+    async def add_application(self, uof: IUnitOfWork, application: ApplicationORM) -> None: ...
+
+    async def find_application(self, uof: IUnitOfWork, vacancy_id: int, user_id: UUID) -> ApplicationORM | None: ...
+    async def find_vacancies_ids_by_user_id(
+        self,
+        uof: IUnitOfWork,
+        user_id: UUID,
+        *,
+        limit: int,
+        offset: int,
+    ) -> list[int] | None: ...
+
+
+class IApplicationProducer(Protocol):
+    async def publish_application(self, message: ApplicationMessage) -> None: ...
+
+    async def stop(self) -> None: ...

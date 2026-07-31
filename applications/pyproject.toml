@@ -4,11 +4,17 @@ version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.12"
 dependencies = [
+    "aio-pika>=10.0.1",
     "alembic>=1.18.5",
     "asyncpg>=0.31.0",
-    "grpcio-reflection>=1.82.0",
-    "grpcio-tools>=1.82.0",
+    "grpcio>=1.82.1",
+    "grpcio-reflection>=1.82.1",
+    "grpcio-tools>=1.82.1",
     "pydantic>=2.13.4",
     "pydantic-settings>=2.14.2",
+    "ruff>=0.16.0",
     "sqlalchemy>=2.0.51",
 ]
+
+[tool.ruff]
+line-length = 130

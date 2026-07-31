@@ -13,58 +13,50 @@ import (
 )
 
 func validateHeaders(r *http.Request) (int, error) {
-	if r.Header.Get("Content-type") != "application/json" {
-		return 0, models.Error{
-			Message: fmt.Sprintf("content type is not application/json, type=%s", r.Header.Get("Content-type")),
+	if r.Header.Get("Content-Type") != "application/json" {
+		return http.StatusUnsupportedMediaType, models.Error{
+			Message: fmt.Sprintf("content type is not application/json, type=%s", r.Header.Get("Content-Type")),
 			Code:    models.ErrCodeUnsupportedMediaType,
 		}
 	}
 
-	return http.StatusUnsupportedMediaType, nil
+	return 0, nil
 }
 
 func handleResponseError(w http.ResponseWriter, err error) {
 	var e models.Error
-	w.Header().Add("Content-type", "applications/json")
+	w.Header().Add("Content-Type", "applications/json")
 
-	if errors.As(err, &e) {
-		switch e.Code {
-		case models.ErrCodeAlreadyExists:
-			w.WriteHeader(http.StatusConflict)
+	statuses := map[models.ErrCode]int{
+		models.ErrCodeAlreadyExists:        http.StatusConflict,
+		models.ErrCodeInvalidArgument:      http.StatusBadRequest,
+		models.ErrCodeUnprocessableEntity:  http.StatusUnprocessableEntity,
+		models.ErrCodeInternal:             http.StatusInternalServerError,
+		models.ErrCodeUnsupportedMediaType: http.StatusUnsupportedMediaType,
+		models.ErrCodeInvalidCookie:        http.StatusBadRequest,
+		models.ErrCodeAccess:               http.StatusForbidden,
+		models.ErrCodeNotFound:             http.StatusNotFound,
+	}
 
-		case models.ErrCodeInvalidArgument:
-			w.WriteHeader(http.StatusBadRequest)
-
-		case models.ErrCodeUnprocessableEntity:
-			w.WriteHeader(http.StatusUnprocessableEntity)
-
-		case models.ErrCodeInternal:
-			w.WriteHeader(http.StatusInternalServerError)
-
-		case models.ErrCodeUnsupportedMediaType:
-			w.WriteHeader(http.StatusUnsupportedMediaType)
-
-		case models.ErrCodeInvalidCookie:
-			w.WriteHeader(http.StatusBadRequest)
-
-		case models.ErrCodeAccess:
-			w.WriteHeader(http.StatusForbidden)
-
-		case models.ErrCodeNotFound:
-			w.WriteHeader(http.StatusNotFound)
-		}
-
+	if errors.As(err, &e) && statuses[e.Code] != 0 {
+		w.WriteHeader(statuses[e.Code])
 		json.NewEncoder(w).Encode(e)
-
 	} else {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(err)
 	}
 }
 
-func setCookie(name string, value string) *http.Cookie {
+type cookieName string
+
+const (
+	Access  cookieName = "access"
+	Refresh cookieName = "refresh"
+)
+
+func createCookie(name cookieName, value string) *http.Cookie {
 	return &http.Cookie{
-		Name:     name,
+		Name:     string(name),
 		Value:    value,
 		Path:     "/",
 		Secure:   true,
@@ -73,27 +65,29 @@ func setCookie(name string, value string) *http.Cookie {
 	}
 }
 
-func getCookie(ctx context.Context, w http.ResponseWriter, r *http.Request, name string) (*http.Cookie, error) {
+func getCookie(ctx context.Context, w http.ResponseWriter, r *http.Request, name cookieName) (*http.Cookie, error) {
 	log := adapters.GetLogger(ctx)
 
-	cookie, err := r.Cookie(name)
+	cookie, err := r.Cookie(string(name))
 	e := models.Error{
 		Code: models.ErrCodeInvalidCookie,
 	}
 
-	if err != nil {
+	switch {
+	case err != nil:
 		e.Message = err.Error()
-	} else if cookie.Valid() != nil {
+	case cookie.Valid() != nil:
 		e.Message = cookie.Valid().Error()
-	} else {
+	default:
 		return cookie, nil
 	}
 
 	log.ErrorContext(ctx, "invalid cookie", slog.String("error", e.Message))
 
-	w.Header().Add("Content-type", "applications/json")
+	w.Header().Add("Content-Type", "applications/json")
 	w.WriteHeader(http.StatusBadRequest)
 	json.NewEncoder(w).Encode(e)
+
 	return nil, e
 }
 
@@ -115,9 +109,23 @@ func validateModel(ctx context.Context, w http.ResponseWriter, model validator, 
 		Code:    models.ErrCodeUnprocessableEntity,
 	}
 
-	w.Header().Add("Content-type", "applications/json")
+	w.Header().Add("Content-Type", "applications/json")
 	w.WriteHeader(http.StatusUnprocessableEntity)
 	json.NewEncoder(w).Encode(err)
 
 	return err
+}
+
+func getUserInfo(ctx context.Context) (*models.UserInfo, error) {
+	val := ctx.Value(payloadKey)
+
+	userInfo, ok := val.(*models.UserInfo)
+	if !ok {
+		return nil, models.Error{
+			Message: "can't get user info",
+			Code:    models.ErrCodeInternal,
+		}
+	}
+
+	return userInfo, nil
 }

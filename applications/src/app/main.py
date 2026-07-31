@@ -1,4 +1,3 @@
-import logging
 from asyncio import run
 
 from src.app.app import App
@@ -14,7 +13,6 @@ async def main() -> None:
     try:
         await app.run()
     finally:
-        logging.info("Stopping applications service")
         await app.stop()
 
 
