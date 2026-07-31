@@ -3,7 +3,7 @@ from uuid import UUID
 from pkg.vacancy_api.vacancy_pb2 import CreateVacancyRequest, UpdateVacancyRequest, VacancyInfo
 
 from src.domain.schemas import VacancyCreateSchema, VacancyResponseSchema, VacancyUpdateSchema
-from src.domain.types import Currency, Money, RemoteType, TimeType, Year
+from src.domain.types import Currency, RemoteType, TimeType
 
 
 def vacancy_create_dto(request: CreateVacancyRequest) -> VacancyCreateSchema:
@@ -35,10 +35,10 @@ def vacancy_create_dto(request: CreateVacancyRequest) -> VacancyCreateSchema:
         schema.experience_max = request.experience_max
 
     if request.HasField("salary_min"):
-        schema.salary_min = Money(request.salary_min)
+        schema.salary_min = request.salary_min
 
     if request.HasField("salary_max"):
-        schema.salary_max = Money(request.salary_max)
+        schema.salary_max = request.salary_max
 
     return schema
 
@@ -91,10 +91,10 @@ def vacancy_update_dto(request: UpdateVacancyRequest) -> VacancyUpdateSchema:
         schema.conditions = request.conditions
 
     if request.HasField("salary_min"):
-        schema.salary_min = Money(request.salary_min) if request.salary_min else None
+        schema.salary_min = request.salary_min if request.salary_min else None
 
     if request.HasField("salary_max"):
-        schema.salary_max = Money(request.salary_max) if request.salary_max else None
+        schema.salary_max = request.salary_max if request.salary_max else None
 
     if request.HasField("currency"):
         schema.currency = Currency(request.currency)
@@ -112,10 +112,10 @@ def vacancy_update_dto(request: UpdateVacancyRequest) -> VacancyUpdateSchema:
         schema.time_type = TimeType(request.time_type)
 
     if request.HasField("experience_min"):
-        schema.experience_min = Year(request.experience_min) if request.experience_min else None
+        schema.experience_min = request.experience_min if request.experience_min else None
 
     if request.HasField("experience_max"):
-        schema.experience_max = Year(request.experience_max) if request.experience_max else None
+        schema.experience_max = request.experience_max if request.experience_max else None
 
     if request.update_tags:
         schema.tags = list(request.tags)
