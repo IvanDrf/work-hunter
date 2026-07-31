@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package vacancy;
 
+option go_package = "pkg/applications_api";
+
 import "common.proto";
 
 service ApplicationService {
@@ -21,12 +23,16 @@ message UpdateApplicationsRequest {
 
 message FindVacanciesIDByUserIDRequest {
     string user_id = 1;
+    uint32 limit = 2;
+    uint32 offset = 3;
 
-    common.UserInfo user_info = 2;
+    common.UserInfo user_info = 4;
 }
 
 message FindVacanciesIDByUserIDResponse {
     string user_id = 1;
+    uint32 limit = 2;
+    uint32 offset = 3;
 
-    repeated string vacancies_ids = 2;
+    repeated uint64 vacancies_ids = 4;
 }

@@ -14,6 +14,7 @@ package main
 // steps - migrations steps, file code 001, 002
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -46,7 +47,7 @@ func main() {
 	}
 
 	if command == "up" {
-		if err = m.Steps(steps); err != migrate.ErrNoChange && err != nil {
+		if err = m.Steps(steps); !errors.Is(err, migrate.ErrNoChange) && err != nil {
 			log.Fatal(err)
 		}
 
@@ -54,7 +55,7 @@ func main() {
 	}
 
 	if command == "down" {
-		if err = m.Steps(-steps); err != migrate.ErrNoChange && err != nil {
+		if err = m.Steps(-steps); !errors.Is(err, migrate.ErrNoChange) && err != nil {
 			log.Fatal(err)
 		}
 

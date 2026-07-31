@@ -1,0 +1,34 @@
+import logging
+
+from aio_pika import Message
+from aio_pika.abc import AbstractChannel, AbstractExchange, AbstractRobustConnection
+from aio_pika.exceptions import ChannelInvalidStateError, ConnectionClosed, DeliveryError, PublishError
+
+from src.core.exc import InternalError
+from src.domain.schemas import ApplicationMessage
+
+
+class ApplicationsRabbitMQProducer:
+    def __init__(
+        self, conn: AbstractRobustConnection, chan: AbstractChannel, exchange: AbstractExchange, routing_key: str
+    ) -> None:
+        self.conn = conn
+        self.chan = chan
+        self.exchange = exchange
+        self.routing_key = routing_key
+
+        self.logger = logging.getLogger("ApplicationsProducer")
+
+    async def publish_application(self, message: ApplicationMessage) -> None:
+        try:
+            await self.exchange.publish(
+                message=Message(body=message.model_dump_json().encode()),
+                routing_key=self.routing_key,
+            )
+        except (ConnectionClosed, PublishError, DeliveryError, ChannelInvalidStateError) as e:
+            self.logger.critical(f"publish_application: can't send applications, details={e}")
+            raise InternalError("can't send applications to vacany service")
+
+    async def stop(self) -> None:
+        await self.chan.close()
+        await self.conn.close()

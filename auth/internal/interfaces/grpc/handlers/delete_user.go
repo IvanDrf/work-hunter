@@ -2,36 +2,19 @@ package handlers
 
 import (
 	"context"
-	"errors"
 	"log/slog"
 
-	"github.com/IvanDrf/work-hunter/auth/internal/domain/models"
 	auth_api "github.com/IvanDrf/work-hunter/pkg/auth-api"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 func (h *Handler) DeleteUser(ctx context.Context, req *auth_api.DeleteUserRequest) (*auth_api.Empty, error) {
 	slog.Info("DeleteUser got request")
 
-	err := h.authService.DeleteUser(ctx, req.Access, req.Password)
-	var e models.Error
-
-	if errors.As(err, &e) {
-		slog.Error("DeleteUser error", slog.String("error", err.Error()))
-
-		switch e.Code {
-		case models.ErrCodeInvalidJWT, models.ErrCodeInvalidPassword:
-			return nil, status.Error(codes.InvalidArgument, e.Message)
-
-		case models.ErrCodeUserNotFound:
-			return nil, status.Error(codes.NotFound, e.Message)
-
-		case models.ErrCodeInternal:
-			return nil, status.Error(codes.Internal, e.Message)
-		}
+	err := h.authService.DeleteUser(ctx, req.GetAccess(), req.GetPassword())
+	if err != nil {
+		return nil, handleError(err, "DeleteUser error")
 	}
 
-	slog.Info("DeleteUser successfull response")
+	slog.Info("DeleteUser successful response")
 	return &auth_api.Empty{}, nil
 }

@@ -18,19 +18,37 @@ class UpdateApplicationsRequest(_message.Message):
     ) -> None: ...
 
 class FindVacanciesIDByUserIDRequest(_message.Message):
-    __slots__ = ("user_id", "user_info")
+    __slots__ = ("user_id", "limit", "offset", "user_info")
     USER_ID_FIELD_NUMBER: _ClassVar[int]
+    LIMIT_FIELD_NUMBER: _ClassVar[int]
+    OFFSET_FIELD_NUMBER: _ClassVar[int]
     USER_INFO_FIELD_NUMBER: _ClassVar[int]
     user_id: str
+    limit: int
+    offset: int
     user_info: _common_pb2.UserInfo
     def __init__(
-        self, user_id: _Optional[str] = ..., user_info: _Optional[_Union[_common_pb2.UserInfo, _Mapping]] = ...
+        self,
+        user_id: _Optional[str] = ...,
+        limit: _Optional[int] = ...,
+        offset: _Optional[int] = ...,
+        user_info: _Optional[_Union[_common_pb2.UserInfo, _Mapping]] = ...,
     ) -> None: ...
 
 class FindVacanciesIDByUserIDResponse(_message.Message):
-    __slots__ = ("user_id", "vacancies_ids")
+    __slots__ = ("user_id", "limit", "offset", "vacancies_ids")
     USER_ID_FIELD_NUMBER: _ClassVar[int]
+    LIMIT_FIELD_NUMBER: _ClassVar[int]
+    OFFSET_FIELD_NUMBER: _ClassVar[int]
     VACANCIES_IDS_FIELD_NUMBER: _ClassVar[int]
     user_id: str
-    vacancies_ids: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, user_id: _Optional[str] = ..., vacancies_ids: _Optional[_Iterable[str]] = ...) -> None: ...
+    limit: int
+    offset: int
+    vacancies_ids: _containers.RepeatedScalarFieldContainer[int]
+    def __init__(
+        self,
+        user_id: _Optional[str] = ...,
+        limit: _Optional[int] = ...,
+        offset: _Optional[int] = ...,
+        vacancies_ids: _Optional[_Iterable[int]] = ...,
+    ) -> None: ...

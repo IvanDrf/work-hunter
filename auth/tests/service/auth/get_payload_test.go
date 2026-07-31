@@ -9,9 +9,12 @@ import (
 	"github.com/IvanDrf/work-hunter/auth/tests/common"
 	"github.com/IvanDrf/work-hunter/auth/tests/service/fixtures"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGetTokenPayload(t *testing.T) {
+	t.Parallel()
+
 	// create valid and invalud access jwt
 	validTokens, invalidTokens := common.CreateTokens()
 	auth := newAuthService()
@@ -34,18 +37,21 @@ func TestGetTokenPayload(t *testing.T) {
 			testInvalidTokensPayload(t, auth, token)
 		}
 	})
-
 }
 
 func testValidTokensPayload(t *testing.T, auth *service.AuthService, token string, payload *models.JwtPayload) {
+	t.Helper()
+
 	p, err := auth.GetTokenPayload(t.Context(), token)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	assert.Equal(t, payload.UserID, p.UserID)
 	assert.Equal(t, payload.Verificated, p.Verificated)
 }
 
 func testInvalidTokensPayload(t *testing.T, auth *service.AuthService, token string) {
+	t.Helper()
+
 	p, err := auth.GetTokenPayload(t.Context(), token)
 
 	var e models.Error

@@ -1,6 +1,9 @@
 package config
 
-import "fmt"
+import (
+	"fmt"
+	"net"
+)
 
 type PostgreConfig struct {
 	PostgresHost string `env:"POSTGRES_HOST"`
@@ -13,7 +16,7 @@ type PostgreConfig struct {
 }
 
 func (d *PostgreConfig) POSTGRES_DSN() string {
-	return fmt.Sprintf(
+	return fmt.Sprintf( //nolint:nosprintfhostport
 		"postgres://%s:%s@%s:%d/%s?sslmode=disable",
 		d.PostgresUser, d.PostgresPassword, d.PostgresHost, d.PostgresPort, d.PostgresDatabase,
 	)
@@ -21,12 +24,12 @@ func (d *PostgreConfig) POSTGRES_DSN() string {
 
 type RedisConfig struct {
 	RedisHost string `env:"REDIS_HOST"`
-	RedisPort int    `env:"REDIS_PORT"`
+	RedisPort string `env:"REDIS_PORT"`
 
 	RedisPassword string `env:"REDIS_PASSWORD"`
 	RedisDatabase int    `env:"REDIS_DATABASE"`
 }
 
 func (r *RedisConfig) REDIS_DSN() string {
-	return fmt.Sprintf("%s:%d", r.RedisHost, r.RedisPort)
+	return net.JoinHostPort(r.RedisHost, r.RedisPort)
 }

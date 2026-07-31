@@ -8,6 +8,7 @@ import (
 	"github.com/IvanDrf/work-hunter/auth/internal/infrastructure/service"
 	"github.com/IvanDrf/work-hunter/auth/tests/service/fixtures"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestSendVerificationEmail(t *testing.T) {
@@ -29,20 +30,23 @@ func TestSendVerificationEmail(t *testing.T) {
 }
 
 func testSendVerificationEmail(t *testing.T, verif *service.VerificationService) {
+	t.Helper()
+
 	sended := 0 // amount of sended emails, should be equal to email producer queue len
 	for email := range fixtures.Users {
 		sended++
 
 		err := verif.SendVerificationEmail(t.Context(), email)
-		assert.Nil(t, err)
-		assert.Equal(t, sended, len(Queue)) // len of email producer queue should increase and be equal to sended
+		require.NoError(t, err)
+		assert.Len(t, Queue, sended) // len of email producer queue should increase and be equal to sended
 	}
 }
 
 func testSendVerificationEmailUnregistredUsers(t *testing.T, verif *service.VerificationService) {
+	t.Helper()
+
 	sended := len(Queue)
 	for email := range fixtures.Unregistered {
-
 		err := verif.SendVerificationEmail(t.Context(), email)
 		var e models.Error
 		if errors.As(err, &e) {
@@ -51,6 +55,6 @@ func testSendVerificationEmailUnregistredUsers(t *testing.T, verif *service.Veri
 			t.Fatalf("send verif email: should me models error with code %s, actual %s", models.ErrCodeUserNotFound, err.Error())
 		}
 
-		assert.Equal(t, sended, len(Queue)) // len of email producer queue should not change and should be equal to sended
+		assert.Len(t, Queue, sended) // len of email producer queue should not change and should be equal to sended
 	}
 }

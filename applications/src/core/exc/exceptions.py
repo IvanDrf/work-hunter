@@ -2,17 +2,21 @@ class BaseError(Exception):
     pass
 
 
-class ArgumentError(Exception):
+class ArgumentError(BaseError):
     pass
 
 
-class InternalError(Exception):
+class InternalError(BaseError):
     pass
 
 
-class AccessError(Exception):
+class AccessError(BaseError):
     pass
 
 
-class AlreadyExistsError(Exception):
+class AlreadyExistsError(BaseError):
+    pass
+
+
+class NotFoundError(BaseError):
     pass

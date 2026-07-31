@@ -5,7 +5,7 @@ from src.core.config.database import PostgreSQLConfig
 
 __all__ = [
     "AppConfig",
-    "RabbitMQConfig",
-    "PostgreSQLConfig",
     "Config",
+    "PostgreSQLConfig",
+    "RabbitMQConfig",
 ]

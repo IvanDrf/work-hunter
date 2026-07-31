@@ -6,10 +6,10 @@ import (
 )
 
 type Handler struct {
+	auth_api.UnimplementedAuthServer
+
 	authService         service.AuthService
 	verificationService service.VerificationService
-
-	auth_api.UnimplementedAuthServer
 }
 
 func NewHandler(service service.AuthService, verificationService service.VerificationService) *Handler {
