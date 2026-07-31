@@ -9,10 +9,8 @@ from src.infrastructure.persistence.rabbitmq_broker import (
     declare_channel,
     declare_exchange,
 )
-from src.infrastructure.persistence.redis_saver import MessageRedisSaver, connect_to_redis
 from src.infrastructure.service.application import ApplicationService
 from src.infrastructure.service.application.dependencies import IApplicationProducer
-from src.infrastructure.service.application.utils import MessageBox
 
 
 class Fabric:
@@ -24,19 +22,13 @@ class Fabric:
         engine, session_maker = await connect_to_postgresql(self.config)
         uof = UnitOfWork(engine, session_maker)
 
-        redis = connect_to_redis(self.config)
-        message_saver = MessageRedisSaver(redis)
-
         application_producer = await self.new_application_producer()
-        message_box = MessageBox(self.config.app_message_box_size)
 
         application_service = ApplicationService(
             uof,
             application_repo,  # type: ignore
             self.config.postgres_timeout,
             application_producer,
-            message_box,
-            message_saver,
         )
 
         return ApplicationHandlers(application_service, self.config.service_timeout)

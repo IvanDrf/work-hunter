@@ -7,7 +7,6 @@ class AppConfig(BaseConfig):
     app_host: str = Field(default="localhost", validation_alias="APP_HOST")
     app_port: int = Field(default=50053, validation_alias="APP_PORT")
 
-    app_message_box_size: int = Field(default=10, ge=2, validation_alias="MESSAGE_BOX_SIZE")
     service_timeout: float = Field(default=2, validation_alias="SERVICE_TIMEOUT")
     workers: int = Field(default=4, gt=0, validation_alias="WORKERS")
     logger_level: str = Field(default="debug", validation_alias="LOGGER_LEVEL")
