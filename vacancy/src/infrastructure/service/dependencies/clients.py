@@ -1,6 +1,0 @@
-from typing import Protocol
-
-
-class IValidationServiceClient(Protocol):
-    async def is_metro_valid(self, city: str, metro: str) -> bool: ...
-    async def is_city_valid(self, city: str) -> bool: ...

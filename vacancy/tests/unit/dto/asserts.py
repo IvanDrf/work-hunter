@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Any, Protocol
 
-from google.protobuf.timestamp import Timestamp
+from google.protobuf.timestamp_pb2 import Timestamp
 from pkg.vacancy_api.vacancy_pb2 import CreateVacancyRequest
 from pkg.vacancy_api.vacancy_pb2 import Currency as PKGCurrency
 from pkg.vacancy_api.vacancy_pb2 import RemoteType as PKGRemoteType

@@ -3,4 +3,4 @@ from src.domain.models.base import Base
 from src.domain.models.tag import TagORM
 from src.domain.models.vacancy import VacancyORM
 
-__all__ = ["Base", "VacanciesTagsORM", "TagORM", "VacancyORM"]
+__all__ = ["Base", "TagORM", "VacanciesTagsORM", "VacancyORM"]

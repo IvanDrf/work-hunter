@@ -1,4 +1,4 @@
-from typing import Final
+from typing import ClassVar, Final
 
 from pydantic import ValidationInfo, field_validator
 
@@ -13,7 +13,7 @@ MAX_YEAR: Final[Year] = 1_000_000_000
 
 
 class SalaryValidatorMixin:
-    model_config = {"validate_assignment": True}
+    model_config: ClassVar = {"validate_assignment": True}
 
     @field_validator("salary_min")
     def validate_salary_min(cls, value: Money | UnsetValue | None, info: ValidationInfo) -> Money | UnsetValue | None:
@@ -45,7 +45,7 @@ class SalaryValidatorMixin:
 
 
 class ExperienceValidatorMixin:
-    model_config = {"validate_assignment": True}
+    model_config: ClassVar = {"validate_assignment": True}
 
     @field_validator("experience_min")
     def validate_experience_min(cls, value: Year | UnsetValue | None, info: ValidationInfo) -> Year | UnsetValue | None:

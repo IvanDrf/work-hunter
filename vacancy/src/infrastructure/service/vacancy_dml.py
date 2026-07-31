@@ -1,5 +1,5 @@
 from asyncio import create_task, gather
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from src.core.exc import AccessError, ArgumentError, NotFoundError
 from src.domain.models.vacancy import VacancyORM, VacancyStatus
@@ -9,7 +9,7 @@ from src.domain.schemas import UserInfo, VacancyCreateSchema, VacancyResponseSch
 from src.domain.types import UNSET_VALUE, UnsetValue
 from src.infrastructure.service.base_vacancy import BaseVacancyService
 from src.infrastructure.service.dependencies import ICache, ITagRepo, IUnitOfWork, IVacancyRepo, IValidationServiceClient
-from src.infrastructure.service.dto.vacancy_dto import (
+from src.infrastructure.service.vacancy_dto import (
     create_vacancy_dto,
     vacancy_orm_to_response_dto,
 )
@@ -30,7 +30,7 @@ class VacancyDMLService(BaseVacancyService):
 
         self.vacancy_repo: IVacancyRepo = vacancy_repo
         self.tag_repo: ITagRepo = tag_repo
-        self.uof_factory: IUnitOfWork = uof
+        self.uof: IUnitOfWork = uof
 
         self.validation_client: IValidationServiceClient = validation_client
 
@@ -47,13 +47,13 @@ class VacancyDMLService(BaseVacancyService):
         if not is_user_employer(user_info):
             raise AccessError("only employer can create vacancies")
 
-        vacancy_create_date = datetime.now(timezone.utc)
+        vacancy_create_date = datetime.now(UTC)
         vacancy_status = VacancyStatus.MODERATING
         vacancyORM = create_vacancy_dto(vacancy, user_info, vacancy_create_date, vacancy_status)
 
         vacancyORM.is_city_valid, vacancyORM.is_metro_valid = await self.__validate_city_and_metro(vacancy.city, vacancy.metro)
 
-        async with self.uof_factory as uof:
+        async with self.uof as uof:
             tags = await self.tag_repo.add_tags(uof, vacancy.tags)
             await self.vacancy_repo.create_vacancy(uof, vacancyORM, tags)
 
@@ -75,7 +75,7 @@ class VacancyDMLService(BaseVacancyService):
         if not is_user_admin(user_info):
             raise AccessError("you can't change vacancy status, you are not admin")
 
-        async with self.uof_factory as uof:
+        async with self.uof as uof:
             fields = create_fields_for_status_update(status, moderator_comments)
             await self.vacancy_repo.update_vacancy(uof, vacancy_id, fields)
 
@@ -87,7 +87,7 @@ class VacancyDMLService(BaseVacancyService):
             await self.__delete_vacancy_by_admin(vacancy_id)
             return
 
-        async with self.uof_factory as uof:
+        async with self.uof as uof:
             author_id = await self.vacancy_repo.find_vacancy_author(uof, vacancy_id)
 
         if author_id is None:
@@ -96,7 +96,7 @@ class VacancyDMLService(BaseVacancyService):
         if not is_user_vacancy_author(author_id, user_info.user_id):
             raise AccessError("you have no rights to delete vacancy, you didn't created")
 
-        async with self.uof_factory as uof:
+        async with self.uof as uof:
             await self.vacancy_repo.delete_vacancy(uof, vacancy_id)
 
     async def update_vacancy(self, vacancy_update_schema: VacancyUpdateSchema, user_info: UserInfo) -> VacancyResponseSchema:
@@ -105,7 +105,7 @@ class VacancyDMLService(BaseVacancyService):
 
         fields = create_fields_for_update(vacancy_update_schema)
 
-        async with self.uof_factory as uof:
+        async with self.uof as uof:
             vacancy = await self.vacancy_repo.find_vacancy_by_id(uof, vacancy_update_schema.vacancy_id)
             if vacancy is None:
                 raise NotFoundError(f"can't find vacancy with given vacancy_id={vacancy_update_schema.vacancy_id}")
@@ -132,7 +132,7 @@ class VacancyDMLService(BaseVacancyService):
         return vacancy_orm_to_response_dto(vacancy)
 
     async def __delete_vacancy_by_admin(self, vacancy_id: int) -> None:
-        async with self.uof_factory as uof:
+        async with self.uof as uof:
             vacancy = await self.vacancy_repo.find_vacancy_by_id(uof, vacancy_id)
             if vacancy is None:
                 raise NotFoundError(f"can't find vacancy with {vacancy_id=}")
@@ -181,13 +181,13 @@ def create_fields_for_update(vacancy_update_schema: VacancyUpdateSchema) -> dict
     if not fields and isinstance(vacancy_update_schema.tags, UnsetValue):
         raise ArgumentError("no fields were given to update")
 
-    fields["updated_at"] = datetime.now(timezone.utc)
+    fields["updated_at"] = datetime.now(UTC)
     return fields
 
 
 def create_fields_for_status_update(status: VacancyStatus, moderator_comments: str) -> dict:
     fields: dict = {"status": status}
-    updated_time = datetime.now(timezone.utc)
+    updated_time = datetime.now(UTC)
 
     match status:
         case VacancyStatus.PUBLISHED:

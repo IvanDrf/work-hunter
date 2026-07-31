@@ -19,6 +19,8 @@ class BaseVacancyService:
         self.VACANCY_TTL: Final[timedelta] = vacancy_ttl
         self.CACHE_TIMEOUT: Final[float] = cache_timeout
 
+        self.logger = logging.getLogger("BaseVacancyService")
+
     async def _save_vacancy_in_cache_by_id(self, vacancy: VacancyResponseSchema) -> None:
         vacancy_json = vacancy.model_dump_json()
 
@@ -30,10 +32,10 @@ class BaseVacancyService:
             return VacancyResponseSchema.model_validate_json(vacancy_json) if vacancy_json is not None else None
 
         except ValidationError as e:
-            logging.error(f"Invalid vacancy json in cache, can't parse it, error={e}")
+            self.logger.error(f"Invalid vacancy json in cache, can't parse it, error={e}")
 
         except TimeoutError:
-            logging.error(f"Can't get vacancy with {vacancy_id=} form cache, timeout error")
+            self.logger.error(f"Can't get vacancy with {vacancy_id=} form cache, timeout error")
 
     async def _save_vacancies_by_author(
         self,
@@ -64,10 +66,10 @@ class BaseVacancyService:
             return Vacancies.validate_json(vacancies_json) if vacancies_json is not None else None
 
         except ValidationError as e:
-            logging.error(f"Invalid vacancies json in cache, can't parse it, error={e}")
+            self.logger.error(f"Invalid vacancies json in cache, can't parse it, error={e}")
 
         except TimeoutError:
-            logging.error(f"Can't get vacancy by author with args {author=}, {offset=}, {limit=} form cache, timeout error")
+            self.logger.error(f"Can't get vacancy by author with args {author=}, {offset=}, {limit=} form cache, timeout error")
 
 
 def generate_cache_key(author: str, order_by: OrderBy, user_info: UserInfo | None, offset: int, limit: int) -> str:
