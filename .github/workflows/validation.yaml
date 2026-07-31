@@ -25,6 +25,10 @@ jobs:
         working-directory: ./validation
         run: uv sync --locked --all-extras --dev
 
+      - name: Run ruff check
+        working-directory: ./validation
+        run: uv run ruff check
+
       - name: Run tests
         working-directory: ./validation
         run: chmod +x run_tests.sh && ./run_tests.sh
