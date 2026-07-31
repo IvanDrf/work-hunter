@@ -44,26 +44,6 @@ services:
       retries: 5
       start_period: 5s
 
-  broker:
-    image: rabbitmq:4.3.0
-    container_name: vacancy_broker
-    ports:
-      - "${RABBITMQ_OUTPUT_PORT}:5672"
-    environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
-    networks:
-      - vacancy_network
-      - shared_network
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_port_connectivity"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-      start_period: 15s
-
   prometheus:
     image: prom/prometheus:v3
     container_name: vacancy_prometheus
@@ -73,7 +53,6 @@ services:
       - "${PROMETHEUS_PORT}:9090"
     networks:
       - vacancy_network
-
 
 
   vacancy_app:
@@ -89,8 +68,6 @@ services:
         condition: service_healthy
       cache:
         condition: service_healthy
-      broker:
-        condition: service_healthy
       
     networks:
       - vacancy_network
@@ -100,7 +77,6 @@ services:
 volumes:
   pgdata:
   redis_data:
-  rabbitmq_data:
 
 networks:
   vacancy_network:

@@ -1,7 +1,6 @@
 import logging
 from asyncio import wait_for
 
-from applications.src.api.grpc.dto.user_info import user_info_dto
 from grpc.aio import ServicerContext
 from pkg.applications_api.applications_pb2 import (
     FindVacanciesIDByUserIDRequest,
@@ -13,6 +12,7 @@ from pkg.common.common_pb2 import Response, ResponseStatus, ServiceStatus, Statu
 
 from src.api.grpc.dependencies import IApplicationService
 from src.api.grpc.dto import application_dto
+from src.api.grpc.dto.user_info import user_info_dto
 from src.api.grpc.utils import handle_errors, validate_limit_offset
 
 
