@@ -1,4 +1,4 @@
-from sqlalchemy import delete, update
+from sqlalchemy import case, delete, update
 from sqlalchemy.exc import DBAPIError, SQLAlchemyError
 
 from src.core.exc import InternalError
@@ -32,3 +32,16 @@ class VacancyDMLRepo:
             raise InternalError(f"can't update vacancy with {vacancy_id=}")
 
         return vacancy
+
+    @catch_raise_error((SQLAlchemyError, DBAPIError), InternalError, "critical", "can't update vacancies")
+    async def update_vacancies(self, uof: UnitOfWork, fields: list[dict]) -> None:
+        query = (
+            update(VacancyORM)
+            .where(VacancyORM.vacancy_id.in_(field["vacancy_id"] for field in fields))
+            .values(
+                applications_count=VacancyORM.applications_count
+                + case(*[VacancyORM.vacancy_id == field["vacancy_id"] for field in fields], else_=0)
+            )
+        )
+
+        await uof.session.execute(query)
