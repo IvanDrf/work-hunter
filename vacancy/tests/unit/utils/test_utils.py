@@ -31,7 +31,7 @@ async def test_catch_raise_error(catch_err, raise_err, message, caplog) -> None:
     for level, level_str in levels.items():
         caplog.set_level(level)
 
-        @catch_raise_error((catch_err,), raise_err, level_str.lower(), message)  # type: ignore
+        @catch_raise_error((catch_err,), raise_error=raise_err, logger_level=level_str.lower(), message=message)  # type: ignore
         async def wrap(err: type[Exception], *, raise_err: bool, message: str) -> str:
             if raise_err is True:
                 raise err(message)

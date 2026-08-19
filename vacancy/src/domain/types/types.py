@@ -1,6 +1,9 @@
 from typing import Any, ClassVar, Final
 
 from pydantic_core import CoreSchema, core_schema
+from sqlalchemy.exc import DBAPIError, SQLAlchemyError
+
+DBErrors = (DBAPIError, SQLAlchemyError)
 
 type Money = int
 type Year = int

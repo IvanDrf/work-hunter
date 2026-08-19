@@ -1,26 +1,25 @@
 from uuid import UUID
 
 from sqlalchemy import and_, select, text
-from sqlalchemy.exc import DBAPIError, SQLAlchemyError
 from sqlalchemy.orm import selectinload
 
 from src.core.exc import InternalError
 from src.domain.models import TagORM, VacanciesTagsORM, VacancyORM
 from src.domain.models.vacancy import VacancyStatus
-from src.domain.types import OrderBy
+from src.domain.types import DBErrors, OrderBy
 from src.infrastructure.persistence.postgresql_repo.unit_of_work import UnitOfWork
 from src.utils.catch_error import catch_raise_error
 
 
 class VacancySearchRepo:
-    @catch_raise_error((SQLAlchemyError, DBAPIError), InternalError, "critical", "can't find vacancy with given vacancy_id")
+    @catch_raise_error(DBErrors, raise_error=InternalError, message="can't find vacancy with given vacancy_id")
     async def find_vacancy_by_id(self, uof: UnitOfWork, vacancy_id: int) -> VacancyORM | None:
         query = select(VacancyORM).where(VacancyORM.vacancy_id == vacancy_id).options(selectinload(VacancyORM.tags))
 
         res = await uof.session.execute(query)
         return res.scalar_one_or_none()
 
-    @catch_raise_error((SQLAlchemyError, DBAPIError), InternalError, "critical", "can't find vacancies with given tags")
+    @catch_raise_error(DBErrors, raise_error=InternalError, message="can't find vacancies with given tags")
     async def find_only_published_vacancies_with_tags(
         self,
         uof: UnitOfWork,
@@ -45,7 +44,7 @@ class VacancySearchRepo:
 
         return vacancies if len(vacancies) > 0 else None
 
-    @catch_raise_error((SQLAlchemyError, DBAPIError), InternalError, "critical", "can't find vacancies with given tags")
+    @catch_raise_error(DBErrors, raise_error=InternalError, message="can't find vacancies with given tags")
     async def find_vacancies_for_admin_with_tags(
         self,
         uof: UnitOfWork,
@@ -70,7 +69,7 @@ class VacancySearchRepo:
 
         return vacancies if len(vacancies) > 0 else None
 
-    @catch_raise_error((SQLAlchemyError, DBAPIError), InternalError, "critical", "can't find vacancies by author_id")
+    @catch_raise_error(DBErrors, raise_error=InternalError, message="can't find vacancies by author_id")
     async def find_vacancies_by_author_id(
         self,
         uof: UnitOfWork,
@@ -93,7 +92,7 @@ class VacancySearchRepo:
 
         return vacancies if len(vacancies) > 0 else None
 
-    @catch_raise_error((SQLAlchemyError, DBAPIError), InternalError, "critical", "can't find vacancies by author")
+    @catch_raise_error(DBErrors, raise_error=InternalError, message="can't find vacancies by author")
     async def find_only_published_vacancies_by_author(
         self,
         uof: UnitOfWork,
@@ -116,7 +115,7 @@ class VacancySearchRepo:
 
         return vacancies if len(vacancies) > 0 else None
 
-    @catch_raise_error((SQLAlchemyError, DBAPIError), InternalError, "critical", "can't find vacancies by author for admin")
+    @catch_raise_error(DBErrors, raise_error=InternalError, message="can't find vacancies by author for admin")
     async def find_vacancies_for_admin_by_author(
         self,
         uof: UnitOfWork,
@@ -139,14 +138,14 @@ class VacancySearchRepo:
 
         return vacancies if len(vacancies) > 0 else None
 
-    @catch_raise_error((SQLAlchemyError, DBAPIError), InternalError, "critical", "can't find author_id by vacancy_id")
+    @catch_raise_error(DBErrors, raise_error=InternalError, message="can't find author_id by vacancy_id")
     async def find_vacancy_author(self, uof: UnitOfWork, vacancy_id: int) -> UUID | None:
         query = select(VacancyORM.author_id).where(VacancyORM.vacancy_id == vacancy_id)
 
         author_id = await uof.session.execute(query)
         return author_id.scalar_one_or_none()
 
-    @catch_raise_error((SQLAlchemyError, DBAPIError), InternalError, "critical", "can't find vacancies for admin by title")
+    @catch_raise_error(DBErrors, raise_error=InternalError, message="can't find vacancies for admin by title")
     async def find_vacancies_for_admin_by_title(
         self,
         uof: UnitOfWork,
@@ -169,7 +168,7 @@ class VacancySearchRepo:
 
         return list(vacancies) if len(vacancies) > 0 else None
 
-    @catch_raise_error((SQLAlchemyError, DBAPIError), InternalError, "critical", "can't find vacancies for admin by title")
+    @catch_raise_error(DBErrors, raise_error=InternalError, message="can't find vacancies for admin by title")
     async def find_only_published_vacancies_by_title(
         self,
         uof: UnitOfWork,
