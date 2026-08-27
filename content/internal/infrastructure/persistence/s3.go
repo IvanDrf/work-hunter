@@ -30,7 +30,7 @@ func (r *s3Repository) getPath(userID string, cType models.ContentType) string {
 
 func (r *s3Repository) Upload(ctx context.Context, file io.Reader, metadata *models.ContentMetadata) error {
 	path := r.getPath(metadata.UserID, metadata.Type)
-	opts := minio.PutObjectOptions{ContentType: metadata.ContentType}
+	opts := minio.PutObjectOptions{ContentType: metadata.MimeType}
 
 	_, err := r.client.PutObject(ctx, r.bucket, path, file, metadata.Size, opts)
 	if err != nil {
@@ -58,10 +58,10 @@ func (r *s3Repository) Download(ctx context.Context, userID string, cType models
 	}
 
 	meta := &models.ContentMetadata{
-		UserID:      userID,
-		Type:        cType,
-		ContentType: stat.ContentType,
-		Size:        stat.Size,
+		UserID:   userID,
+		Type:     cType,
+		MimeType: stat.ContentType,
+		Size:     stat.Size,
 	}
 	return obj, meta, nil
 }

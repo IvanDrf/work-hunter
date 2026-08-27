@@ -8,8 +8,8 @@ const (
 )
 
 type ContentMetadata struct {
-	UserID      string
-	Type        ContentType
-	ContentType string //MIME (application/pdf, image/jpeg)
-	Size        int64
+	UserID   string
+	Type     ContentType
+	MimeType string //MIME (application/pdf, image/jpeg)
+	Size     int64
 }
