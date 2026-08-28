@@ -13,7 +13,7 @@ type Config struct {
 	RabbitMQConfig
 }
 
-func LoadFomEnv() *Config {
+func LoadFromEnv() *Config {
 	if err := godotenv.Load(); err != nil {
 		log.Fatalf("can't load config settings from .env, error=%s", err)
 	}

@@ -10,25 +10,25 @@ import (
 	"github.com/minio/minio-go/v7"
 )
 
-type s3Repository struct {
+type S3Repository struct {
 	client *minio.Client
 	bucket string
 	log    *slog.Logger
 }
 
-func NewS3Repository(client *minio.Client, bucket string, log *slog.Logger) *s3Repository {
-	return &s3Repository{
+func NewS3Repository(client *minio.Client, bucket string, log *slog.Logger) *S3Repository {
+	return &S3Repository{
 		client: client,
 		bucket: bucket,
 		log:    log,
 	}
 }
 
-func (r *s3Repository) getPath(userID string, cType models.ContentType) string {
+func (r *S3Repository) getPath(userID string, cType models.ContentType) string {
 	return fmt.Sprintf("%s/%s", cType, userID)
 }
 
-func (r *s3Repository) Upload(ctx context.Context, file io.Reader, metadata *models.ContentMetadata) error {
+func (r *S3Repository) Upload(ctx context.Context, file io.Reader, metadata *models.ContentMetadata) error {
 	path := r.getPath(metadata.UserID, metadata.Type)
 	opts := minio.PutObjectOptions{ContentType: metadata.MimeType}
 
@@ -40,7 +40,7 @@ func (r *s3Repository) Upload(ctx context.Context, file io.Reader, metadata *mod
 	return nil
 }
 
-func (r *s3Repository) Download(ctx context.Context, userID string, cType models.ContentType) (io.ReadCloser, *models.ContentMetadata, error) {
+func (r *S3Repository) Download(ctx context.Context, userID string, cType models.ContentType) (io.ReadCloser, *models.ContentMetadata, error) {
 	path := r.getPath(userID, cType)
 
 	obj, err := r.client.GetObject(ctx, r.bucket, path, minio.GetObjectOptions{})
@@ -66,7 +66,7 @@ func (r *s3Repository) Download(ctx context.Context, userID string, cType models
 	return obj, meta, nil
 }
 
-func (r *s3Repository) Delete(ctx context.Context, userID string, cType models.ContentType) error {
+func (r *S3Repository) Delete(ctx context.Context, userID string, cType models.ContentType) error {
 	path := r.getPath(userID, cType)
 	if err := r.client.RemoveObject(ctx, r.bucket, path, minio.RemoveObjectOptions{}); err != nil {
 		r.log.Error("failed to delete from s3", slog.String("error", err.Error()))
