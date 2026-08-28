@@ -12,4 +12,5 @@ type ContentService interface {
 	UploadAvatar(ctx context.Context, userID string, file io.Reader, size int64) error
 	GetContent(ctx context.Context, userID string, cType models.ContentType) (io.ReadCloser, *models.ContentMetadata, error)
 	DeleteContent(ctx context.Context, userID string, cType models.ContentType) error
+	DeleteAllUserContent(ctx context.Context, userID string) error
 }

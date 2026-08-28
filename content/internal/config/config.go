@@ -10,6 +10,7 @@ import (
 type Config struct {
 	AppConfig
 	S3Config
+	RabbitMQConfig
 }
 
 func LoadFomEnv() *Config {

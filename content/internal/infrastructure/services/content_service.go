@@ -65,3 +65,19 @@ func (s *contentService) DeleteContent(ctx context.Context, userID string, cType
 	s.log.Info("deleting content", slog.String("userID", userID), slog.String("type", string(cType)))
 	return s.repo.Delete(ctx, userID, cType)
 }
+
+func (s *contentService) DeleteAllUserContent(ctx context.Context, userID string) error {
+	s.log.Info("cascade deleting all content for deleted user", slog.String("userID", userID))
+
+	if err := s.repo.Delete(ctx, userID, models.TypeResume); err != nil {
+		s.log.Error("failed to delete resume during cascade wipe", slog.String("userID", userID), slog.String("error", err.Error()))
+		return err
+	}
+
+	if err := s.repo.Delete(ctx, userID, models.TypeAvatar); err != nil {
+		s.log.Error("failed to delete avatar during cascade wipe", slog.String("userID", userID), slog.String("error", err.Error()))
+		return err
+	}
+
+	return nil
+}
