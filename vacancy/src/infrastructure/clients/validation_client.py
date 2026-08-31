@@ -83,9 +83,11 @@ class ValidationClient:
         )
 
         if response.status_code == codes.NO_CONTENT:
+            await response.aclose()
             return True
 
         if response.status_code == codes.NOT_FOUND:
+            await response.aclose()
             return False
 
         code = response.status_code

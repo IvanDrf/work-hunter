@@ -7,9 +7,9 @@ from src.domain.rules.user import is_user_admin, is_user_employer, is_user_vacan
 from src.domain.rules.vacancy import is_vacancy_id_valid
 from src.domain.schemas import UserInfo, VacancyCreateSchema, VacancyResponseSchema, VacancyUpdateSchema
 from src.domain.types import UNSET_VALUE, UnsetValue
-from src.infrastructure.service.base_vacancy import BaseVacancyService
 from src.infrastructure.service.dependencies import ICache, ITagRepo, IUnitOfWork, IVacancyRepo, IValidationServiceClient
-from src.infrastructure.service.vacancy_dto import (
+from src.infrastructure.service.vacancy.base_vacancy import BaseVacancyService
+from src.infrastructure.service.vacancy.vacancy_dto import (
     create_vacancy_dto,
     vacancy_orm_to_response_dto,
 )

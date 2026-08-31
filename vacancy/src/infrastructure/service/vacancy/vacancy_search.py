@@ -7,9 +7,9 @@ from src.domain.rules.user import is_user_admin, is_user_employee, is_user_emplo
 from src.domain.rules.vacancy import has_right_to_vacancy, is_vacancy_id_valid
 from src.domain.schemas import UserInfo, VacancyResponseSchema
 from src.domain.types import OrderBy, VacancyStatus
-from src.infrastructure.service.base_vacancy import BaseVacancyService
 from src.infrastructure.service.dependencies import ICache, IUnitOfWork, IVacancyRepo
-from src.infrastructure.service.vacancy_dto import vacancy_orm_to_response_dto
+from src.infrastructure.service.vacancy.base_vacancy import BaseVacancyService
+from src.infrastructure.service.vacancy.vacancy_dto import vacancy_orm_to_response_dto
 
 
 class VacancySearchService(BaseVacancyService):

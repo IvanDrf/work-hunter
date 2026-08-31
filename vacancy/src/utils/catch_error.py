@@ -12,10 +12,10 @@ logger_levels = {
 
 
 def catch_raise_error(
-    expect_error: tuple[type[Exception], ...] | type[Exception],
+    expect_error: tuple[type[Exception], ...],
     raise_error: type[Exception],
-    logger_level: Literal["debug", "info", "warning", "error", "critical"],
     message: str,
+    logger_level: Literal["debug", "info", "warning", "error", "critical"] = "critical",
 ):
     def decorator(func):
         @wraps(func)

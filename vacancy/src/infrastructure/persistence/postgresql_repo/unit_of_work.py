@@ -28,5 +28,7 @@ class UnitOfWork:
         await self.session.flush()
 
     async def stop(self) -> None:
-        await self.session.close_all()
+        if hasattr(self, "session") and self.session is not None:
+            await self.session.close_all()
+
         await self.engine.dispose()

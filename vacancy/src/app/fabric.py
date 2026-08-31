@@ -10,9 +10,8 @@ from src.infrastructure.persistence.postgresql_repo import TagRepo, UnitOfWork, 
 from src.infrastructure.persistence.postgresql_repo import connect as connect_postgresql
 from src.infrastructure.persistence.redis_cache import RedisCache
 from src.infrastructure.persistence.redis_cache import connect as connect_redis
-from src.infrastructure.service.application import ApplicationService
+from src.infrastructure.service import ApplicationService, VacancyService
 from src.infrastructure.service.dependencies import ICache, ITagRepo, IUnitOfWork, IVacancyRepo, IValidationServiceClient
-from src.infrastructure.service.vacancy_service import VacancyService
 
 
 class Fabric:
